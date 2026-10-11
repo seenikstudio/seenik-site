@@ -1006,7 +1006,8 @@
 #phone-hold { display: none; }
 @media (max-width: 760px) {
   #phone-hold { display: grid; position: fixed; inset: 0; z-index: 100000; background: #000; color: #f2f4f7; place-content: center; justify-items: center; gap: 26px; padding: 32px 28px; text-align: center; font: 400 13px/1.8 'IBM Plex Mono', ui-monospace, Menlo, monospace; }
-  #phone-hold img { width: min(78vw, 340px); display: block; }
+  #phone-hold img { width: 106vw; max-width: none; display: block; transform: translateX(-6.65%); margin-block: -6vw -2vw; }   /* big, with the white wordmark centred on the screen */
+  #phone-hold { overflow: hidden; }
   #phone-hold h1 { margin: 0; font: 400 15px/1.6 'IBM Plex Mono', monospace; letter-spacing: .3em; text-transform: uppercase; }
   #phone-hold p { margin: 0; max-width: 30ch; color: rgba(242,244,247,.85); }
   #phone-hold .mail { letter-spacing: .08em; border-bottom: 1px solid rgba(242,244,247,.4); padding-bottom: 3px; user-select: all; }
