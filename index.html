@@ -1866,6 +1866,8 @@
   const ePos = new Float32Array(ALL * 3), eCol = new Float32Array(ALL * 3);
   const ePts = [], eVel = [];
   for (let i = 0; i < ALL; i++) { ePts.push(new THREE.Vector3()); eVel.push(new THREE.Vector3()); }
+  const eHand = new Uint8Array(ALL);   // field points handed to The Mirror page: hidden here, carried on by its triangles
+  let mirHand = null;                   // { pts: [{x, y}] screen px, t0 } — picked up by mirTri()
   const eGeo = new THREE.BufferGeometry();
   eGeo.setAttribute('position', new THREE.BufferAttribute(ePos, 3));
   eGeo.setAttribute('color', new THREE.BufferAttribute(eCol, 3));
@@ -1899,7 +1901,7 @@
     return [mid - half, mid + half];
   }
   function startField() {   // Begin was clicked: the square opens into the top + bottom lines, the wall breaks into the field
-    endMode = 'field'; endT = 0;
+    endMode = 'field'; endT = 0; eHand.fill(0);
     const [topPx, botPx] = bandPx();
     {   // same triangle size as the wall: link distance and spacing come from the wall's edge length
       const dist = camera.position.z - 0.3, visH = 2 * dist * Math.tan(THREE.MathUtils.degToRad(22.5)), visW = visH * camera.aspect;
@@ -1996,6 +1998,7 @@
       }
       const L = fieldL;   // links match the wall's triangle size
       for (let i = 0; i < PFN && nLines < MAXL; i++) for (let j = i + 1; j < PFN && nLines < MAXL; j++) {
+        if (eHand[i] || eHand[j]) continue;
         const a = ePts[i], b = ePts[j], d = Math.hypot(a.x - b.x, a.y - b.y);
         if (d < L) {
           const o = nLines * 6, c = 0.72 * (0.4 + (1 - d / L) * 0.6) * Math.min(1, (1 - d / L) * 3) * endVis;   // dome brightness, soft only at the very end of a link
@@ -2007,7 +2010,7 @@
       if (mouse.active) {   // particles.js "grab": faint lines reach toward the cursor
         for (let i = 0; i < PFN && nLines < MAXL; i++) {
           const a = ePts[i], d = Math.hypot(a.x - curWorld.x, a.y - curWorld.y);
-          if (d < 1.1 && d > 0.7) {
+          if (d < 1.1 && d > 0.7 && !eHand[i]) {
             const o = nLines * 6, c = (1 - d / 1.1) * 0.5;
             elPos[o] = a.x; elPos[o + 1] = a.y; elPos[o + 2] = a.z; elPos[o + 3] = curWorld.x; elPos[o + 4] = curWorld.y; elPos[o + 5] = 0.3;
             elCol[o] = elCol[o + 3] = c; elCol[o + 1] = elCol[o + 4] = c; elCol[o + 2] = elCol[o + 5] = c;
@@ -2021,7 +2024,7 @@
       let edgeF = 1;
       // (the wall now connects to the border instead of fading)
       eFade[i] = edgeF;
-      const b = 0.95 * endVis * edgeF; eCol[o] = b * 0.92; eCol[o + 1] = b * 0.96; eCol[o + 2] = b;   // same as the dome's points
+      const b = eHand[i] ? 0 : 0.95 * endVis * edgeF; eCol[o] = b * 0.92; eCol[o + 1] = b * 0.96; eCol[o + 2] = b;   // same as the dome's points
     }
     eGeo.setDrawRange(0, count); elGeo.setDrawRange(0, nLines * 2);
     eGeo.attributes.position.needsUpdate = true; eGeo.attributes.color.needsUpdate = true;
@@ -2156,7 +2159,16 @@
   function openPage(key) {   // The Studio / The Mirror: the rings burst, the scene fades, the page comes up
     phase = 'artist'; phaseT = 0;
     const ring = menuRings.find(m => m.btn.dataset.key === key);
-    for (let i = 0; i < PFN; i++) { const a = Math.random() * Math.PI * 2, s2 = 0.06 + Math.random() * 0.12; eVel[i].set(Math.cos(a) * s2, Math.sin(a) * s2, 0); }
+    eHand.fill(0); mirHand = null;
+    if (key === 'mirror' && endMode === 'field') {   // the field's points on screen travel on into The Mirror's clusters instead of bursting
+      endGroup.updateMatrixWorld(); const on = [], v = new THREE.Vector3();
+      for (let i = 0; i < PFN; i++) { v.copy(ePts[i]).applyMatrix4(endGroup.matrixWorld).project(camera);
+        const x = (v.x + 1) / 2 * innerWidth, y = (1 - v.y) / 2 * innerHeight; if (x > -20 && x < innerWidth + 20 && y > -20 && y < innerHeight + 20) on.push({ i, x, y }); }
+      for (let k = on.length - 1; k > 0; k--) { const j = Math.random() * (k + 1) | 0; [on[k], on[j]] = [on[j], on[k]]; }
+      const take = on.slice(0, 78); take.forEach(o => eHand[o.i] = 1);   // 78 = the Mirror's cluster points
+      if (take.length) mirHand = { pts: take.map(o => ({ x: o.x, y: o.y })), t0: performance.now() };
+    }
+    for (let i = 0; i < PFN; i++) { if (eHand[i]) { eVel[i].set(0, 0, 0); continue; } const a = Math.random() * Math.PI * 2, s2 = 0.06 + Math.random() * 0.12; eVel[i].set(Math.cos(a) * s2, Math.sin(a) * s2, 0); }
     menuRings.forEach(m => { for (let i = 0; i < m.n; i++) { const a = Math.random() * Math.PI * 2, s2 = 0.04 + Math.random() * 0.1; m.vel[i].set(Math.cos(a) * s2, Math.sin(a) * s2, 0); } m.burst = true; });
     spawnStars((ring && ring.sx) || innerWidth / 2, (ring && ring.sy) || innerHeight / 2, 80, 5);
     document.body.classList.add('artist-on');
@@ -2187,7 +2199,7 @@
     setTimeout(() => { SV.classList.remove('arriving'); f2.style.transition = 'opacity .35s ease'; f2.style.opacity = '0'; setTimeout(() => f2.remove(), 380); }, 1250);
   }
   function closeArtist() {
-    clearInterval(flipTimer);
+    clearInterval(flipTimer); eHand.fill(0);
     if (typeof SV !== 'undefined') { SV.classList.remove('on'); AV.classList.remove('away'); }
     if (fly) { fly.remove(); fly = null; }
     AV.classList.remove('on', 'ready', 'named'); avName.classList.add('waiting'); avName.getAnimations().forEach(x => x.cancel());
@@ -2711,6 +2723,7 @@
   // Grab any cluster and throw it; it glides, then finds its way home. Points never settle on the writing.
   (function mirTri() {
     let cv = null, g, W, H, HH, pts = [], cl = [], last = 0, mx = -1e4, my = -1e4, drag = null, boxes = [], noClick = false;
+    let fly = null, ov = null, og = null;   // the hand-off from the opening: points arrive from where the field left them, drawn on a screen overlay until they land
     const near = (x, y) => { let best = null, bd = 30; for (const p of pts) { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = p; } } return best; };
     const measure = () => {   // the canvas runs from the top of the eye to the bottom of the first statement
       const st = cv.parentElement, hero = st.querySelector('.mir-hero'), first = SV.querySelector('.mir-first'), sr = st.getBoundingClientRect();
@@ -2740,6 +2753,18 @@
         for (let i = 0; i < n; i++) { let ox, oy, t = 0; do { const a = Math.random() * 7, r = R * Math.sqrt(Math.random()); ox = Math.cos(a) * r; oy = Math.sin(a) * r * .8; t++; }
           while (t < 40 && pts.some(o => o.k === k && Math.hypot(o.ox - ox, o.oy - oy) < E * .62));
           pts.push({ k, x: q.x + ox, y: q.y + oy, vx: 0, vy: 0, ox, oy, ph: Math.random() * 7, sp: .25 + Math.random() * .3 }); } });
+      fly = null; if (ov) { ov.remove(); ov = null; }
+      if (mirHand && performance.now() - mirHand.t0 < 1500) {   // each cluster point starts at the nearest handed-over field point, then drifts home
+        const src = mirHand.pts, used = new Uint8Array(src.length), cr = cv.getBoundingClientRect(); let end = 0; mirHand = null;
+        for (const p of pts) { let bi = -1, bd = 1e12, fi = -1, fd = 1e12;
+          src.forEach((s, i) => { const d = (s.x - cr.left - p.x) ** 2 + (s.y - cr.top - p.y) ** 2; if (d < fd) { fd = d; fi = i; } if (!used[i] && d < bd) { bd = d; bi = i; } });
+          const i = bi >= 0 ? bi : fi; used[i] = 1;
+          p.fx = src[i].x; p.fy = src[i].y; p.fd = .05 + Math.random() * .55; p.fD = 1.5 + Math.random() * .8; p.fc = (Math.random() - .5) * .5;
+          end = Math.max(end, p.fd + p.fD); }
+        fly = { t0: performance.now(), end };
+        ov = document.createElement('canvas'); ov.setAttribute('aria-hidden', 'true'); ov.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:6';
+        document.body.appendChild(ov); og = ov.getContext('2d');
+      }
       dotC = document.createElement('canvas'); dotC.width = dotC.height = 64; const dg = dotC.getContext('2d'), gr = dg.createRadialGradient(32, 32, 0, 32, 32, 32);   // the field's point sprite
       gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.25, 'rgba(230,240,255,.85)'); gr.addColorStop(1, 'rgba(200,220,255,0)'); dg.fillStyle = gr; dg.fillRect(0, 0, 64, 64);
     };
@@ -2759,9 +2784,9 @@
     SV.addEventListener('dragstart', e => { if (e.target.closest('.mir-stage')) e.preventDefault(); });
     const tick = now => {
       requestAnimationFrame(tick);
-      const c = document.querySelector('.mir-tri'); if (!c) { cv = null; return; }
+      const c = document.querySelector('.mir-tri'); if (!c) { cv = null; if (ov) { ov.remove(); ov = null; fly = null; } return; }
       if (c !== cv) setup(c); else if (now % 1000 < 20) measure();
-      if (Math.abs(c.parentElement.getBoundingClientRect().width - W) > 2) setup(c);
+      if (Math.abs(c.parentElement.getBoundingClientRect().width - W) > 2) { if (fly) measure(); else setup(c); }
       const dt = Math.min(.05, (now - last) / 1000 || .016); last = now;
       const L = E * 1.3;
       cl.forEach((q, k) => {
@@ -2785,18 +2810,31 @@
         }
         const dm = held ? .75 : .9; p.vx *= dm; p.vy *= dm; p.x += p.vx * dt; p.y += p.vy * dt;
       }
-      g.clearRect(0, 0, W, H); g.lineWidth = .8;
-      for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) {   // links, as in the opening: brighter when closer; clusters join when they meet
-        const a = pts[i], b = pts[j], dx = a.x - b.x; if (dx > L || dx < -L) continue; const d = Math.hypot(dx, a.y - b.y);
-        if (d < L) { const c2 = .72 * (.4 + (1 - d / L) * .6) * Math.min(1, (1 - d / L) * 3); g.strokeStyle = `rgba(${242 * .95 | 0},${247 * .97 | 0},255,${c2 * .7})`; g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(b.x, b.y); g.stroke(); }
+      g.clearRect(0, 0, W, H);
+      let P = pts;
+      if (fly) {   // in flight: soft ease along a gently curved path from the field's point to where the cluster has it now
+        const ft = (now - fly.t0) / 1000, cr = cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+        if (ov.width !== Math.round(innerWidth * dpr) || ov.height !== Math.round(innerHeight * dpr)) { ov.width = Math.round(innerWidth * dpr); ov.height = Math.round(innerHeight * dpr); }
+        og.setTransform(1, 0, 0, 1, 0, 0); og.clearRect(0, 0, ov.width, ov.height);
+        if (ft > fly.end) { ov.remove(); ov = null; fly = null; }
+        else { og.setTransform(dpr, 0, 0, dpr, cr.left * dpr, cr.top * dpr);
+          P = pts.map(p => { const u = Math.max(0, Math.min(1, (ft - p.fd) / p.fD)), e = u * u * u * (u * (u * 6 - 15) + 10), sx = p.fx - cr.left, sy = p.fy - cr.top, dx = p.x - sx, dy = p.y - sy, arc = Math.sin(Math.PI * e);
+            const w = arc * E * .12;   // a little dreamy sway mid-flight
+            return { k: p.k, e, arc, x: sx + dx * e - dy * p.fc * arc + Math.sin(ft * 1.7 + p.ph) * w, y: sy + dy * e + dx * p.fc * arc + Math.cos(ft * 1.3 + p.ph) * w }; });
+        }
       }
-      if (!drag) for (const p of pts) {   // reach toward the cursor, like the opening's grab lines
+      const G = fly ? og : g; G.lineWidth = .8;
+      for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {   // links, as in the opening: brighter when closer; clusters join when they meet
+        const a = P[i], b = P[j], Lk = fly && a.k === b.k ? L * (1 + .9 * Math.max(a.arc, b.arc)) : L, dx = a.x - b.x; if (dx > Lk || dx < -Lk) continue; const d = Math.hypot(dx, a.y - b.y);   // mid-flight a cluster's lines stretch further before they let go
+        if (d < Lk) { const c2 = .72 * (.4 + (1 - d / Lk) * .6) * Math.min(1, (1 - d / Lk) * 3); G.strokeStyle = `rgba(${242 * .95 | 0},${247 * .97 | 0},255,${c2 * .7})`; G.beginPath(); G.moveTo(a.x, a.y); G.lineTo(b.x, b.y); G.stroke(); }
+      }
+      if (!drag && !fly) for (const p of pts) {   // reach toward the cursor, like the opening's grab lines
         const d = Math.hypot(p.x - mx, p.y - my);
         if (d < 170 && d > 110) { g.strokeStyle = `rgba(255,255,255,${(1 - d / 170) * .5})`; g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(mx, my); g.stroke(); }
       }
-      g.globalCompositeOperation = 'lighter';   // additive, like the field
-      for (const p of pts) { const d = PT * (drag && drag.k === p.k ? 1.1 : .85); g.globalAlpha = .9; g.drawImage(dotC, p.x - d / 2, p.y - d / 2, d, d); }
-      g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+      G.globalCompositeOperation = 'lighter';   // additive, like the field
+      for (const p of P) { const d = PT * (drag && drag.k === p.k ? 1.1 : .85); G.globalAlpha = .9; G.drawImage(dotC, p.x - d / 2, p.y - d / 2, d, d); }
+      G.globalAlpha = 1; G.globalCompositeOperation = 'source-over';
     };
     requestAnimationFrame(tick);
   })();
