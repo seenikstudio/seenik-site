@@ -268,6 +268,7 @@
   .site-nav button.deep[aria-current="page"]::before, .site-nav button.deep[aria-current="page"]::after { font-size: 20px; vertical-align: -2px; }
   .site-nav button { transition: color .3s, transform .5s cubic-bezier(.2,.7,.2,1), font-size .4s; }
   .site-nav button.deep[aria-current="page"]:hover { color: var(--glow); }
+  @media (min-width: 761px) { .site-nav button { font-size: 12.5px; color: rgba(242,244,247,.85); } .site-nav button:hover, .site-nav button[aria-current="page"] { color: var(--fg); } .site-nav button.deep[aria-current="page"] { font-size: 14px; } }   /* desktop menu: same size and brightness as the kickers */
   @media (max-width: 760px) { .site-nav { top: calc(100px + env(safe-area-inset-top, 0px)); width: 100%; justify-content: center; } }
 
   /* shared filmstrip: faint sprocket bands, frames in the media's own shape */
@@ -473,7 +474,7 @@
   .fx-gate .reel { gap: 16px; }
   .fx-gate .reel .m { border-radius: 10px; overflow: hidden; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), 0 0 0 6px #000, 0 0 0 7px rgba(255,255,255,.1); }
   .fx-gate .reel .m img { filter: none; }
-  .clip-head { display: grid; gap: 10px; padding-top: 6px; justify-items: center; width: min(1100px, 100%); justify-self: center; }
+  .clip-head { display: grid; gap: 4px; padding-top: 0; justify-items: center; width: min(1100px, 100%); justify-self: center; }
   .slate { display: grid; gap: 4px; justify-self: center; text-align: left; font: 400 clamp(14px, 1.3vw, 18px)/1.8 var(--mono); letter-spacing: .04em; color: var(--fg); }
   @media (max-width: 760px) { .slate { margin-left: 16px; } }
   .clip-sec { display: grid; gap: clamp(26px, 5vh, 56px); width: min(1100px, 100%); justify-self: center; }
@@ -517,10 +518,10 @@
   .st-logo { width: min(560px, 62%); display: block; position: relative; z-index: 1; user-select: none; pointer-events: none; }
   .mir-sing.st-say { padding-block: 0; width: 100%; }
   .mir-sing.st-based { padding-block: clamp(14px, 2.5vh, 28px); width: var(--sw, 100%); --sw: calc((var(--vw, 100vw) - 48px) * .85 + 24px); justify-self: center; }
-  .mir-sing.st-based .mir-big { font-size: calc(var(--sw) / 63) !important; letter-spacing: .3em; }   /* the line runs the full width of the frames above and below */
+  .mir-sing.st-based .mir-big { font-size: 17px !important; letter-spacing: .3em; white-space: nowrap; }   /* the line runs the full width of the frames above and below */
   .st-pier { margin-top: 0; }
   .st-pier img { outline: 1px solid rgba(255,255,255,.4); outline-offset: 12px; }
-  .st-say .mir-big { font-size: clamp(11px, 1.08vw, 15px) !important; white-space: nowrap; }
+  .st-say .mir-big { font-size: 17px !important; letter-spacing: .3em; white-space: nowrap; }
   .ph-br { display: none; }
   .st-ph-txt { display: none; }
   .st-lead { display: contents; }
@@ -558,8 +559,14 @@
   .art-intro span { display: block; white-space: nowrap; }
   .art-words { margin-block: calc(-1 * clamp(10px, 2.5vh, 30px)); display: grid; gap: clamp(14px, 2.2vh, 22px); justify-items: center; text-align: center; padding-block: clamp(10px, 2vh, 24px); }
   .art-head { margin: 0; font: 300 clamp(20px, 2.5vw, 32px)/1.3 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif; letter-spacing: .03em; color: var(--fg); text-wrap: balance; }
-  .clip-head .art-head { font-size: clamp(17px, 2vw, 26px); }
+  .clip-head .art-head { font: 400 clamp(14px, 1.3vw, 18px)/1.8 var(--mono); letter-spacing: .04em; }   /* same as the line above it */
   .art-head em { font-style: italic; }
+  .art-words .art-head { font: 400 17px/1.6 var(--mono); letter-spacing: .3em; text-transform: uppercase; }   /* the special caps line, as on The Studio and The Mirror */
+  .art-words .art-head em { font-style: normal; }
+  .art-words .art-head { opacity: 0; transform-origin: 50% 0; }
+  .fw-sets { opacity: 0; transform-origin: 50% 0; font: 400 17px/1.6 var(--mono) !important; letter-spacing: .3em !important; text-transform: uppercase; }
+  .fw-sets.in { animation: subMirror 1.8s cubic-bezier(.25,.7,.3,1) both; }
+  .art-words .art-head.in { animation: subMirror 1.8s cubic-bezier(.25,.7,.3,1) both; }
   .art-sheet { position: fixed; inset: 0; z-index: 15; background: rgba(0,0,0,.96); display: grid; place-items: center; padding: 56px 24px 24px; overflow-y: auto; animation: svIn .5s ease both; }
   .sheet-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: min(1180px, 100%, calc(((100vh - 110px) - (var(--rows) - 1) * 10px) / var(--rows) * 1.294 * 3 + 20px)); }
   .art-sheet .ap { height: auto; width: 100%; aspect-ratio: 1100 / 850; filter: none; padding: 4px; }
@@ -612,6 +619,15 @@
   .set-concept .gp { margin: 0; }
   /* film-page media reel: same width as the header, on a film strip, each piece with its own caption panel */
   .pj-reel { width: min(1240px, calc(var(--vw, 100vw) - 96px)); justify-self: center; background: #050505; display: grid; margin-top: var(--title-space); }
+  .pj-con { display: grid; justify-items: start; gap: 22px; margin-top: var(--title-space); width: min(1240px, calc(var(--vw, 100vw) - 96px)); justify-self: center; }
+  .pj-con > .fw-group { padding: 0 28px; font-size: 22px; letter-spacing: .3em; text-align: left; }   /* set names: left, below the 28px page title */
+  .pj-con .pj-reel { margin-top: 0; width: 100%; }
+  .pj-note { margin: 0; padding-inline: 28px; box-sizing: border-box; width: 100%; font: 400 15px/1.8 var(--mono); color: var(--fg); opacity: .9; text-align: left; }
+  .pj-cr .pj-row { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; }
+  .pj-cr.one .pj-row { grid-template-columns: minmax(0, 1fr); }
+  .pj-cb { display: block; padding: 0; border: 0; background: none; cursor: zoom-in; }
+  .pj-cb img { width: 100%; height: auto; display: block; }
+  @media (max-width: 760px) { .pj-con { width: calc(var(--vw, 100vw) - 32px); } .pj-con > .fw-group { font-size: 14px; padding: 0 4px; } .pj-note { font-size: 12px; padding-inline: 4px; } .pj-cr .pj-row { grid-template-columns: minmax(0, 1fr); } }
   .pj-sp { height: 12px; background: repeating-linear-gradient(90deg, var(--line) 0 16px, transparent 16px 30px); opacity: .7; -webkit-mask: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); mask: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); }
   .pj-row { display: grid; gap: clamp(14px, 2vw, 28px); padding: clamp(18px, 2.6vw, 30px) clamp(18px, 2.6vw, 34px); }
   .pj-phones .pj-row { grid-template-columns: repeat(5, minmax(0, 1fr)); }
@@ -727,7 +743,7 @@
   @keyframes mirBreath { from { transform: scale(1); filter: brightness(.92); } to { transform: scale(1.035); filter: brightness(1.04); } }
   .mir-sing.mir-wind { padding-top: clamp(4px, 1.5vh, 20px); padding-bottom: clamp(60px, 10vh, 120px); }
   .mir-sing.mir-first { padding-top: clamp(10px, 2.5vh, 32px); padding-bottom: clamp(30px, 5vh, 60px); }
-  .mir-first .mir-small { font-size: clamp(16px, 1.65vw, 23px); color: var(--fg); letter-spacing: .06em; }
+  .mir-first .mir-small { font: 400 clamp(15px, 1.55vw, 22px)/1.6 var(--mono); color: var(--fg); letter-spacing: .3em; text-transform: uppercase; }   /* same caps style as the line above it */
   .mir-lined { background: #000; }
   .mir-lined img { -webkit-mask: linear-gradient(to bottom, #000 62%, transparent 100%); mask: linear-gradient(to bottom, #000 62%, transparent 100%); }
   .mir-lined::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px; z-index: 2; pointer-events: none; background: linear-gradient(90deg, transparent 6%, rgba(255,255,255,.75) 26%, rgba(255,255,255,.75) 74%, transparent 94%); }
@@ -907,8 +923,9 @@
 /* DESKTOP TYPE STANDARD: every thumbnail title is the same size */
 @media (min-width: 761px) {
   .frl .lab, .fw-sec .frl .lab, .reel .lab, .reel.clip .lab { font-size: 11px !important; letter-spacing: .2em !important; }
-  .kicker { font-size: 11.5px !important; letter-spacing: .28em !important; color: rgba(242,244,247,.72) !important; }   /* small labels (01 · Social media): same size as the thumbnail titles, a little brighter */
-  .reel-txt h3 { font-size: 30px !important; white-space: nowrap; }   /* Digital Media headings: one line, held as the standard */
+  .kicker { font-size: 12.5px !important; letter-spacing: .28em !important; color: rgba(242,244,247,.85) !important; }   /* small labels (01 · Social media): same size as the thumbnail titles, a little brighter */
+  .reel-txt h3 { font: 400 16px/1.4 var(--mono) !important; letter-spacing: .24em !important; text-transform: uppercase; white-space: nowrap; opacity: 0; transform-origin: 50% 0; }   /* caps titles with the mirror flip */
+  .reel-txt h3.in { animation: subMirror 1.8s cubic-bezier(.25,.7,.3,1) both; }   /* Digital Media headings: one line, held as the standard */
 }
 
 /* PHONE TYPE STANDARD: one title size on every page, one text style for Studio and Mirror */
@@ -2327,9 +2344,11 @@
   const SOC_YT = ['ghDde60PnqQ', '6R8P0X7psjc', 'n8nmUN3zrAs', 'iZkt3YqgZ5g', 'jV_xOIiUoDk', 'Moux2gPuZik'];
   const tile = (src, t, s) => `<button type="button" class="sq" data-t="${t}" data-s="${s}"><img alt="" src="${src}"><span class="cap"><span>${t}</span><em>${s}</em></span></button>`;
   const FILM_INFO = {
-    'Speculo': { credits: [['Director', 'Jon Joffin'], ['Production Designer', 'Sandy Heidebrecht']], text: "I designed the sets and key elements, from the living room to the candles, and every screen in the film: Grace's feeds and apps, her lock screen and her inbox." },
+    'Speculo': { credits: [['Director', 'Jon Joffin'], ['Production Designer', 'Sandy Heidebrecht']], text: "Speculo follows a struggling model who keeps losing jobs to her rival. When she tries a viral mirror ritual, she awakens a twisted version of herself that begins to haunt her. Recently shot and now in post-production, it releases in 2027. I designed the sets and created the playback using Claude Code. Stills to come after the film releases.",
+      note: "Every interface was designed to work as a real app on my phone. For Loupe, I made videos from footage shot on the day, integrated the stills, and added the SkyTrain poster I created, also from stills taken that same day. The turnaround was fast. I also built Thredd, a fake Reddit page, Grace's lock screen with its notifications and mysterious messages, and her inbox of rejection emails.",
+      concepts: [["Grace's House", ['sp-house']], ['Talent Agency', ['sp-agency']], ['Photo Shoots', ['sp-shoots']], ['SkyTrain', ['sp-sky']]] },
     'Tranquil': { credits: [['Director', 'Miguel Barbosa'], ['Production Designer', 'Sandy Heidebrecht']], text: "Tranquil is an action-thriller that follows three intelligence specialists investigating a senator's mysterious disappearance. The house was a white canvas, and I got to fine-tune it with elements that spoke to the character. It was a great experience working with this director." },
-    'Visiting Hours': { credits: [['Director', 'Jon Joffin'], ['Production Designer', 'Sandy Heidebrecht']], text: "Visiting Hours is a music video for Jon Bryant, a beautiful song about how precious our time is, and how fleeting life can be. It's the story of a couple's relationship, as he watches her drift in and out of a catatonic state, trapped inside herself. I had the idea to freeze flowers in ice, film them melting and reverse it. It was great to have so many ideas supported by such a talented team." },
+    'Visiting Hours': { credits: [['Director', 'Jon Joffin'], ['Production Designer', 'Sandy Heidebrecht']], text: "Visiting Hours is a music video for Jon Bryant. He created a beautiful song about how precious our time is, and how fleeting life can be. It's the story of a couple's relationship, as he watches her drift in and out of a catatonic state, trapped inside herself. I had the idea to freeze flowers in ice, film them melting and reverse it. It was great to have so many ideas supported by such a talented team." },
     'Invasion S03': { credits: [['Network', 'Apple TV+']], key: 'key-03', text: 'A science-fiction drama about an alien invasion of Earth, told through ordinary people around the world. This was an incredibly ambitious show with a very high bar. Working closely with Production Designer Simon Rogers, the art department and the construction team, we made sophisticated, high-end sets, from a private command centre to a custom-designed military habitat. It\'s one thing to have an idea, but you need the resources to make it real, and this show had them. Some of my best work came out of this show.' },
     'Under the Bridge': { credits: [['Network', 'Hulu']], key: 'key-04', text: "Under the Bridge is based on the true story of Reena Virk, a 14-year-old girl murdered near Victoria in 1997. As a period piece set in the 90s, it called for a level of authenticity that did justice to what really happened. I was only on this show for a short time, but I've built a few bullpens in my career, and this was a great one to make with designer Jen Morden." },
     'The Watchful Eye': { credits: [['Network', 'Freeform']], key: 'key-05', text: "The Watchful Eye is a mystery-thriller about a young woman who takes a job as a live-in nanny in a wealthy Manhattan building full of secrets. It's great to show up early on a show and be part of the concept with the designer. The art class was a fun one to make, a dreamy, playful place I would have loved to play in as a child. I enjoy making these living sets because they describe how the characters coexist within them; you're telling the story by creating the environment it lives in." },
@@ -2364,7 +2383,7 @@
       const w = 'calc((var(--vw, 100vw) - 48px - 3 * var(--tile-gap)) / 4)';
       const f = FILM_ITEMS.map(([t, y], i) => frameL(filmImgs[i], t, y, w, '3 / 4', `data-proj="${i}"`));
       const fi = FILM_ITEMS.slice(0, 3).map(([t, y], i) => frameL(filmImgs[i], t, y, 'min(270px, calc((var(--vw, 100vw) - 48px - 3 * 34px) / 4))', '3 / 4', `data-proj="${i}"`));
-      return `<p class="reel-intro fw-block"><span>Since 2013 I've worked in film and television with IATSE, learning every role in</span><span>set decoration. From there I moved into decorating and design, building each set</span><span>digitally first, so producers and directors can see the world before it's made.</span></p><p class="reel-intro fw-sets">Here are some of the sets we've created.</p>
+      return `<p class="reel-intro fw-block"><span>Since 2013 I've worked in film and television with IATSE, learning every role in</span><span>set decoration. From there I moved into decorating and design, building each set</span><span>digitally first, so producers and directors can see the world before it's made.</span></p><p class="reel-intro fw-sets">Here are some of the sets we've created</p>
         <section class="fw-sec fw-indie-sec"><div class="sec-head fw-ruled"><span class="kicker">01 · Short film</span><h3>Independent</h3></div>
           <div class="fw-indie"><div class="fw-card"><p class="fw-card-t">Production Designer</p><p class="fw-just"><span>Film people find solutions,</span><span>making the impossible real.</span></p><p class="fw-just"><span>It's amazing what a small</span><span>team of professionals can do.</span></p></div>${fi.join('')}</div></section>
         <section class="fw-sec"><div class="sec-head"><span class="kicker">02 · Film &amp; television</span><h3>Commercial</h3></div><div class="fw-two">${strip(f.slice(3, 7), '100%')}${strip(f.slice(7, 11), '100%')}</div><div class="fw-one">${strip(f.slice(3, 11), '100%', 'left')}</div></section>`; } },
@@ -2396,12 +2415,12 @@
       return `<div class="proj wide${inf.key ? '' : ' poster'}"><div class="m"><img alt="" style="--ty:${['46%', '40%', '14%'][i] || '50%'}" src="${inf.key ? IMG(inf.key) : filmImgs[i]}"></div><div class="info"><span>${y}</span>
         <dl>${inf.credits.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
         ${inf.list ? `<ul>${inf.list.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}
-        <p>${inf.text || `Write-up coming: your role on ${t} and what you did.`}</p></div></div>${gal ? `<div class="gal">${gal}</div>` : ''}${i === 0 ? reel('pj-phones', SPEC_VIDS.map(([n, d]) => [`<video src="vid/spec-${n}.mp4" poster="${IMG('spec-' + n)}" muted loop playsinline autoplay preload="auto"></video>`, n.replace('_', ' '), d + '<span class="pj-ctl"><button type="button" class="pj-pp" aria-label="Pause"></button><span class="pj-bar"><i></i></span></span>'])) : ''}${i === 2 ? reel('pj-wide', [[`<img alt="" src="${IMG('vh-film')}"><span class="pj-play" aria-hidden="true"></span>`, 'Visiting Hours', 'The music video'], [`<img alt="" src="${IMG('vh-bts')}"><span class="pj-play" aria-hidden="true"></span>`, 'Behind the Scenes', 'On set, including the frozen-flower effects']]) : ''}${sets ? `<div class="sets">${PROJ_TOP[i] ? `<section class="set set-concept"><h3 class="fw-group">Concept</h3><button type="button" class="gp" data-t="${t}" data-s="Concept board"><img loading="lazy" alt="" src="${IMG(PROJ_TOP[i])}"></button></section>` : ''}${sets}</div>` : ''}`; } },
+        <p>${inf.text || `Write-up coming: your role on ${t} and what you did.`}</p></div></div>${gal ? `<div class="gal">${gal}</div>` : ''}${inf.note ? `<section class="pj-con"><h3 class="fw-group">Grace's Phone</h3><p class="pj-note">${inf.note}</p>` : ''}${i === 0 ? reel('pj-phones', SPEC_VIDS.map(([n, d]) => [`<video src="vid/spec-${n}.mp4" poster="${IMG('spec-' + n)}" muted loop playsinline autoplay preload="auto"></video>`, n.replace('_', ' '), d + '<span class="pj-ctl"><button type="button" class="pj-pp" aria-label="Pause"></button><span class="pj-bar"><i></i></span></span>'])) : ''}${inf.note ? '</section>' : ''}${i === 2 ? reel('pj-wide', [[`<img alt="" src="${IMG('vh-film')}"><span class="pj-play" aria-hidden="true"></span>`, 'Visiting Hours', 'The music video'], [`<img alt="" src="${IMG('vh-bts')}"><span class="pj-play" aria-hidden="true"></span>`, 'Behind the Scenes', 'On set, including the frozen-flower effects']]) : ''}${inf.concepts ? inf.concepts.map(([n, l]) => `<section class="pj-con"><h3 class="fw-group">${n}</h3><div class="pj-reel pj-cr${l.length === 1 ? ' one' : ''}"><div class="pj-sp" aria-hidden="true"></div><div class="pj-row">${l.map(m => `<button type="button" class="gp pj-cb" data-t="${t}" data-s="${n} · concept"><img loading="lazy" alt="" src="${IMG(m)}"></button>`).join('')}</div><div class="pj-sp" aria-hidden="true"></div></div></section>`).join('') : ''}${sets ? `<div class="sets">${PROJ_TOP[i] ? `<section class="set set-concept"><h3 class="fw-group">Concept</h3><button type="button" class="gp" data-t="${t}" data-s="Concept board"><img loading="lazy" alt="" src="${IMG(PROJ_TOP[i])}"></button></section>` : ''}${sets}</div>` : ''}`; } },
     art: { title: 'Art', back: 'artist', spaced: true, render: () => {
       const roll = (list, dir, secs, kind) => { const t = list.map(([n, w, h]) => `<button type="button" class="ap" style="--ar:${w} / ${h}" data-t="Art" data-s=""><img alt="" src="${IMG(n)}?v=5"></button>`).join('');
         return `<div class="fs art-roll" data-kind="${kind}"><div class="sprockets" aria-hidden="true"></div><div class="mq"><div class="mq-track ${dir}" style="animation-duration:${secs}s">${t}${t}</div></div><div class="sprockets" aria-hidden="true"></div></div>`; };
       return `<div class="art-rolls">${roll(ART_COL, 'ltr', 40, 'col')}</div>
-        <div class="art-words"><h3 class="art-head">There are no <em>mistakes</em>, only new directions.</h3><p class="art-text">${ART_TEXT.split(/(?<=\.) /).map(t => `<span>${t}</span>`).join(' ')}</p></div>
+        <div class="art-words"><h3 class="art-head">There are no <em>mistakes</em>, only new directions</h3><p class="art-text">${ART_TEXT.split(/(?<=\.) /).map(t => `<span>${t}</span>`).join(' ')}</p></div>
         <div class="art-rolls">${roll(ART_BW, 'rtl', 50, 'bw')}</div>`; } },
     resume: { title: 'Experience', back: 'artist', spaced: true, render: () => `<div class="reel-strip cv-strip"><div class="sprockets" aria-hidden="true"></div><div class="cv-row">${[0, 1].map(k => `<button type="button" class="cv-pg" data-t="Resume" data-s="Page ${k + 1}"><span class="lab">Page ${k + 1}</span><span class="m"><img alt="Sandy Heidebrecht CV, page ${k + 1}" src="${IMG('resume-0' + k)}?v=2"></span></button>`).join('')}</div><div class="sprockets" aria-hidden="true"></div></div>` },
     contact: { title: 'Contact', back: 'artist', spaced: true, render: () => `<div class="contact-wrap ct-sleek"><div class="contact-pic"><img alt="Sandy Heidebrecht" src="${IMG('contact')}?v=2"></div><form class="cform st-form" data-to="artist" novalidate>
@@ -2415,8 +2434,8 @@
           <label class="sf"><input name="name" type="text" autocomplete="name" placeholder="Name" required><i aria-hidden="true"></i></label>
           <label class="sf"><input name="email" type="email" autocomplete="email" placeholder="Email" required><i aria-hidden="true"></i></label>
           <label class="sf"><textarea name="message" rows="2" placeholder="Message" required></textarea><i aria-hidden="true"></i></label>
-          <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form></div></div><div class="mir-sing st-say"><p class="mir-big">Our focus is to create seamless,<br class="ph-br"> dreamlike immersive experiences.</p></div><figure class="st-photo"><img alt="Mountains dissolving into a leaf" draggable="false" src="${IMG('studio-journey')}"></figure></div>
-        <div class="mir-sing st-say st-based"><p class="mir-big">Seenik is based in North Vancouver,<br class="ph-br"> where the mountains meet the sea.</p></div>
+          <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form></div></div><div class="mir-sing st-say"><p class="mir-big">Our focus is to create seamless,<br class="ph-br"> dreamlike immersive experiences</p></div><figure class="st-photo"><img alt="Mountains dissolving into a leaf" draggable="false" src="${IMG('studio-journey')}"></figure></div>
+        <div class="mir-sing st-say st-based"><p class="mir-big">Seenik is based in North Vancouver,<br class="ph-br"> where the mountains meet the sea</p></div>
         <figure class="studio-place st-pier"><img alt="North Vancouver at night, from the pier" src="${IMG('studio-pier')}"></figure>
         <div class="st-contact"><form class="cform st-form" data-to="studio" novalidate>
           <h3>Contact</h3>
@@ -2430,9 +2449,9 @@
       const sing = (big, small, x = '') => `<div class="mir-sing${x}"><p class="mir-big">${big}</p>${small ? `<p class="mir-small">${small}</p>` : ''}</div>`;
       return say('Not a film you watch,<br class="ph-br"> but a world you inhabit.', 'Designed to feel like moving<br class="ph-br"> through a single living thing.')
         + `<div class="mir-stage"><div class="mir-hero"><div class="mir-par"><img alt="The Mirror" draggable="false" src="${IMG('seenik-00')}"></div></div><canvas class="mir-tri" aria-hidden="true"></canvas></div>`
-        + sing('Every visual decision<br class="ph-br"> flows from the music.', 'Through photorealistic worlds —<br class="ph-br"> the cosmos, the deep ocean.', ' mir-first') + one('seenik-02c', 'The Music Tells the Story', '1572 / 523', ' mir-lined')
-        + sing('Experience the power of<br class="ph-br"> the elemental forces.', '', ' mir-wind') + one('seenik-03c', 'Effects that Mirror Nature', '1540 / 462')
-        + sing('The same patterns that<br class="ph-br"> build a galaxy build us.', '', ' mir-close')
+        + sing('Every visual decision<br class="ph-br"> flows from the music', 'Through photorealistic worlds —<br class="ph-br"> the cosmos, the deep ocean', ' mir-first') + one('seenik-02c', 'The Music Tells the Story', '1572 / 523', ' mir-lined')
+        + sing('Experience the power of<br class="ph-br"> the elemental forces', '', ' mir-wind') + one('seenik-03c', 'Effects that Mirror Nature', '1540 / 462')
+        + sing('The same patterns that<br class="ph-br"> build a galaxy build us', '', ' mir-close')
         + `<div class="mir-galaxy"><video src="vid/deep-field.mp4" autoplay muted loop playsinline preload="auto" aria-label="A flight through thousands of real galaxies, from James Webb Space Telescope data"></video></div><p class="mir-credit">Visualization: NASA, ESA, CSA, STScI · F. Summers, G. Bacon, J. DePasquale, L. Hustak, J. Olmsted, A. Pagan</p>`; } }
   };
   function layoutWall() {   // salon wall: justified rows, every piece keeps its true shape
@@ -2719,7 +2738,7 @@
   (function pjBars() { requestAnimationFrame(pjBars); SV.querySelectorAll('.pj-item video').forEach(v => { const i = v.closest('.pj-item').querySelector('.pj-bar i'); if (i && v.duration) i.style.width = (v.currentTime / v.duration * 100) + '%'; }); })();
   // The Mirror's statements rise in as they scroll into view
   const mirIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); mirIO.unobserve(e.target); } }), { threshold: .35 });
-  new MutationObserver(() => document.querySelectorAll('.mir-sing:not(.in), .fw-sec .sec-head h3:not(.in)').forEach(el => mirIO.observe(el))).observe(SV, { childList: true, subtree: true });
+  new MutationObserver(() => document.querySelectorAll('.mir-sing:not(.in), .fw-sec .sec-head h3:not(.in), .art-words .art-head:not(.in), .fw-sets:not(.in), .reel-txt h3:not(.in)').forEach(el => mirIO.observe(el))).observe(SV, { childList: true, subtree: true });
   // The Mirror: clusters of the opening's linked triangles. Ten orbit the eye, four more wander down the sides to the first line and back.
   // Grab any cluster and throw it; it glides, then finds its way home. Points never settle on the writing.
   (function mirTri() {
