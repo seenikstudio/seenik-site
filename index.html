@@ -1867,7 +1867,7 @@
   const ePts = [], eVel = [];
   for (let i = 0; i < ALL; i++) { ePts.push(new THREE.Vector3()); eVel.push(new THREE.Vector3()); }
   const eHand = new Uint8Array(ALL);   // field points handed to The Mirror page: hidden here, carried on by its triangles
-  let mirHand = null;                   // { pts: [{i, x, y}] screen px, t0 } — picked up by mirTri(), which gives back what it doesn't use
+  let mirHand = null;                   // { pts: [{x, y}] screen px, links: [[a, b, length / link distance]], t0 } — picked up by mirTri()
   const eGeo = new THREE.BufferGeometry();
   eGeo.setAttribute('position', new THREE.BufferAttribute(ePos, 3));
   eGeo.setAttribute('color', new THREE.BufferAttribute(eCol, 3));
@@ -2160,13 +2160,13 @@
     phase = 'artist'; phaseT = 0;
     const ring = menuRings.find(m => m.btn.dataset.key === key);
     eHand.fill(0); mirHand = null;
-    if (key === 'mirror' && endMode === 'field') {   // the field's points on screen travel on into The Mirror's clusters instead of bursting
-      endGroup.updateMatrixWorld(); const on = [], v = new THREE.Vector3();
+    if (key === 'mirror' && endMode === 'field') {   // the field freezes and is handed over whole: its points on screen, in pixels, with the field's own links
+      endGroup.updateMatrixWorld(); const v = new THREE.Vector3(), on = [], pts = [], links = [];
       for (let i = 0; i < PFN; i++) { v.copy(ePts[i]).applyMatrix4(endGroup.matrixWorld).project(camera);
-        const x = (v.x + 1) / 2 * innerWidth, y = (1 - v.y) / 2 * innerHeight; if (x > -20 && x < innerWidth + 20 && y > -20 && y < innerHeight + 20) on.push({ i, x, y }); }
-      for (let k = on.length - 1; k > 0; k--) { const j = Math.random() * (k + 1) | 0; [on[k], on[j]] = [on[j], on[k]]; }
-      on.forEach(o => eHand[o.i] = 1);
-      if (on.length) mirHand = { pts: on, t0: performance.now() };
+        const x = (v.x + 1) / 2 * innerWidth, y = (1 - v.y) / 2 * innerHeight; if (x > -40 && x < innerWidth + 40 && y > -40 && y < innerHeight + 40) { on.push(i); pts.push({ x, y }); } }
+      for (let a = 0; a < on.length; a++) for (let b = a + 1; b < on.length; b++) { const p = ePts[on[a]], q = ePts[on[b]], d = Math.hypot(p.x - q.x, p.y - q.y); if (d < fieldL) links.push([a, b, d / fieldL]); }
+      eHand.fill(1, 0, PFN);   // the whole field leaves the 3D scene on this frame; The Mirror draws it from here
+      if (pts.length) mirHand = { pts, links, t0: performance.now() }; else eHand.fill(0);
     }
     for (let i = 0; i < PFN; i++) { if (eHand[i]) { eVel[i].set(0, 0, 0); continue; } const a = Math.random() * Math.PI * 2, s2 = 0.06 + Math.random() * 0.12; eVel[i].set(Math.cos(a) * s2, Math.sin(a) * s2, 0); }
     menuRings.forEach(m => { for (let i = 0; i < m.n; i++) { const a = Math.random() * Math.PI * 2, s2 = 0.04 + Math.random() * 0.1; m.vel[i].set(Math.cos(a) * s2, Math.sin(a) * s2, 0); } m.burst = true; });
@@ -2723,8 +2723,8 @@
   // The Mirror: clusters of the opening's linked triangles. Ten orbit the eye, four more wander down the sides to the first line and back.
   // Grab any cluster and throw it; it glides, then finds its way home. Points never settle on the writing.
   (function mirTri() {
-    let cv = null, g, W, H, HH, pts = [], cl = [], last = 0, mx = -1e4, my = -1e4, drag = null, boxes = [], noClick = false;
-    let fly = null, ov = null, og = null;   // the hand-off from the opening: points arrive from where the field left them, drawn on a screen overlay until they land
+    let cv = null, g, W, H, HH, pts = [], cl = [], links = [], seams = [], last = 0, mx = -1e4, my = -1e4, drag = null, boxes = [], noClick = false;
+    let fly = null, ov = null, og = null, calmT = -1e9;   // the hand-off from the opening: its pieces travel on a screen overlay until they land
     const near = (x, y) => { let best = null, bd = 30; for (const p of pts) { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = p; } } return best; };
     const measure = () => {   // the canvas runs from the top of the eye to the bottom of the first statement
       const st = cv.parentElement, hero = st.querySelector('.mir-hero'), first = SV.querySelector('.mir-first'), sr = st.getBoundingClientRect();
@@ -2740,64 +2740,86 @@
       const top = HH * .55, bot = H - 40, y = (top + bot) / 2 + Math.sin(q.a) * (bot - top) / 2;
       return [W / 2 + q.side * W * (.42 + .03 * Math.sin(q.a * 1.7)), y];
     };
-    let E = 120, PT = 8;
-    const scale = () => {   // exactly the field after Begin: its triangle edge, and its point size as three.js draws it
+    const fit = (q, x, y) => [Math.max(4 - q.ext[0], Math.min(W - 4 - q.ext[2], x)), Math.max(4 - q.ext[1], Math.min(H - 4 - q.ext[3], y))];   // a whole piece stays on the canvas
+    let E = 120, PT = 8, FOG = .8;
+    const scale = () => {   // exactly the field after Begin: its triangle edge, its point size as three.js draws it, and the scene's fog on it
       try { const dist = camera.position.z - 0.3, visH = 2 * dist * Math.tan(22.5 * Math.PI / 180), ppw = innerHeight / visH;
-        E = Math.min(visH * .7, visH * camera.aspect * .82) / (WROWS - 1) * ppw; PT = 0.11 * (innerHeight / 2) / dist; } catch (e) { E = Math.min(innerHeight * .7, innerWidth * .82) / 5; PT = 8; }
+        E = Math.min(visH * .7, visH * camera.aspect * .82) / (WROWS - 1) * ppw; PT = 0.11 * (innerHeight / 2) / dist; FOG = Math.exp(-((0.08 * dist) ** 2)); } catch (e) { E = Math.min(innerHeight * .7, innerWidth * .82) / 5; PT = 8; FOG = .8; }
+    };
+    const freshField = () => {   // arriving any other way: a field laid out as it is after Begin — points spread evenly through the band, linked to near neighbours
+      const tall = innerWidth < innerHeight * .9, half = tall ? innerHeight * .3 : Math.min(innerHeight / 2 - 120, Math.max(140, innerHeight * .21));
+      const bw = innerWidth * .96, bh = half * 2, n = Math.max(20, Math.min(260, Math.round(bw * bh * 2 / (Math.sqrt(3) * E * E) * 2.2))), Lp = E * 1.3;
+      const src = []; for (let i = 0; i < n; i++) src.push({ x: (innerWidth - bw) / 2 + Math.random() * bw, y: innerHeight / 2 - half + Math.random() * bh });
+      const lk = []; for (let a = 0; a < n; a++) for (let b = a + 1; b < n; b++) { const d = Math.hypot(src[a].x - src[b].x, src[a].y - src[b].y); if (d < Lp) lk.push([a, b, d / Lp]); }
+      return { pts: src, links: lk };
+    };
+    const chunkUp = (src, n) => {   // divide the field by position into about n pieces (k-means from well-spread seeds)
+      let cs = [src.reduce((m, p) => p.x < m.x ? p : m, src[0])].map(p => ({ x: p.x, y: p.y }));
+      while (cs.length < Math.min(n, src.length)) { let best = src[0], bd = -1; for (const p of src) { let d = 1e18; for (const c of cs) d = Math.min(d, (c.x - p.x) ** 2 + (c.y - p.y) ** 2); if (d > bd) { bd = d; best = p; } } cs.push({ x: best.x, y: best.y }); }
+      const lab = new Int32Array(src.length);
+      for (let it = 0; it < 12; it++) {
+        src.forEach((p, i) => { let b = 0, bd = 1e18; cs.forEach((c, k) => { const d = (c.x - p.x) ** 2 + (c.y - p.y) ** 2; if (d < bd) { bd = d; b = k; } }); lab[i] = b; });
+        cs = cs.map((c, k) => { let sx = 0, sy = 0, m = 0; src.forEach((p, i) => { if (lab[i] === k) { sx += p.x; sy += p.y; m++; } }); return m ? { x: sx / m, y: sy / m } : c; });
+      }
+      return [...new Set(lab)].map(k => src.map((p, i) => lab[i] === k ? i : -1).filter(i => i >= 0));
     };
     const setup = c => {
       cv = c; g = c.getContext('2d'); measure(); scale();
-      cl = []; for (let k = 0; k < 6; k++) cl.push({ kind: 'orbit', a: k * Math.PI * 2 / 6 + .3, sp: (k % 2 ? -1 : 1) * (0.03 + (k % 3) * 0.012), r: .9 + (k % 2) * .08, free: 0, vx: 0, vy: 0 });
-      for (let k = 0; k < 4; k++) cl.push({ kind: 'wander', side: k % 2 ? 1 : -1, a: k * 1.6, sp: 0.14 + k * 0.025, free: 0, vx: 0, vy: 0 });
-      const hand = mirHand && performance.now() - mirHand.t0 < 1500 ? mirHand : null; mirHand = null;
-      if (hand) cl.forEach((q, k) => { if (q.kind === 'wander') q.a = -Math.PI / 2 + (k - 6) * .25; });   // arriving from the opening: the wanderers start up beside the eye, in view
-      pts = []; cl.forEach((q, k) => { [q.x, q.y] = home(q, 0);
-        const n = 6 + (k % 3) * 2, R = E * (1.3 + (k % 3) * .25);   // the field's density: points as close as they are after Begin
-        for (let i = 0; i < n; i++) { let ox, oy, t = 0; do { const a = Math.random() * 7, r = R * Math.sqrt(Math.random()); ox = Math.cos(a) * r; oy = Math.sin(a) * r * .8; t++; }
-          while (t < 40 && pts.some(o => o.k === k && Math.hypot(o.ox - ox, o.oy - oy) < E * .62));
-          pts.push({ k, x: q.x + ox, y: q.y + oy, vx: 0, vy: 0, ox, oy, ph: Math.random() * 7, sp: .25 + Math.random() * .3 }); } });
       fly = null; if (ov) { ov.remove(); ov = null; }
-      if (hand) {   // the field's points gather into the clusters: every cluster point that lands on screen is flown in from the nearest field point
-        const src = hand.pts, cr = cv.getBoundingClientRect(), tb = SV.querySelector('.sv-title').getBoundingClientRect().bottom + 16, ns = src.length;
-        const land = pts.filter(p => { const x = p.x + cr.left, y = p.y + cr.top; return x > 6 && x < innerWidth - 6 && y > tb && y < innerHeight - 6; });
-        const pairs = []; land.forEach((p, a) => src.forEach((o, b) => pairs.push([(o.x - cr.left - p.x) ** 2 + (o.y - cr.top - p.y) ** 2, a, b])));
-        pairs.sort((u, v) => u[0] - v[0]);
-        const src4 = new Int32Array(land.length).fill(-1), used = new Uint8Array(ns);
-        for (const [, a, b] of pairs) if (src4[a] < 0 && !used[b]) { src4[a] = b; used[b] = 1; }
-        for (const [, a, b] of pairs) if (src4[a] < 0) src4[a] = b;   // fewer field points than landing spots: some split in two on the way
-        src.forEach((o, b) => { if (!used[b]) { eHand[o.i] = 0; const a = Math.random() * Math.PI * 2, s2 = 0.06 + Math.random() * 0.12; eVel[o.i].set(Math.cos(a) * s2, Math.sin(a) * s2, 0); } });   // the rest burst and fade with the field as before
-        for (const p of pts) { p.fd = -9; p.fD = 1; p.fc = 0; }   // spots off screen: already home
-        land.forEach((p, a) => { const o = src[src4[a]]; p.fx = o.x; p.fy = o.y; p.fd = .1 + Math.random() * .35; p.fD = 1.45 + Math.random() * .2; p.fc = (Math.random() - .5) * .45; });
-        fly = { t0: hand.t0, end: 2.05, tb };
+      const hand = mirHand && performance.now() - mirHand.t0 < 1500 && mirHand.pts.length ? mirHand : null; mirHand = null;
+      const F = hand || freshField(), src = F.pts, groups = chunkUp(src, 10), N = groups.length, cr = cv.getBoundingClientRect();
+      // the pieces become the page's clusters: some orbit the eye (starting round its upper half, so they land in view), the rest wander the sides
+      const nw = N >= 8 ? 4 : N >= 5 ? 2 : 0, no = N - nw, slots = [];
+      for (let k = 0; k < no; k++) slots.push({ kind: 'orbit', a: Math.PI + (k + .5) * Math.PI / no, sp: (k % 2 ? -1 : 1) * (0.03 + (k % 3) * 0.012), r: .9 + (k % 2) * .08 });
+      for (let k = 0; k < nw; k++) slots.push({ kind: 'wander', side: k % 2 ? 1 : -1, a: -Math.PI / 2 + (k >> 1) * .6, sp: 0.14 + k * 0.025 });
+      const pieces = groups.map(ix => { let x = 0, y = 0; ix.forEach(i => { x += src[i].x; y += src[i].y; }); return { ix, x: x / ix.length, y: y / ix.length }; });
+      const pairs = []; pieces.forEach((pc, i) => slots.forEach((s, j) => { const [hx, hy] = home(s, 0); pairs.push([(hx + cr.left - pc.x) ** 2 + (hy + cr.top - pc.y) ** 2, i, j]); }));
+      pairs.sort((u, v) => u[0] - v[0]); const slotOf = new Int32Array(N).fill(-1), taken = new Uint8Array(N);
+      for (const [, i, j] of pairs) if (slotOf[i] < 0 && !taken[j]) { slotOf[i] = j; taken[j] = 1; }   // each piece takes the nearest free home, so nothing crosses the page needlessly
+      cl = []; pts = []; links = []; seams = []; const at = new Int32Array(src.length);
+      pieces.forEach((pc, k) => {
+        const th = hand ? (Math.random() - .5) * .4 : 0, co = Math.cos(th), si = Math.sin(th), ext = [1e9, 1e9, -1e9, -1e9];   // at most a gentle turn on the way
+        const q = Object.assign(slots[slotOf[k]], { free: 0, vx: 0, vy: 0, ext, f: hand ? { x: pc.x, y: pc.y, d: .2 + Math.random() * .3, D: 1.5, c: (Math.random() - .5) * .35, th } : null });
+        pc.ix.forEach(i => { const rx = src[i].x - pc.x, ry = src[i].y - pc.y, ox = rx * co - ry * si, oy = rx * si + ry * co;
+          ext[0] = Math.min(ext[0], ox); ext[1] = Math.min(ext[1], oy); ext[2] = Math.max(ext[2], ox); ext[3] = Math.max(ext[3], oy);
+          at[i] = pts.length; pts.push({ k, rx, ry, ox, oy, x: 0, y: 0, vx: 0, vy: 0, ph: Math.random() * 7, sp: .25 + Math.random() * .3 }); });
+        [q.x, q.y] = fit(q, ...home(q, 0)); cl.push(q);
+      });
+      for (const p of pts) { p.x = cl[p.k].x + p.ox; p.y = cl[p.k].y + p.oy; }
+      const lab = new Int32Array(src.length); groups.forEach((ix, k) => ix.forEach(i => lab[i] = k));
+      for (const [a, b, r] of F.links) { const l = [at[a], at[b], r, Math.hypot(src[a].x - src[b].x, src[a].y - src[b].y)]; if (lab[a] === lab[b]) links.push(l); else if (hand) seams.push(l); }   // links inside a piece stay; the seams between pieces are cut
+      if (hand) {
+        fly = { t0: hand.t0, end: Math.max(...cl.map(q => q.f.d + q.f.D)), tb: SV.querySelector('.sv-title').getBoundingClientRect().bottom + 14 }; calmT = 1e15;
         ov = document.createElement('canvas'); ov.setAttribute('aria-hidden', 'true'); ov.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:7';
         SV.after(ov); og = ov.getContext('2d');   // in the page's own layer, just above it and under the header
-      }
-      dotC = document.createElement('canvas'); dotC.width = dotC.height = 64; const dg = dotC.getContext('2d'), gr = dg.createRadialGradient(32, 32, 0, 32, 32, 32);   // the field's point sprite
-      gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.25, 'rgba(230,240,255,.85)'); gr.addColorStop(1, 'rgba(200,220,255,0)'); dg.fillStyle = gr; dg.fillRect(0, 0, 64, 64);
+      } else calmT = -1e9;
+      dotC = document.createElement('canvas'); dotC.width = dotC.height = 64; const dg = dotC.getContext('2d'), gr = dg.createRadialGradient(32, 32, 0, 32, 32, 32);   // the field's point sprite, tinted as the field tints it
+      const t = [.95 * .92, .95 * .96, .95], rgba = (r, gg, b, a) => `rgba(${r * t[0] | 0},${gg * t[1] | 0},${b * t[2] | 0},${a})`;
+      gr.addColorStop(0, rgba(255, 255, 255, 1)); gr.addColorStop(.25, rgba(230, 240, 255, .85)); gr.addColorStop(1, rgba(200, 220, 255, 0)); dg.fillStyle = gr; dg.fillRect(0, 0, 64, 64);
     };
     let dotC = null;
     const rel = e => { const b = cv.getBoundingClientRect(); return [e.clientX - b.left, e.clientY - b.top]; };
     addEventListener('pointermove', e => { if (!cv || !cv.isConnected) return; [mx, my] = rel(e);
       if (mx < 0 || my < 0 || mx > W || my > H) { if (!drag) { mx = my = -1e4; } }
       if (drag) { const q = cl[drag.k], nx = mx - drag.dx, ny = my - drag.dy; q.vx = (nx - q.x) * 30; q.vy = (ny - q.y) * 30; q.x = nx; q.y = ny; }
-      SV.style.cursor = drag ? 'grabbing' : near(mx, my) ? 'grab' : '';
+      SV.style.cursor = drag ? 'grabbing' : !fly && near(mx, my) ? 'grab' : '';
       const st = cv.parentElement.querySelector('.mir-par'), b = cv.parentElement.querySelector('.mir-hero').getBoundingClientRect();   // the eye leans a little toward the cursor
       if (e.clientY < b.bottom && e.clientY > b.top) st.style.transform = `translate(${((e.clientX - b.left) / b.width - .5) * -14}px, ${((e.clientY - b.top) / b.height - .5) * -9}px)`; else st.style.transform = '';
     });
-    SV.addEventListener('pointerdown', e => { if (!cv || !cv.isConnected) return; const [x, y] = rel(e), p = near(x, y); if (!p) return;
+    SV.addEventListener('pointerdown', e => { if (!cv || !cv.isConnected || fly) return; const [x, y] = rel(e), p = near(x, y); if (!p) return;
       const q = cl[p.k]; drag = { k: p.k, dx: x - q.x, dy: y - q.y }; q.free = 1; e.preventDefault(); SV.style.cursor = 'grabbing'; });
     addEventListener('pointerup', () => { if (!drag) return; cl[drag.k].free = 1; drag = null; noClick = true; setTimeout(() => noClick = false, 60); });
     SV.addEventListener('click', e => { if (noClick) { e.stopPropagation(); e.preventDefault(); } }, true);
     SV.addEventListener('dragstart', e => { if (e.target.closest('.mir-stage')) e.preventDefault(); });
+    const glow = r => .72 * (.4 + (1 - r) * .6) * Math.min(1, (1 - r) * 3) * FOG;   // the field's link brightness for a link at r = length / link distance
     const tick = now => {
       requestAnimationFrame(tick);
       const c = document.querySelector('.mir-tri'); if (!c) { cv = null; if (ov) { ov.remove(); ov = null; fly = null; } return; }
       if (c !== cv) setup(c); else if (now % 1000 < 20) measure();
       if (Math.abs(c.parentElement.getBoundingClientRect().width - W) > 2) { if (fly) measure(); else setup(c); }
       const dt = Math.min(.05, (now - last) / 1000 || .016); last = now;
-      const L = E * 1.3;
       cl.forEach((q, k) => {
-        const [ox, oy] = home(q, dt);
+        const [ox, oy] = fit(q, ...home(q, dt));
         if (drag && drag.k === k) return;
         if (q.free > 0) {   // thrown: glide on its own speed, then ease back home
           q.x += q.vx * dt; q.y += q.vy * dt; q.vx *= .94; q.vy *= .94; q.free = Math.max(0, q.free - dt * .22);
@@ -2805,9 +2827,12 @@
           if (q.x < 0 || q.x > W) q.vx *= -1; if (q.y < 0 || q.y > H) q.vy *= -1;
         } else { q.x = ox; q.y = oy; }
       });
+      const calm = Math.max(0, Math.min(1, (now - calmT) / 1500)), cw = calm * calm * (3 - 2 * calm);   // after landing, the gentle drift eases in
       for (const p of pts) {
-        const q = cl[p.k], held = drag && drag.k === p.k, wob = now / 1000 * .6 + p.ph, kk = held ? 40 : q.free > 0 ? 12 : 3;
-        const tx = q.x + p.ox + Math.cos(wob * p.sp) * E * .22, ty = q.y + p.oy + Math.sin(wob * p.sp * 1.3) * E * .18;   // each point drifts, so triangles fold, break and re-form like the field
+        const q = cl[p.k];
+        if (fly) { p.x = q.x + p.ox; p.y = q.y + p.oy; p.vx = p.vy = 0; continue; }   // in flight the piece is rigid
+        const held = drag && drag.k === p.k, wob = now / 1000 * .6 + p.ph, kk = held ? 40 : q.free > 0 ? 12 : 3;
+        const tx = q.x + p.ox + Math.cos(wob * p.sp) * E * .05 * cw, ty = q.y + p.oy + Math.sin(wob * p.sp * 1.3) * E * .04 * cw;   // a soft drift: the triangles breathe but keep their shape
         p.vx += (tx - p.x) * kk * dt; p.vy += (ty - p.y) * kk * dt;
         if (!held) { const dx = p.x - mx, dy = p.y - my, d = Math.hypot(dx, dy);
           if (d < 110) { const f = (1 - d / 110) ** 2 * 900 * dt; p.vx += dx / (d + 1e-3) * f; p.vy += dy / (d + 1e-3) * f; } }
@@ -2817,36 +2842,43 @@
         }
         const dm = held ? .75 : .9; p.vx *= dm; p.vy *= dm; p.x += p.vx * dt; p.y += p.vy * dt;
       }
+      const dpr = Math.min(2, devicePixelRatio || 1);
       g.clearRect(0, 0, W, H);
-      let P = pts;
-      if (fly) {   // in flight: soft ease along a gently curved path from the field's point to where the cluster has it now
-        const ft = (now - fly.t0) / 1000, cr = cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
+      let P = pts, G = g, ft = 0;
+      if (fly) {   // in flight: each piece moves whole, on a soft curve from where it was in the field to its home round the eye
+        ft = (now - fly.t0) / 1000; const cr = cv.getBoundingClientRect();
         if (ov.width !== Math.round(innerWidth * dpr) || ov.height !== Math.round(innerHeight * dpr)) { ov.width = Math.round(innerWidth * dpr); ov.height = Math.round(innerHeight * dpr); }
         og.setTransform(1, 0, 0, 1, 0, 0); og.clearRect(0, 0, ov.width, ov.height);
         const body = SV.querySelector('.sv-body'), shown = !SV.classList.contains('arriving') && body && +getComputedStyle(body).opacity > .995 && +getComputedStyle(SV).opacity > .995;
-        if ((ft > fly.end && shown) || ft > 5) { ov.remove(); ov = null; fly = null; }   // hand over to the page's own canvas only once it is fully faded in
-        else { og.setTransform(dpr, 0, 0, dpr, cr.left * dpr, cr.top * dpr);
-          P = pts.map(p => { const u = Math.max(0, Math.min(1, (ft - p.fd) / p.fD)), e = u * u * u * (u * (u * 6 - 15) + 10), sx = p.fx - cr.left, sy = p.fy - cr.top, dx = p.x - sx, dy = p.y - sy, arc = Math.sin(Math.PI * e);
-            const w = arc * E * .12;   // a little dreamy sway mid-flight
-            let y = sy + dy * e + dx * p.fc * arc + Math.cos(ft * 1.3 + p.ph) * w;
-            if (u < 1) { const m = fly.tb - cr.top, r = Math.min(1, ft / .35), sm = (y + m + Math.hypot(y - m, 24)) / 2; y += (sm - y) * r * r * (3 - 2 * r); }   // stay below the title while the letters come in
-            return { k: p.k, e, arc, x: sx + dx * e - dy * p.fc * arc + Math.sin(ft * 1.7 + p.ph) * w, y }; });
+        if ((ft > fly.end && shown) || ft > 5) { ov.remove(); ov = null; fly = null; calmT = now; }   // hand over to the page's own canvas only once it is fully faded in
+        else {
+          G = og; og.setTransform(dpr, 0, 0, dpr, 0, 0); P = new Array(pts.length);
+          const r = Math.min(1, ft / .4), rise = r * r * (3 - 2 * r);
+          cl.forEach((q, k) => {
+            const f = q.f, u = Math.max(0, Math.min(1, (ft - f.d) / f.D)), e = u * u * u * (u * (u * 6 - 15) + 10), tx = q.x + cr.left, ty = q.y + cr.top, arc = Math.sin(Math.PI * e) * f.c;
+            const cx = f.x + (tx - f.x) * e - (ty - f.y) * arc, cy = f.y + (ty - f.y) * e + (tx - f.x) * arc, a = f.th * e, co = Math.cos(a), si = Math.sin(a);
+            const mine = []; let top = 1e9;
+            pts.forEach((p, i) => { if (p.k !== k) return; const x = cx + p.rx * co - p.ry * si, y = cy + p.rx * si + p.ry * co; P[i] = { x, y, k }; mine.push(i); top = Math.min(top, y); });
+            if (u < 1) { const need = fly.tb - top, s = (need + Math.hypot(need, 24)) / 2 * rise; if (s > 0) mine.forEach(i => P[i].y += s); }   // the whole piece keeps below the title while the letters come in
+          });
         }
       }
-      const G = fly ? og : g; G.lineWidth = .8;
-      for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {   // links, as in the opening: brighter when closer; clusters join when they meet
-        const a = P[i], b = P[j], Lk = fly && a.k === b.k ? L * (1 + .9 * Math.max(a.arc, b.arc)) : L, dx = a.x - b.x; if (dx > Lk || dx < -Lk) continue; const d = Math.hypot(dx, a.y - b.y);   // mid-flight a cluster's lines stretch further before they let go
-        if (d < Lk) { const c2 = .72 * (.4 + (1 - d / Lk) * .6) * Math.min(1, (1 - d / Lk) * 3); G.strokeStyle = `rgba(${242 * .95 | 0},${247 * .97 | 0},255,${c2 * .7})`; G.beginPath(); G.moveTo(a.x, a.y); G.lineTo(b.x, b.y); G.stroke(); }
-      }
-      if (!drag && !fly) for (const p of pts) {   // reach toward the cursor, like the opening's grab lines
+      G.lineWidth = 1 / dpr; G.globalCompositeOperation = 'lighter';   // additive, one device pixel wide, like the field's lines
+      for (const [a, b, r0, d0] of links) { const A = P[a], B = P[b], r = fly ? r0 : Math.min(.95, r0 * Math.hypot(A.x - B.x, A.y - B.y) / d0);
+        G.strokeStyle = `rgba(242,247,255,${glow(r)})`; G.beginPath(); G.moveTo(A.x, A.y); G.lineTo(B.x, B.y); G.stroke(); }
+      if (fly) for (const [a, b, r0, d0] of seams) {   // the seams stretch and let go as the pieces part
+        const A = P[a], B = P[b], r = r0 * Math.hypot(A.x - B.x, A.y - B.y) / d0, k = Math.max(0, 1 - ft / .45); if (r >= 1 || k <= 0) continue;
+        G.strokeStyle = `rgba(242,247,255,${glow(r) * k})`; G.beginPath(); G.moveTo(A.x, A.y); G.lineTo(B.x, B.y); G.stroke(); }
+      G.globalCompositeOperation = 'source-over';
+      if (!drag && !fly) { g.lineWidth = .8; for (const p of pts) {   // reach toward the cursor, like the opening's grab lines
         const d = Math.hypot(p.x - mx, p.y - my);
         if (d < 170 && d > 110) { g.strokeStyle = `rgba(255,255,255,${(1 - d / 170) * .5})`; g.beginPath(); g.moveTo(p.x, p.y); g.lineTo(mx, my); g.stroke(); }
-      }
-      G.globalCompositeOperation = 'lighter';   // additive, like the field
-      for (const p of P) { const d = PT * (drag && drag.k === p.k ? 1.1 : .85); G.globalAlpha = .9; G.drawImage(dotC, p.x - d / 2, p.y - d / 2, d, d); }
+      } }
+      G.globalCompositeOperation = 'lighter'; G.globalAlpha = FOG;   // the field's points: same sprite, same size, same fogged brightness
+      for (const p of P) { const d = PT * (drag && drag.k === p.k ? 1.25 : 1); G.drawImage(dotC, p.x - d / 2, p.y - d / 2, d, d); }
       G.globalAlpha = 1; G.globalCompositeOperation = 'source-over';
-      if (fly) {   // the title's letters stay on top: the travelling points and lines pass under them
-        og.setTransform(Math.min(2, devicePixelRatio || 1), 0, 0, Math.min(2, devicePixelRatio || 1), 0, 0); og.globalCompositeOperation = 'destination-out';
+      if (fly) {   // the title's letters stay on top: the travelling pieces pass under them
+        og.globalCompositeOperation = 'destination-out';
         SV.querySelectorAll('.sv-t span').forEach(sp => { const r = sp.getBoundingClientRect(); og.fillRect(r.left - 3, r.top - 3, r.width + 6, r.height + 6); });
         og.globalCompositeOperation = 'source-over';
       }
