@@ -1867,7 +1867,7 @@
   const ePts = [], eVel = [];
   for (let i = 0; i < ALL; i++) { ePts.push(new THREE.Vector3()); eVel.push(new THREE.Vector3()); }
   const eHand = new Uint8Array(ALL);   // field points handed to The Mirror page: hidden here, carried on by its triangles
-  let mirHand = null;                   // { pts: [{x, y}] screen px, t0 } — picked up by mirTri()
+  let mirHand = null;                   // { pts: [{i, x, y}] screen px, t0 } — picked up by mirTri(), which gives back what it doesn't use
   const eGeo = new THREE.BufferGeometry();
   eGeo.setAttribute('position', new THREE.BufferAttribute(ePos, 3));
   eGeo.setAttribute('color', new THREE.BufferAttribute(eCol, 3));
@@ -2165,8 +2165,8 @@
       for (let i = 0; i < PFN; i++) { v.copy(ePts[i]).applyMatrix4(endGroup.matrixWorld).project(camera);
         const x = (v.x + 1) / 2 * innerWidth, y = (1 - v.y) / 2 * innerHeight; if (x > -20 && x < innerWidth + 20 && y > -20 && y < innerHeight + 20) on.push({ i, x, y }); }
       for (let k = on.length - 1; k > 0; k--) { const j = Math.random() * (k + 1) | 0; [on[k], on[j]] = [on[j], on[k]]; }
-      const take = on.slice(0, 78); take.forEach(o => eHand[o.i] = 1);   // 78 = the Mirror's cluster points
-      if (take.length) mirHand = { pts: take.map(o => ({ x: o.x, y: o.y })), t0: performance.now() };
+      on.forEach(o => eHand[o.i] = 1);
+      if (on.length) mirHand = { pts: on, t0: performance.now() };
     }
     for (let i = 0; i < PFN; i++) { if (eHand[i]) { eVel[i].set(0, 0, 0); continue; } const a = Math.random() * Math.PI * 2, s2 = 0.06 + Math.random() * 0.12; eVel[i].set(Math.cos(a) * s2, Math.sin(a) * s2, 0); }
     menuRings.forEach(m => { for (let i = 0; i < m.n; i++) { const a = Math.random() * Math.PI * 2, s2 = 0.04 + Math.random() * 0.1; m.vel[i].set(Math.cos(a) * s2, Math.sin(a) * s2, 0); } m.burst = true; });
@@ -2178,6 +2178,7 @@
     f2.style.left = ((ring && ring.sx) || innerWidth / 2) + 'px'; f2.style.top = ((ring && ring.sy) || innerHeight / 2) + 'px';
     f2.style.fontSize = (ring ? parseFloat(ring.btn.style.fontSize) || 12 : 12) + 'px'; f2.style.letterSpacing = '0.24em';
     document.body.appendChild(f2); if (ring) ring.btn.style.visibility = 'hidden';
+    if (key === 'mirror') { AV.classList.add('away'); AV.style.transition = 'none'; requestAnimationFrame(() => requestAnimationFrame(() => AV.style.transition = '')); }   // the artist view never shows through on the way to The Mirror
     AV.classList.add('on', 'ready', 'named'); avName.classList.remove('waiting'); avFit();
     SV.classList.add('arriving'); showSection(key);
     if (key === 'mirror') {   // The Mirror: the letters lift off the circle and fly home into the title, one by one; the page itself comes in as before
@@ -2748,22 +2749,28 @@
       cv = c; g = c.getContext('2d'); measure(); scale();
       cl = []; for (let k = 0; k < 6; k++) cl.push({ kind: 'orbit', a: k * Math.PI * 2 / 6 + .3, sp: (k % 2 ? -1 : 1) * (0.03 + (k % 3) * 0.012), r: .9 + (k % 2) * .08, free: 0, vx: 0, vy: 0 });
       for (let k = 0; k < 4; k++) cl.push({ kind: 'wander', side: k % 2 ? 1 : -1, a: k * 1.6, sp: 0.14 + k * 0.025, free: 0, vx: 0, vy: 0 });
+      const hand = mirHand && performance.now() - mirHand.t0 < 1500 ? mirHand : null; mirHand = null;
+      if (hand) cl.forEach((q, k) => { if (q.kind === 'wander') q.a = -Math.PI / 2 + (k - 6) * .25; });   // arriving from the opening: the wanderers start up beside the eye, in view
       pts = []; cl.forEach((q, k) => { [q.x, q.y] = home(q, 0);
         const n = 6 + (k % 3) * 2, R = E * (1.3 + (k % 3) * .25);   // the field's density: points as close as they are after Begin
         for (let i = 0; i < n; i++) { let ox, oy, t = 0; do { const a = Math.random() * 7, r = R * Math.sqrt(Math.random()); ox = Math.cos(a) * r; oy = Math.sin(a) * r * .8; t++; }
           while (t < 40 && pts.some(o => o.k === k && Math.hypot(o.ox - ox, o.oy - oy) < E * .62));
           pts.push({ k, x: q.x + ox, y: q.y + oy, vx: 0, vy: 0, ox, oy, ph: Math.random() * 7, sp: .25 + Math.random() * .3 }); } });
       fly = null; if (ov) { ov.remove(); ov = null; }
-      if (mirHand && performance.now() - mirHand.t0 < 1500) {   // each cluster point starts at the nearest handed-over field point, then drifts home
-        const src = mirHand.pts, used = new Uint8Array(src.length), cr = cv.getBoundingClientRect(); let end = 0; mirHand = null;
-        for (const p of pts) { let bi = -1, bd = 1e12, fi = -1, fd = 1e12;
-          src.forEach((s, i) => { const d = (s.x - cr.left - p.x) ** 2 + (s.y - cr.top - p.y) ** 2; if (d < fd) { fd = d; fi = i; } if (!used[i] && d < bd) { bd = d; bi = i; } });
-          const i = bi >= 0 ? bi : fi; used[i] = 1;
-          p.fx = src[i].x; p.fy = src[i].y; p.fd = .05 + Math.random() * .55; p.fD = 1.5 + Math.random() * .8; p.fc = (Math.random() - .5) * .5;
-          end = Math.max(end, p.fd + p.fD); }
-        fly = { t0: performance.now(), end };
-        ov = document.createElement('canvas'); ov.setAttribute('aria-hidden', 'true'); ov.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:6';
-        document.body.appendChild(ov); og = ov.getContext('2d');
+      if (hand) {   // the field's points gather into the clusters: every cluster point that lands on screen is flown in from the nearest field point
+        const src = hand.pts, cr = cv.getBoundingClientRect(), tb = SV.querySelector('.sv-title').getBoundingClientRect().bottom + 16, ns = src.length;
+        const land = pts.filter(p => { const x = p.x + cr.left, y = p.y + cr.top; return x > 6 && x < innerWidth - 6 && y > tb && y < innerHeight - 6; });
+        const pairs = []; land.forEach((p, a) => src.forEach((o, b) => pairs.push([(o.x - cr.left - p.x) ** 2 + (o.y - cr.top - p.y) ** 2, a, b])));
+        pairs.sort((u, v) => u[0] - v[0]);
+        const src4 = new Int32Array(land.length).fill(-1), used = new Uint8Array(ns);
+        for (const [, a, b] of pairs) if (src4[a] < 0 && !used[b]) { src4[a] = b; used[b] = 1; }
+        for (const [, a, b] of pairs) if (src4[a] < 0) src4[a] = b;   // fewer field points than landing spots: some split in two on the way
+        src.forEach((o, b) => { if (!used[b]) { eHand[o.i] = 0; const a = Math.random() * Math.PI * 2, s2 = 0.06 + Math.random() * 0.12; eVel[o.i].set(Math.cos(a) * s2, Math.sin(a) * s2, 0); } });   // the rest burst and fade with the field as before
+        for (const p of pts) { p.fd = -9; p.fD = 1; p.fc = 0; }   // spots off screen: already home
+        land.forEach((p, a) => { const o = src[src4[a]]; p.fx = o.x; p.fy = o.y; p.fd = .1 + Math.random() * .35; p.fD = 1.45 + Math.random() * .2; p.fc = (Math.random() - .5) * .45; });
+        fly = { t0: hand.t0, end: 2.05, tb };
+        ov = document.createElement('canvas'); ov.setAttribute('aria-hidden', 'true'); ov.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;pointer-events:none;z-index:7';
+        SV.after(ov); og = ov.getContext('2d');   // in the page's own layer, just above it and under the header
       }
       dotC = document.createElement('canvas'); dotC.width = dotC.height = 64; const dg = dotC.getContext('2d'), gr = dg.createRadialGradient(32, 32, 0, 32, 32, 32);   // the field's point sprite
       gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(.25, 'rgba(230,240,255,.85)'); gr.addColorStop(1, 'rgba(200,220,255,0)'); dg.fillStyle = gr; dg.fillRect(0, 0, 64, 64);
@@ -2816,11 +2823,14 @@
         const ft = (now - fly.t0) / 1000, cr = cv.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio || 1);
         if (ov.width !== Math.round(innerWidth * dpr) || ov.height !== Math.round(innerHeight * dpr)) { ov.width = Math.round(innerWidth * dpr); ov.height = Math.round(innerHeight * dpr); }
         og.setTransform(1, 0, 0, 1, 0, 0); og.clearRect(0, 0, ov.width, ov.height);
-        if (ft > fly.end) { ov.remove(); ov = null; fly = null; }
+        const body = SV.querySelector('.sv-body'), shown = !SV.classList.contains('arriving') && body && +getComputedStyle(body).opacity > .995 && +getComputedStyle(SV).opacity > .995;
+        if ((ft > fly.end && shown) || ft > 5) { ov.remove(); ov = null; fly = null; }   // hand over to the page's own canvas only once it is fully faded in
         else { og.setTransform(dpr, 0, 0, dpr, cr.left * dpr, cr.top * dpr);
           P = pts.map(p => { const u = Math.max(0, Math.min(1, (ft - p.fd) / p.fD)), e = u * u * u * (u * (u * 6 - 15) + 10), sx = p.fx - cr.left, sy = p.fy - cr.top, dx = p.x - sx, dy = p.y - sy, arc = Math.sin(Math.PI * e);
             const w = arc * E * .12;   // a little dreamy sway mid-flight
-            return { k: p.k, e, arc, x: sx + dx * e - dy * p.fc * arc + Math.sin(ft * 1.7 + p.ph) * w, y: sy + dy * e + dx * p.fc * arc + Math.cos(ft * 1.3 + p.ph) * w }; });
+            let y = sy + dy * e + dx * p.fc * arc + Math.cos(ft * 1.3 + p.ph) * w;
+            if (u < 1) { const m = fly.tb - cr.top, r = Math.min(1, ft / .35), sm = (y + m + Math.hypot(y - m, 24)) / 2; y += (sm - y) * r * r * (3 - 2 * r); }   // stay below the title while the letters come in
+            return { k: p.k, e, arc, x: sx + dx * e - dy * p.fc * arc + Math.sin(ft * 1.7 + p.ph) * w, y }; });
         }
       }
       const G = fly ? og : g; G.lineWidth = .8;
@@ -2835,6 +2845,11 @@
       G.globalCompositeOperation = 'lighter';   // additive, like the field
       for (const p of P) { const d = PT * (drag && drag.k === p.k ? 1.1 : .85); G.globalAlpha = .9; G.drawImage(dotC, p.x - d / 2, p.y - d / 2, d, d); }
       G.globalAlpha = 1; G.globalCompositeOperation = 'source-over';
+      if (fly) {   // the title's letters stay on top: the travelling points and lines pass under them
+        og.setTransform(Math.min(2, devicePixelRatio || 1), 0, 0, Math.min(2, devicePixelRatio || 1), 0, 0); og.globalCompositeOperation = 'destination-out';
+        SV.querySelectorAll('.sv-t span').forEach(sp => { const r = sp.getBoundingClientRect(); og.fillRect(r.left - 3, r.top - 3, r.width + 6, r.height + 6); });
+        og.globalCompositeOperation = 'source-over';
+      }
     };
     requestAnimationFrame(tick);
   })();
