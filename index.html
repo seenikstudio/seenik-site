@@ -2724,11 +2724,11 @@
   // Grab any cluster and throw it; it glides, then finds its way home. Points never settle on the writing.
   (function mirTri() {
     let cv = null, g, W, H, HH, pts = [], cl = [], links = [], seams = [], last = 0, mx = -1e4, my = -1e4, drag = null, boxes = [], noClick = false;
-    let fly = null, ov = null, og = null, calmT = -1e9;   // the hand-off from the opening: its pieces travel on a screen overlay until they land
+    let fly = null, ov = null, og = null, calmT = -1e9, edge = 1;   // edge: just below the thin line along the top of the eye; nothing is ever drawn above it   // the hand-off from the opening: its pieces travel on a screen overlay until they land
     const near = (x, y) => { let best = null, bd = 30; for (const p of pts) { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = p; } } return best; };
     const measure = () => {   // the canvas runs from the top of the eye to the bottom of the first statement
       const st = cv.parentElement, hero = st.querySelector('.mir-hero'), first = SV.querySelector('.mir-first'), sr = st.getBoundingClientRect();
-      W = sr.width; HH = hero.getBoundingClientRect().height; H = first ? first.getBoundingClientRect().bottom - sr.top : HH;
+      W = sr.width; HH = hero.getBoundingClientRect().height; H = first ? first.getBoundingClientRect().bottom - sr.top : HH; edge = hero.getBoundingClientRect().top - sr.top + 1;
       const dpr = Math.min(2, devicePixelRatio || 1); cv.style.height = H + 'px'; cv.width = W * dpr; cv.height = H * dpr; g.setTransform(dpr, 0, 0, dpr, 0, 0);
       boxes = first ? [...first.querySelectorAll('p')].map(el => { const r = el.getBoundingClientRect(), x0 = r.left + (r.width - Math.min(r.width, el.scrollWidth)) / 2;
         const rg = document.createRange(); rg.selectNodeContents(el); const tr = rg.getBoundingClientRect();
@@ -2740,7 +2740,7 @@
       const top = HH * .55, bot = H - 40, y = (top + bot) / 2 + Math.sin(q.a) * (bot - top) / 2;
       return [W / 2 + q.side * W * (.42 + .03 * Math.sin(q.a * 1.7)), y];
     };
-    const fit = (q, x, y) => [Math.max(4 - q.ext[0], Math.min(W - 4 - q.ext[2], x)), Math.max(4 - q.ext[1], Math.min(H - 4 - q.ext[3], y))];   // a whole piece stays on the canvas
+    const fit = (q, x, y) => [Math.max(4 - q.ext[0], Math.min(W - 4 - q.ext[2], x)), Math.max(edge + PT / 2 + 4 - q.ext[1], Math.min(H - 4 - q.ext[3], y))];   // a whole piece stays on the canvas, below the eye's top line
     let E = 120, PT = 8, FOG = .8;
     const scale = () => {   // exactly the field after Begin: its triangle edge, its point size as three.js draws it, and the scene's fog on it
       try { const dist = camera.position.z - 0.3, visH = 2 * dist * Math.tan(22.5 * Math.PI / 180), ppw = innerHeight / visH;
@@ -2844,7 +2844,7 @@
       }
       const dpr = Math.min(2, devicePixelRatio || 1);
       g.clearRect(0, 0, W, H);
-      let P = pts, G = g, ft = 0;
+      let P = pts, G = g, ft = 0, clipY = edge;
       if (fly) {   // in flight: each piece moves whole, on a soft curve from where it was in the field to its home round the eye
         ft = (now - fly.t0) / 1000; const cr = cv.getBoundingClientRect();
         if (ov.width !== Math.round(innerWidth * dpr) || ov.height !== Math.round(innerHeight * dpr)) { ov.width = Math.round(innerWidth * dpr); ov.height = Math.round(innerHeight * dpr); }
@@ -2852,7 +2852,7 @@
         const body = SV.querySelector('.sv-body'), shown = !SV.classList.contains('arriving') && body && +getComputedStyle(body).opacity > .995 && +getComputedStyle(SV).opacity > .995;
         if ((ft > fly.end && shown) || ft > 5) { ov.remove(); ov = null; fly = null; calmT = now; }   // hand over to the page's own canvas only once it is fully faded in
         else {
-          G = og; og.setTransform(dpr, 0, 0, dpr, 0, 0); P = new Array(pts.length);
+          G = og; og.setTransform(dpr, 0, 0, dpr, 0, 0); P = new Array(pts.length); clipY = cr.top + edge;
           const r = Math.min(1, ft / .4), rise = r * r * (3 - 2 * r);
           cl.forEach((q, k) => {
             const f = q.f, u = Math.max(0, Math.min(1, (ft - f.d) / f.D)), e = u * u * u * (u * (u * 6 - 15) + 10), tx = q.x + cr.left, ty = q.y + cr.top, arc = Math.sin(Math.PI * e) * f.c;
@@ -2863,6 +2863,7 @@
           });
         }
       }
+      G.save(); G.beginPath(); G.rect(0, clipY, 1e5, 1e5); G.clip();   // hard border: the eye's top line
       G.lineWidth = 1 / dpr; G.globalCompositeOperation = 'lighter';   // additive, one device pixel wide, like the field's lines
       for (const [a, b, r0, d0] of links) { const A = P[a], B = P[b], r = fly ? r0 : Math.min(.95, r0 * Math.hypot(A.x - B.x, A.y - B.y) / d0);
         G.strokeStyle = `rgba(242,247,255,${glow(r)})`; G.beginPath(); G.moveTo(A.x, A.y); G.lineTo(B.x, B.y); G.stroke(); }
@@ -2876,7 +2877,7 @@
       } }
       G.globalCompositeOperation = 'lighter'; G.globalAlpha = FOG;   // the field's points: same sprite, same size, same fogged brightness
       for (const p of P) { const d = PT * (drag && drag.k === p.k ? 1.25 : 1); G.drawImage(dotC, p.x - d / 2, p.y - d / 2, d, d); }
-      G.globalAlpha = 1; G.globalCompositeOperation = 'source-over';
+      G.globalAlpha = 1; G.globalCompositeOperation = 'source-over'; G.restore();
       if (fly) {   // the title's letters stay on top: the travelling pieces pass under them
         og.globalCompositeOperation = 'destination-out';
         SV.querySelectorAll('.sv-t span').forEach(sp => { const r = sp.getBoundingClientRect(); og.fillRect(r.left - 3, r.top - 3, r.width + 6, r.height + 6); });
