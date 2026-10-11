@@ -1001,7 +1001,20 @@
   #artist-view .who .sub span { display: none !important; }
   #artist-view .who .sub a { display: inline-block; border: 1px solid rgba(255,255,255,.6) !important; border-radius: 999px; padding: 10px 22px !important; font-size: 11px !important; letter-spacing: .3em !important; text-decoration: none; }
 }
+
+/* PHONE HOLDING SCREEN: the site is desktop-only for now */
+#phone-hold { display: none; }
+@media (max-width: 760px) {
+  #phone-hold { display: grid; position: fixed; inset: 0; z-index: 100000; background: #000; color: #f2f4f7; place-content: center; justify-items: center; gap: 26px; padding: 32px 28px; text-align: center; font: 400 13px/1.8 'IBM Plex Mono', ui-monospace, Menlo, monospace; }
+  #phone-hold img { width: min(78vw, 340px); display: block; }
+  #phone-hold h1 { margin: 0; font: 400 15px/1.6 'IBM Plex Mono', monospace; letter-spacing: .3em; text-transform: uppercase; }
+  #phone-hold p { margin: 0; max-width: 30ch; color: rgba(242,244,247,.85); }
+  #phone-hold .mail { letter-spacing: .08em; border-bottom: 1px solid rgba(242,244,247,.4); padding-bottom: 3px; user-select: all; }
+  body > *:not(#phone-hold) { visibility: hidden; }
+}
 </style>
+<div id="phone-hold" role="dialog" aria-label="Desktop only"><img alt="Seenik" src="img/logo-black.jpg"><h1>Best on desktop</h1><p>The full Seenik experience is built for a larger screen. A mobile version is coming soon.</p><p>Get in touch</p><span class="mail">sandy@seenik.studio</span></div>
+
 
 <canvas id="stage" aria-label="A floating geometric shape made of particles that scatters when you move through it"></canvas>
 <canvas id="stars" aria-hidden="true"></canvas>
