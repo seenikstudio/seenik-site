@@ -1,0 +1,33 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Studio subtitle options</title>
+<style>
+body{margin:0;background:#000;color:#eef3ff;font:300 17px/1.7 "Helvetica Neue",Arial,sans-serif;padding:24px 16px}
+h2{font:400 11px/1 monospace;letter-spacing:.22em;text-transform:uppercase;color:#8a95a8;margin:0 0 18px}
+.opt{border-top:1px solid #222;padding:40px 0 48px;text-align:center;position:relative}
+.t span{display:block}
+button{position:absolute;right:0;top:14px;background:none;border:1px solid #444;color:#aaa;border-radius:99px;padding:5px 12px;font:11px monospace;cursor:pointer}
+/* A: a line draws, text rises from behind it */
+.A .rule{height:1px;background:#fff;width:0;margin:0 auto 18px;animation:draw 1s cubic-bezier(.7,0,.2,1) forwards}
+.A .t span{overflow:hidden}.A .t i{display:block;font-style:normal;transform:translateY(110%);animation:up .9s cubic-bezier(.2,.8,.2,1) forwards}
+.A .t span+span i{animation-delay:.15s}.A .t span:first-child i{animation-delay:.6s}.A .t span+span i{animation-delay:.75s}
+@keyframes draw{to{width:min(560px,80%)}}@keyframes up{to{transform:none}}
+/* B: large, light, word by word */
+.B .t{font:200 26px/1.45 "Helvetica Neue",Arial,sans-serif;letter-spacing:.01em}
+.B .w{opacity:0;filter:blur(6px);display:inline-block;animation:in .7s ease forwards}
+@keyframes in{to{opacity:1;filter:none}}
+/* C: a vertical light bar, text slides out from it */
+.C .wrap{display:inline-flex;gap:22px;align-items:stretch;text-align:left}
+.C .bar{width:2px;background:linear-gradient(#fff,#7fa8ff);box-shadow:0 0 14px #9cc0ff;transform:scaleY(0);animation:bar .6s cubic-bezier(.7,0,.2,1) forwards}
+.C .t{clip-path:inset(0 100% 0 0);animation:wipe 1s .5s cubic-bezier(.7,0,.2,1) forwards}
+@keyframes bar{to{transform:none}}@keyframes wipe{to{clip-path:inset(0 0 0 0)}}
+/* D: light scans across the letters once, then settles bright */
+.D .t{background:linear-gradient(100deg,#3a4250 40%,#fff 50%,#3a4250 60%) 120% 0/250% 100% no-repeat,#eef3ff;background-clip:text;-webkit-background-clip:text;color:transparent;animation:scan 2.2s ease forwards}
+@keyframes scan{0%{background:linear-gradient(100deg,#3a4250 40%,#fff 50%,#3a4250 60%) 120% 0/250% 100%;-webkit-background-clip:text}99%{background:linear-gradient(100deg,#3a4250 40%,#fff 50%,#3a4250 60%) -20% 0/250% 100%;-webkit-background-clip:text}100%{background:#eef3ff;-webkit-background-clip:text}}
+</style></head><body>
+<div class="opt A"><h2>A · Line draws, text rises</h2><button>Replay</button><div class="rule"></div><p class="t"><span><i>Seenik was founded to bring a deliberate story arc to the fulldome medium,</i></span><span><i>grounded in earth imagery and the patterns that exist all around and inside of us.</i></span></p></div>
+<div class="opt B"><h2>B · Large and light, word by word</h2><button>Replay</button><p class="t" data-words><span>Seenik was founded to bring a deliberate story arc to the fulldome medium,</span><span>grounded in earth imagery and the patterns that exist all around and inside of us.</span></p></div>
+<div class="opt C"><h2>C · Light bar, text slides out</h2><button>Replay</button><div class="wrap"><div class="bar"></div><p class="t" style="margin:0"><span>Seenik was founded to bring a deliberate story arc to the fulldome medium,</span><span>grounded in earth imagery and the patterns that exist all around and inside of us.</span></p></div></div>
+<div class="opt D"><h2>D · Light scans the letters once</h2><button>Replay</button><p class="t"><span>Seenik was founded to bring a deliberate story arc to the fulldome medium,</span><span>grounded in earth imagery and the patterns that exist all around and inside of us.</span></p></div>
+<script>
+let n=0;document.querySelectorAll('[data-words] span').forEach(s=>{s.innerHTML=s.textContent.split(' ').map(w=>`<b class="w" style="font-weight:inherit;animation-delay:${(n++)*.06}s">${w}</b>`).join(' ')});
+document.addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')return;const o=e.target.parentNode;o.replaceWith(o.cloneNode(true))});
+</script></body></html>
