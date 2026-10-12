@@ -1152,6 +1152,7 @@
     .reel-intro.st-intro > span { animation: sn-rise 1.1s cubic-bezier(.2,.7,.2,1) both; }
     .reel-intro.st-intro > span + span { animation-delay: .18s; }
   }
+  #restart { display: none !important; }   /* intro video is gone: no Restart */
 </style>
 <div id="phone-hold" role="dialog" aria-label="Desktop only"><img alt="Seenik" src="img/logo-black.jpg"><h1>Best on desktop</h1><p>The full Seenik experience is built for a larger screen. A mobile version is coming soon.</p><p>Get in touch</p><span class="mail">sandy@seenik.studio</span></div>
 
@@ -2478,7 +2479,7 @@
   document.querySelector('#artist-head .contact').addEventListener('click', () => showSection('contact'));
   document.addEventListener('input', e => {   // the Studio message box grows with what you write, then scrolls once it's tall
     const t = e.target; if (!t.matches || !t.matches('.st-form textarea')) return; t.style.height = 'auto'; t.style.height = Math.min(t.scrollHeight + 2, Math.round(innerHeight * .4)) + 'px'; });
-  document.addEventListener('submit', e => { const f = e.target.closest('.cform'); if (!f) return; e.preventDefault(); const m = f.querySelector('.sent'); m.hidden = false; m.textContent = 'Thank you — sending goes live once the site is on seenik.studio. For now, write to sandy@seenik.studio.';
+  document.addEventListener('submit', e => { const f = e.target.closest('.cform'); if (!f) return; e.preventDefault(); const m = f.querySelector('.sent'); m.hidden = false; const fd = new FormData(f); if ([...f.querySelectorAll('[required]')].some(x => !x.value.trim()) || (f.email && !/^\S+@\S+\.\S+$/.test(f.email.value.trim()))) { m.textContent = 'Please fill in your name, a valid email and a message.'; return; } fd.append('access_key', '4431691c-d78a-46dd-8d0c-d297662eadf1'); fd.append('subject', 'New message from seenik.studio (' + (f.dataset.to || 'site') + ')'); fd.append('from_name', 'Seenik website'); m.textContent = 'Sending…'; fetch('https://api.web3forms.com/submit', { method: 'POST', body: fd }).then(r => r.json()).then(j => { if (j.success) { m.textContent = 'Thank you — your message has been sent.'; f.reset(); } else throw 0; }).catch(() => { m.textContent = 'Sorry, that didn\u2019t send. Please write to sandy@seenik.studio.'; });
     if (f.classList.contains('st-form') && document.querySelector('.st-logo')) {   // a spark leaves the Send button and flies into the logo, which lights up
       const b = f.querySelector('button').getBoundingClientRect(), lo = document.querySelector('.st-logo'), lr = lo.getBoundingClientRect(), sp = document.createElement('i'); sp.className = 'st-spark';
       sp.style.left = (b.left + b.width / 2) + 'px'; sp.style.top = (b.top + b.height / 2) + 'px'; document.body.appendChild(sp);
