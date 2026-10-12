@@ -524,7 +524,7 @@
   .st-spark { position: fixed; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: #fff; box-shadow: 0 0 18px 6px rgba(200,220,255,.8); pointer-events: none; z-index: 30; transition: left .7s cubic-bezier(.5,0,.3,1), top .7s cubic-bezier(.5,0,.3,1), opacity .3s .6s; }
   @media (max-width: 760px) { .st-top { grid-template-columns: minmax(0, 1fr); } }
   .st-logo { width: min(560px, 62%); display: block; position: relative; z-index: 1; user-select: none; pointer-events: none; }
-  .mir-sing.st-say { padding-block: 0; width: 100%; }
+  .mir-sing.st-say { padding-block: 0; width: 100%; position: relative; z-index: 2; }   /* always in front of the logo */
   .mir-sing.st-based { padding-block: clamp(14px, 2.5vh, 28px); width: var(--sw, 100%); --sw: calc((var(--vw, 100vw) - 48px) * .85 + 24px); justify-self: center; }
   .mir-sing.st-based .mir-big { font-size: min(22px, calc((var(--vw, 100vw) - 48px) * .85 / 62)) !important; letter-spacing: .3em; white-space: nowrap; }   /* the line runs the full width of the frames above and below */
   .st-pier { margin-top: 0; }
@@ -760,7 +760,7 @@
   .mir-sing.mir-first { padding-top: clamp(10px, 2.5vh, 32px); padding-bottom: clamp(30px, 5vh, 60px); }
   .mir-first .mir-small { font: 400 clamp(15px, 1.55vw, 22px)/1.6 var(--mono); color: var(--fg); letter-spacing: .3em; text-transform: uppercase; }   /* same caps style as the line above it */
   .mir-lined { background: #000; }
-  .mir-lined img { -webkit-mask: linear-gradient(to bottom, #000 62%, transparent 100%); mask: linear-gradient(to bottom, #000 62%, transparent 100%); }
+  .mir-lined img { -webkit-mask: linear-gradient(to bottom, #000 62%, transparent 100%), linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); -webkit-mask-composite: source-in; mask: linear-gradient(to bottom, #000 62%, transparent 100%), linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); mask-composite: intersect; }   /* fades to black at the bottom and both sides */
   .mir-lined::after { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px; z-index: 2; pointer-events: none; background: linear-gradient(90deg, transparent 6%, rgba(255,255,255,.75) 26%, rgba(255,255,255,.75) 74%, transparent 94%); }
   .mir-wide img { filter: none; }
   /* a fine line where the dome is cut off at the top of the picture, fading to nothing at both ends */
@@ -2333,7 +2333,7 @@
       // the word sEEnik sits centred in the space left of the form; the dark swirl behind it is free to run off the left edge
       const ar = (lo.naturalHeight / lo.naturalWidth) || .5606, dh = Math.min(r.height, r.width * ar), dw = dh / ar, iy = r.top + (r.height - dh) / 2, ix = r.left + (r.width - dw) / 2;   // where the picture actually sits inside its box
       const ox = ix + dw * .949, oy = iy + dh * .466, wx = ix + dw * .569, lx = ix + dw * .066, c0 = Math.max(0, (document.documentElement.clientWidth - PAGE_MAX) / 2), c = (c0 + goal) / 2;   // centred in the page column, not the whole window
-      const S = Math.min((goal - c) / (ox - wx), Math.max(1.45, (c + 40) / (wx - lx))), t = c - (ox + (wx - ox) * S);   // word centred; the right point sits level with the email line
+      const S = Math.min(1.6, (goal - c) / (ox - wx), Math.max(1.45, (c + 40) / (wx - lx))), t = c - (ox + (wx - ox) * S);   // word centred; the right point sits level with the email line
       lo.style.transformOrigin = (ox - r.left).toFixed(1) + 'px ' + (oy - r.top).toFixed(1) + 'px'; lo.style.scale = S.toFixed(3); lo.style.translate = Math.round(t) + 'px ' + Math.round(em.bottom - .5 - oy) + 'px'; };
     requestAnimationFrame(fit); })();
   (function reelLabels() {   // Digital Media: every video title the same size, small enough that the longest one fits inside its thumbnail
@@ -2455,7 +2455,7 @@
       { const fs = nx.querySelector && nx.querySelector('.reel-strip'); if (fs) { const r = fs.getBoundingClientRect(); c = [r.top, r.bottom]; } }   // Digital Media: measure to the top edge of the film roll itself
       const lo = nx.querySelector && nx.querySelector('.st-lead .st-logo');   // The Studio: the first thing you see is the top of the logo artwork (or the Contact heading)
       if (lo) { const r = lo.getBoundingClientRect(), h = SV.querySelector('form.st-form[data-to="studio"]'), ht = h ? h.getBoundingClientRect().top : 0; c = [Math.min(r.top + r.height * .08, ht > 0 ? ht : 1e9), 0]; }
-      const want = b[0] - a[1] + (nx.querySelector && nx.querySelector('.reel-strip') ? 28 : 0), have = c[0] - b[1], m = parseFloat(nx.style.marginTop) || 0;   // Digital Media: the film roll sits a little lower
+      const want = b[0] - a[1] + (nx.querySelector && nx.querySelector('.reel-strip') ? 28 : 0) - (lo ? 30 : 0), have = c[0] - b[1], m = parseFloat(nx.style.marginTop) || 0;   // Digital Media: the film roll sits a little lower
       if (Math.abs(want - have) > .5) nx.style.marginTop = Math.max(-240, Math.min(240, m + want - have)).toFixed(1) + 'px'; };
     requestAnimationFrame(fit); })();
   document.getElementById('top-contact').addEventListener('click', e => { e.stopPropagation(); showSection('contact'); });
@@ -2610,7 +2610,7 @@
   }
 
   // ======== Site navigation + section pages ========
-  const PAGE_MAX = 1440;   // on big screens the pages stop growing at this width and sit centred in black
+  const PAGE_MAX = 1280;   // on big screens the pages stop growing at this width and sit centred in black
   const SV = document.getElementById('section-view'), svInner = SV.querySelector('.sv-inner');
   const navBtns = [...document.querySelectorAll('.site-nav button')];
   // the corner wordmark: SANDY / HEIDEBRECHT in the Artist area, SEENIK / DOME IMMERSION everywhere else
