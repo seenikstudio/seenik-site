@@ -2332,7 +2332,7 @@
       lo.style.scale = 'none'; lo.style.translate = 'none'; const r = lo.getBoundingClientRect(), fr = fm.getBoundingClientRect(), em = fm.form.querySelectorAll('input')[1].getBoundingClientRect(), goal = fr.left - 16;
       // the word sEEnik sits centred in the space left of the form; the dark swirl behind it is free to run off the left edge
       const ar = (lo.naturalHeight / lo.naturalWidth) || .5606, dh = Math.min(r.height, r.width * ar), dw = dh / ar, iy = r.top + (r.height - dh) / 2, ix = r.left + (r.width - dw) / 2;   // where the picture actually sits inside its box
-      const ox = ix + dw * .949, oy = iy + dh * .466, wx = ix + dw * .569, lx = ix + dw * .066, c = goal / 2;
+      const ox = ix + dw * .949, oy = iy + dh * .466, wx = ix + dw * .569, lx = ix + dw * .066, c0 = Math.max(0, (document.documentElement.clientWidth - PAGE_MAX) / 2), c = (c0 + goal) / 2;   // centred in the page column, not the whole window
       const S = Math.min((goal - c) / (ox - wx), Math.max(1.45, (c + 40) / (wx - lx))), t = c - (ox + (wx - ox) * S);   // word centred; the right point sits level with the email line
       lo.style.transformOrigin = (ox - r.left).toFixed(1) + 'px ' + (oy - r.top).toFixed(1) + 'px'; lo.style.scale = S.toFixed(3); lo.style.translate = Math.round(t) + 'px ' + Math.round(em.bottom - .5 - oy) + 'px'; };
     requestAnimationFrame(fit); })();
