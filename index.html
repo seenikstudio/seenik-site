@@ -811,6 +811,10 @@
     display: grid; place-items: center; text-align: center;
   }
   .menu-ring[hidden] { display: none; }
+  .menu-ring .mr-the, .menu-ring .mr-word { display: block; padding-left: .24em; }
+  .menu-ring .mr-word { line-height: 1.1; letter-spacing: .24em; }
+  .menu-ring:has(.mr-word) { align-content: center; gap: .15em; transform: none; margin: calc(-1 * var(--h, 56px)); }
+  .menu-ring .mr-the, .menu-ring .mr-word { -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
   .modes[hidden], .hint[hidden] { display: none !important; }
   .menu-ring:focus-visible { outline: 1px solid var(--glow); outline-offset: 2px; }
   .menu-ring.pop { animation: pop .5s ease-out; }
@@ -1055,7 +1059,7 @@
     #artist-view .rows { flex: 1; min-height: 0; display: flex; justify-content: center; align-items: center; padding-top: 3vh; }
     #artist-view .strip-wrap { display: flex; gap: 14px; width: min(940px, 62vw); height: min(100%, 76vh); box-sizing: border-box; padding: 24px;
       border: 1px solid rgba(255,255,255,.2); border-radius: 24px; background: linear-gradient(#101115, #07080a);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.09), 0 40px 90px rgba(0,0,0,.7); }   /* the interface panel that holds the three buttons */
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.09), 0 40px 90px rgba(0,0,0,.7), 0 0 0 1px rgba(205,225,255,.28), 0 0 18px 2px rgba(190,215,255,.2), 0 0 50px 6px rgba(190,215,255,.06); }   /* the interface panel that holds the three buttons, with a faint halo behind it */
     #artist-view .strip-wrap .sprockets { display: none; }
     /* three raised 3D buttons: a lit top edge, a soft shadow beneath; they lift on hover and press in on click */
     #artist-view .frame { transition: transform .35s cubic-bezier(.2,.7,.2,1); }
@@ -1131,6 +1135,9 @@
     #section-view:has(.st-intro) .sv-t, #section-view:has(.mir-open) .sv-t { display: inline-block; padding: 14px 26px 14px calc(26px + .3em); border: 1px solid rgba(255,255,255,.4); border-radius: 999px; }
     .reel-intro.st-intro, .reel-intro.mir-open { width: max-content !important; max-width: calc(100% - 40px); justify-self: center; padding: 22px 46px; border: 1px solid rgba(255,255,255,.32); border-radius: 46px; box-sizing: border-box; margin-top: 46px !important; will-change: transform; backface-visibility: hidden; }
   }
+
+  /* Artist panel (desktop) sits a little closer to the header; the name's landing line follows it automatically */
+  @media (min-width: 761px) { #artist-view .strip-wrap { margin-top: -44px; } }
 </style>
 <div id="phone-hold" role="dialog" aria-label="Desktop only"><img alt="Seenik" src="img/logo-black.jpg"><h1>Best on desktop</h1><p>The full Seenik experience is built for a larger screen. A mobile version is coming soon.</p><p>Get in touch</p><span class="mail">sandy@seenik.studio</span></div>
 
@@ -1913,7 +1920,7 @@
     const disc = new THREE.Mesh(new THREE.CircleGeometry(R * 0.9, 64), new THREE.MeshBasicMaterial({ color: 0x000000, depthWrite: true, fog: false }));
     disc.position.z = -0.03; g.add(disc);
     const btn = document.createElement('button');
-    btn.type = 'button'; btn.className = 'menu-ring'; btn.textContent = label; btn.hidden = true; btn.dataset.key = key;
+    btn.type = 'button'; btn.className = 'menu-ring'; btn.textContent = label; if (/^The /.test(label) && ['studio', 'mirror', 'artist'].includes(key)) btn.innerHTML = `<span class="mr-the">The</span> <span class="mr-word">${label.slice(4)}</span>`; btn.hidden = true; btn.dataset.key = key;
     btn.addEventListener('pointerdown', e => e.stopPropagation());
     btn.addEventListener('click', e => {
       e.stopPropagation(); btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop'); playChord();
@@ -2001,9 +2008,18 @@
     tmp2.copy(m.g.position).add(new THREE.Vector3(m.R, 0, 0)).project(camera);
     const sx = (tmp.x + 1) / 2 * innerWidth, sy = (1 - tmp.y) / 2 * innerHeight;
     const rpx = Math.max(26, Math.abs(tmp2.x - tmp.x) / 2 * innerWidth);
-    m.btn.style.left = sx + 'px'; m.btn.style.top = sy + 'px';
+    if (m.btn.querySelector('.mr-word')) { m.btn.style.left = '0px'; m.btn.style.top = '0px'; { const p = m._lp || (m._lp = { x: sx, y: sy }), fast = Math.hypot(sx - p.x, sy - p.y) > .35; p.x = sx; p.y = sy;   // gliding: smooth sub-pixel moves; resting: whole pixels, so the letters stay crisp
+        const tx = fast ? sx.toFixed(2) + 'px ' + sy.toFixed(2) + 'px' : Math.round(sx) + 'px ' + Math.round(sy) + 'px'; if (m.btn.style.translate !== tx) m.btn.style.translate = tx; } }
+    else { m.btn.style.left = sx + 'px'; m.btn.style.top = sy + 'px'; }
     m.btn.style.width = m.btn.style.height = (rpx * 1.9) + 'px';
-    m.btn.style.fontSize = Math.max(8, Math.min(rpx * 0.15, rpx * 1.45 / (0.84 * m.btn.textContent.length))) + 'px';   // long labels stay inside the ring
+    { const w = m.btn.querySelector('.mr-word');
+      if (!w) m.btn.style.fontSize = Math.max(8, Math.min(rpx * 0.15, rpx * 1.45 / (0.84 * m.btn.textContent.length))) + 'px';   // long labels stay inside the ring
+      else {   // The Studio · The Mirror · The Artist: sized once from the ring's full size, so the letters never shake while the ring breathes
+        const K = innerWidth + 'x' + innerHeight, R = (window._mrR && window._mrR.k === K) ? window._mrR : (window._mrR = { k: K, r: 0 });
+        if (m.vis > .95) R.r = Math.max(R.r, Math.round(rpx)); const rr = R.r || Math.round(rpx);
+        const fT = Math.max(8, Math.round(rr * 0.15)) + 'px', fW = Math.max(10, Math.round(rr * 1.05 / (0.84 * 6))) + 'px';
+        if (m.btn.style.fontSize !== fT) m.btn.style.fontSize = fT; if (w.style.fontSize !== fW) w.style.fontSize = fW;
+        const half = Math.round(rr * .95), box = half * 2 + 'px'; if (m.btn.style.width !== box) { m.btn.style.width = m.btn.style.height = box; m.btn.style.setProperty('--h', half + 'px'); } } }   // a fixed box too, so the words sit still
     if (!m.text) m.btn.hidden = m.vis < 0.5;
     m.sx = sx; m.sy = sy; m.sr = m.text ? rpx * 0.95 * mg : rpx * 0.95 * m.vis;
     const over = mouse.active && Math.hypot(mouse.px - sx, mouse.py - sy) < rpx;
@@ -2334,7 +2350,9 @@
   (function contactLife() {   // desktop Contact: the hanging, tuggable photo and the geodesic jellyfish
     const teth = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); teth.setAttribute('class', 'ct-teth'); document.body.appendChild(teth);
     { const g = document.createElement('div'); g.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden'; g.innerHTML = '<svg width="0" height="0"><defs><radialGradient id="ig-grad" cx="30%" cy="107%" r="150%"><stop offset="0" stop-color="#fdf497"/><stop offset=".05" stop-color="#fdf497"/><stop offset=".45" stop-color="#fd5949"/><stop offset=".6" stop-color="#d6249f"/><stop offset=".9" stop-color="#285AEB"/></radialGradient></defs></svg>'; document.body.appendChild(g); }
-    const tug = { x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0, on: false, sx: 0, sy: 0 }; let pic = null, sPill = null, mPill = null; const mr = { x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0, on: false, sx: 0, sy: 0 }; const st2 = { x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0, on: false, sx: 0, sy: 0 };
+    const tug = { x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0, on: false, sx: 0, sy: 0 }; let pic = null, sPill = null, mPill = null; const mr = { x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0, on: false, sx: 0, sy: 0 };
+    window._mirSnap = () => { mr.x = 0; mr.y = 95; mr.vx = 0; mr.vy = 0; mr.tx = mr.ty = 0; mr.snap = performance.now(); };   // start pulled down, strings stretched
+    const st2 = { x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0, on: false, sx: 0, sy: 0 };
     const Ph = (1 + Math.sqrt(5)) / 2, IV = [[-1, Ph, 0], [1, Ph, 0], [-1, -Ph, 0], [1, -Ph, 0], [0, -1, Ph], [0, 1, Ph], [0, -1, -Ph], [0, 1, -Ph], [Ph, 0, -1], [Ph, 0, 1], [-Ph, 0, -1], [-Ph, 0, 1]].map(v => { const n = Math.hypot(...v); return v.map(c => c / n); });
     const IE = []; for (let a = 0; a < 12; a++) for (let b = a + 1; b < 12; b++) if (Math.hypot(IV[a][0] - IV[b][0], IV[a][1] - IV[b][1], IV[a][2] - IV[b][2]) < 1.1) IE.push([a, b]);
     const dome = (cx, cy, r, ry, sy) => { const c = Math.cos(ry), s = Math.sin(ry); let d = '', dots = '';
@@ -2366,13 +2384,14 @@
           op.style.transform = `translate3d(${ox.toFixed(2)}px, ${oy.toFixed(2)}px, 0)`; op._ox = ox; op._oy = oy;
           const f2 = op.getBoundingClientRect(), a = rot * Math.PI / 180, cx = (f2.left + f2.right) / 2, cy = (f2.top + f2.bottom) / 2, w = op.offsetWidth / 2, h = op.offsetHeight / 2;
           const at = fx => [cx + fx * w * Math.cos(a) + h * Math.sin(a), cy + fx * w * Math.sin(a) - h * Math.cos(a)];
-          out = strand(L, at(-.4), 0) + strand(R, at(.4), 2);
+          out = strand(L, at(-.4), 0) + strand(R, at(.4), 2);   // The Studio: two strings from the title down to the top of the pill
         } else {   // The Mirror: the frame is held by three equal elastic strings, one up to the title and two down to the picture; no spin, it floats and can be tugged evenly
           if (op !== mPill) { mPill = op; op.style.cursor = 'grab'; op.style.touchAction = 'none'; op.style.userSelect = 'none'; op.style.transformOrigin = '';
             op.addEventListener('pointerdown', e => { mr.on = true; mr.sx = e.clientX - mr.x; mr.sy = e.clientY - mr.y; op.setPointerCapture(e.pointerId); op.style.cursor = 'grabbing'; e.stopPropagation(); });
             op.addEventListener('pointermove', e => { if (!mr.on) return; const dx = e.clientX - mr.sx, dy = e.clientY - mr.sy, d = Math.hypot(dx, dy), k = d > 0 ? Math.min(1, 120 / d) ** .5 : 1; mr.tx = dx * k; mr.ty = dy * k; });
             const go = () => { mr.on = false; mr.tx = mr.ty = 0; op.style.cursor = 'grab'; }; op.addEventListener('pointerup', go); op.addEventListener('pointercancel', go); }
-          mr.vx += (mr.tx - mr.x) * .08; mr.vy += (mr.ty - mr.y) * .08; mr.vx *= .86; mr.vy *= .86; mr.x += mr.vx; mr.y += mr.vy;
+          { const loose = mr.snap && now - mr.snap < 1800, k = loose ? .09 : .08, dmp = loose ? .87 : .86;   // just after opening: a springier snap
+            mr.vx += (mr.tx - mr.x) * k; mr.vy += (mr.ty - mr.y) * k; mr.vx *= dmp; mr.vy *= dmp; mr.x += mr.vx; mr.y += mr.vy; }
           const ox = mr.x + Math.sin(t * .55) * 5, oy = mr.y + Math.sin(t * 1.1) * 4;
           const r0 = restRect(op); op._ox = ox; op._oy = oy;
           op.style.transform = `translate3d(${ox.toFixed(2)}px, ${oy.toFixed(2)}px, 0)`;
@@ -2382,7 +2401,8 @@
           // every string behaves the same: slack when it's shorter than at rest, taut when stretched
           const rest = [Math.hypot(r0.left + r0.width / 2 - C[0], r0.top - C[1]), Math.hypot(r0.left + r0.width * .11 - A1[0], r0.bottom - 6 - A1[1]), Math.hypot(r0.right - r0.width * .11 - A2[0], r0.bottom - 6 - A2[1])];
           const sagOf = (A, B, r) => Math.max(0, r - Math.hypot(B[0] - A[0], B[1] - A[1])) * .7 + 3;
-          out += strand(C, topC, 1, sagOf(C, topC, rest[0])) + strand(bl, A1, 3, sagOf(bl, A1, rest[1])) + strand(br, A2, 4, sagOf(br, A2, rest[2]));
+          const oa = +getComputedStyle(op).opacity, sa = +getComputedStyle(st).opacity;   // strings appear with what they hold (during the drop-in)
+          out += `<g opacity="${oa.toFixed(2)}">` + strand(C, topC, 1, sagOf(C, topC, rest[0])) + `</g><g opacity="${Math.min(oa, sa).toFixed(2)}">` + strand(bl, A1, 3, sagOf(bl, A1, rest[1])) + strand(br, A2, 4, sagOf(br, A2, rest[2])) + '</g>';
         }
         teth.innerHTML = out; teth.style.setProperty('--teth-top', Math.round(document.querySelector('.top').getBoundingClientRect().bottom + 6) + 'px'); return; }
       if (p !== pic) hook(p);
@@ -2504,12 +2524,21 @@
     }, slow ? 2250 : 850));
   }
   // mirror flip: the centred name flips away while the corner flips over to SANDY / HEIDEBRECHT at the same moment
+  function panelGlow(w, delay) {   // the panel's glow flares up, then settles to a steady glow
+    if (!w || innerWidth <= 760 || reduced) return;
+    const base = 'inset 0 1px 0 rgba(255,255,255,.09), 0 40px 90px rgba(0,0,0,.7)';
+    w.animate([
+      { boxShadow: `${base}, 0 0 0 1px rgba(205,225,255,0), 0 0 0 0 rgba(190,215,255,0), 0 0 0 0 rgba(190,215,255,0)` },
+      { boxShadow: `${base}, 0 0 0 1px rgba(215,232,255,.5), 0 0 24px 4px rgba(190,215,255,.36), 0 0 70px 10px rgba(190,215,255,.11)`, offset: .4 },
+      { boxShadow: `${base}, 0 0 0 1px rgba(205,225,255,.28), 0 0 18px 2px rgba(190,215,255,.2), 0 0 50px 6px rgba(190,215,255,.06)` }], { duration: 4400, delay, easing: 'ease-in-out', fill: 'backwards' });
+  }
   function panelIn() {   // desktop: the panel fades in and the three buttons swing forward, one, two, three
     if (AV.classList.contains('flipin')) return;
     const wrap = AV.querySelector('.strip-wrap'); AV.classList.add('ready', 'flipin');
     if (wrap) wrap.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, fill: 'backwards' });
     AV.querySelectorAll('.frame').forEach((f, i) => f.animate([{ opacity: 0, transform: 'perspective(700px) rotateX(-90deg)', transformOrigin: '50% 0' }, { opacity: 1, transform: 'perspective(700px) rotateX(0deg)', transformOrigin: '50% 0' }],
       { duration: 400, delay: i * 60, easing: 'cubic-bezier(.2,.8,.25,1)', fill: 'backwards' }));
+    panelGlow(wrap, 400 + 2 * 60);   // once the last button has flipped down, the glow flares and settles
   }
   function nameToCorner() {
     const mk = document.querySelector('.mark'), h1 = mk.querySelector('h1'), sp = mk.querySelector('span'); mk.dataset.want = 'Sandy';
@@ -2767,7 +2796,7 @@
         <div class="ph-roll">${strip(f.concat(f), 'calc(6 * ' + w + ' + 5 * var(--tile-gap) + 40px)', 'left')}</div>` + PAGES.art.render('under-photo'); } },
     proj: { title: '', back: 'film', render: (i) => {
       const [t, y] = FILM_ITEMS[i], inf = FILM_INFO[t] || { credits: [] };
-      const G = k => IMG('g' + P2(i) + '-' + P2(k)) + '?v=3';
+      const G = k => IMG('g' + P2(i) + '-' + P2(k)) + '?v=4';
       const gal = PROJ_SETS[i] ? '' : Array.from({ length: GAL[i] || 0 }, (_, k) => `<button type="button" class="gp" data-t="${t}" data-s="${y}"><img loading="lazy" alt="" src="${G(k)}"></button>`).join('');
       const sets = PROJ_SETS[i] ? PROJ_SETS[i].map(([name, heroes, board, more]) => {
         const hero = heroes.map(h => `<button type="button" class="gp set-hero" data-t="${name}" data-s="${t}"><img loading="lazy" alt="" src="${IMG('h' + P2(i) + '-' + P2(h))}?v=2"></button>`).join('');
@@ -2779,7 +2808,7 @@
       return `<div class="proj wide${inf.key ? '' : ' poster'} k${i}"><div class="m"><img alt="" style="--ty:${['46%', '40%', '14%'][i] || '50%'}" src="${inf.key ? IMG(inf.key) : filmImgs[i]}"></div><div class="info"><span>${y}</span>
         <dl>${inf.credits.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
         ${inf.list ? `<ul>${inf.list.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}
-        <p>${inf.text || `Write-up coming: your role on ${t} and what you did.`}</p></div></div>${gal ? `<div class="gal">${gal}</div>` : ''}${inf.note ? `<section class="pj-con"><h3 class="fw-group">Grace's Phone</h3><p class="pj-note">${inf.note}</p>` : ''}${i === 0 ? reel('pj-phones', SPEC_VIDS.map(([n, d]) => [`<video src="vid/spec-${n}.mp4" poster="${IMG('spec-' + n)}" muted loop playsinline autoplay preload="auto"></video>`, n.replace('_', ' '), d + '<span class="pj-ctl"><button type="button" class="pj-pp" aria-label="Pause"></button><span class="pj-bar"><i></i></span></span>'])) : ''}${inf.note ? '</section>' : ''}${i === 2 ? reel('pj-wide', [[`<img alt="" src="${IMG('vh-film')}"><span class="pj-play" aria-hidden="true"></span>`, 'Visiting Hours', 'The music video'], [`<img alt="" src="${IMG('vh-bts')}"><span class="pj-play" aria-hidden="true"></span>`, 'Behind the Scenes', 'On set, including the frozen-flower effects']]) : ''}${inf.concepts ? inf.concepts.map(([n, l]) => `<section class="pj-con"><h3 class="fw-group">${n}</h3><div class="pj-reel pj-cr${l.length === 1 ? ' one' : ''}"><div class="pj-sp" aria-hidden="true"></div><div class="pj-row">${l.map(m => `<button type="button" class="gp pj-cb" data-t="${t}" data-s="${n} · concept"><img loading="lazy" alt="" src="${IMG(m)}"></button>`).join('')}</div><div class="pj-sp" aria-hidden="true"></div></div></section>`).join('') : ''}${sets ? `<div class="sets">${PROJ_TOP[i] ? `<section class="set set-concept"><h3 class="fw-group">Concept</h3><button type="button" class="gp" data-t="${t}" data-s="Concept board"><img loading="lazy" alt="" src="${IMG(PROJ_TOP[i])}"></button></section>` : ''}${sets}</div>` : ''}`; } },
+        <p>${inf.text || `Write-up coming: your role on ${t} and what you did.`}</p></div></div>${gal ? `<div class="gal">${gal}</div>` : ''}${inf.note ? `<section class="pj-con"><h3 class="fw-group">Grace's Phone</h3><p class="pj-note">${inf.note}</p>` : ''}${i === 0 ? reel('pj-phones', SPEC_VIDS.map(([n, d]) => [`<video src="vid/spec-${n}.mp4" poster="${IMG('spec-' + n)}" muted loop playsinline autoplay preload="auto"></video>`, n.replace('_', ' '), d + '<span class="pj-ctl"><button type="button" class="pj-pp" aria-label="Pause"></button><span class="pj-bar"><i></i></span></span>'])) : ''}${inf.note ? '</section>' : ''}${i === 2 ? reel('pj-wide', [[`<img alt="" src="${IMG('vh-film')}"><span class="pj-play" aria-hidden="true"></span>`, 'Visiting Hours', 'The music video'], [`<img alt="" src="${IMG('vh-bts')}"><span class="pj-play" aria-hidden="true"></span>`, 'Behind the Scenes', 'On set, including the frozen-flower effects']]) : ''}${inf.concepts ? inf.concepts.map(([n, l]) => `<section class="pj-con"><h3 class="fw-group">${n}</h3><div class="pj-reel pj-cr${l.length === 1 ? ' one' : ''}"><div class="pj-sp" aria-hidden="true"></div><div class="pj-row">${l.map(m => `<button type="button" class="gp pj-cb" data-t="${t}" data-s="${n} · concept"><img loading="lazy" alt="" src="${IMG(m)}"></button>`).join('')}</div><div class="pj-sp" aria-hidden="true"></div></div></section>`).join('') : ''}${sets ? `<div class="sets">${PROJ_TOP[i] ? `<section class="set set-concept"><h3 class="fw-group">Concept</h3><button type="button" class="gp" data-t="${t}" data-s="Concept board"><img loading="lazy" alt="" src="${IMG(PROJ_TOP[i])}?v=6"></button></section>` : ''}${sets}</div>` : ''}`; } },
     art: { title: 'Art', back: 'artist', spaced: true, render: (sub) => {
       const roll = (list, dir, secs, kind) => { const t = list.map(([n, w, h]) => `<button type="button" class="ap" style="--ar:${w} / ${h}" data-t="Art" data-s=""><img alt="" src="${IMG(n)}?v=5"></button>`).join('');
         return `<div class="fs art-roll" data-kind="${kind}"><div class="sprockets" aria-hidden="true"></div><div class="mq"><div class="mq-track ${dir}" style="animation-duration:${secs}s${kind === 'bw' ? `;animation-delay:-${(secs * .37).toFixed(1)}s` : ''}">${t}${t}</div></div><div class="sprockets" aria-hidden="true"></div></div>`; };
@@ -2853,6 +2882,7 @@
     artBtn.dataset.back = pg.back === 'film' ? 'film' : '';
     navBtns.forEach(b => b.classList.toggle('deep', !!pg.back && b.dataset.go === 'artist'));
     if (key === 'art') requestAnimationFrame(layoutWall);
+    if (key === 'mirror' && innerWidth > 760 && !reduced && window._mirSnap) window._mirSnap();   // The Mirror opens with its strings stretched, and they snap back into place
     remember(key === 'proj' ? 'proj-' + arg : key);
     SV.querySelectorAll('.screen video').forEach(v => { try { const p = v.play(); if (p) p.catch(() => {}); } catch (e) {} });
   }
@@ -2860,6 +2890,11 @@
     svKey = null; SV.classList.remove('on'); AV.classList.remove('away'); setNav('artist'); navBtns.forEach(b => b.classList.remove('deep'));
     const artBtn = navBtns.find(b => b.dataset.go === 'artist'); artBtn.textContent = 'The Artist'; artBtn.dataset.back = '';
     remember('artist');
+    if (innerWidth > 760 && !reduced) {   // coming back to The Artist: no movement, just a soft light that blooms behind the panel
+      const w = AV.querySelector('.strip-wrap');
+      // and a soft light blooms behind it as it lands, then fades to a faint glow
+      panelGlow(w, 300);
+    }
   }
   // ---- Come back to the same page after a reload (link #film, #proj-3 … or the last page you were on, for 15 minutes)
   function remember(k) {
