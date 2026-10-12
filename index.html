@@ -2455,7 +2455,7 @@
       { const fs = nx.querySelector && nx.querySelector('.reel-strip'); if (fs) { const r = fs.getBoundingClientRect(); c = [r.top, r.bottom]; } }   // Digital Media: measure to the top edge of the film roll itself
       const lo = nx.querySelector && nx.querySelector('.st-lead .st-logo');   // The Studio: the first thing you see is the top of the logo artwork (or the Contact heading)
       if (lo) { const r = lo.getBoundingClientRect(), h = SV.querySelector('form.st-form[data-to="studio"]'), ht = h ? h.getBoundingClientRect().top : 0; c = [Math.min(r.top + r.height * .08, ht > 0 ? ht : 1e9), 0]; }
-      const want = b[0] - a[1] + (nx.querySelector && nx.querySelector('.reel-strip') ? 28 : 0) - (lo ? 30 : 0), have = c[0] - b[1], m = parseFloat(nx.style.marginTop) || 0;   // Digital Media: the film roll sits a little lower
+      const want = b[0] - a[1] + (nx.querySelector && nx.querySelector('.reel-strip') ? 28 : 0) - (lo ? 80 : 0), have = c[0] - b[1], m = parseFloat(nx.style.marginTop) || 0;   // Digital Media: the film roll sits a little lower
       if (Math.abs(want - have) > .5) nx.style.marginTop = Math.max(-240, Math.min(240, m + want - have)).toFixed(1) + 'px'; };
     requestAnimationFrame(fit); })();
   document.getElementById('top-contact').addEventListener('click', e => { e.stopPropagation(); showSection('contact'); });
