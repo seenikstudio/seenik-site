@@ -203,8 +203,8 @@
   #artist-view { transition: opacity .6s ease; }
   #artist-view.away { opacity: 0; pointer-events: none !important; }
   #artist-view.away .stage { pointer-events: none; }
-  .sv-inner { max-width: 1320px; margin: 0 auto; display: grid; gap: 0; }
-  .sv-body { display: grid; gap: clamp(14px, 2.4vh, 28px); justify-items: center; }
+  .sv-inner { max-width: 1320px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .sv-body { display: grid; grid-template-columns: minmax(0, 1fr); min-width: 0; gap: clamp(14px, 2.4vh, 28px); justify-items: center; }   /* never wider than the page column, so full-width pieces stay centred */
   .sv-body .intro { justify-self: center; text-align: center; }
   .sv-head { display: grid; gap: 14px; justify-items: center; text-align: center; padding-block: var(--title-space) var(--title-space); }
   #section-view { --title-space: clamp(24px, 5.5vh, 56px); }
@@ -813,7 +813,7 @@
   .menu-ring[hidden] { display: none; }
   .menu-ring .mr-the, .menu-ring .mr-word { display: block; padding-left: .24em; }
   .menu-ring .mr-word { line-height: 1.1; letter-spacing: .24em; }
-  .menu-ring:has(.mr-word) { align-content: center; gap: .15em; transform: none; margin: calc(-1 * var(--h, 56px)); }
+  .menu-ring:has(.mr-word) { align-content: center; gap: .15em; margin: calc(-1 * var(--h, 56px)); will-change: transform; }
   .menu-ring .mr-the, .menu-ring .mr-word { -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
   .modes[hidden], .hint[hidden] { display: none !important; }
   .menu-ring:focus-visible { outline: 1px solid var(--glow); outline-offset: 2px; }
@@ -2008,8 +2008,7 @@
     tmp2.copy(m.g.position).add(new THREE.Vector3(m.R, 0, 0)).project(camera);
     const sx = (tmp.x + 1) / 2 * innerWidth, sy = (1 - tmp.y) / 2 * innerHeight;
     const rpx = Math.max(26, Math.abs(tmp2.x - tmp.x) / 2 * innerWidth);
-    if (m.btn.querySelector('.mr-word')) { m.btn.style.left = '0px'; m.btn.style.top = '0px'; { const p = m._lp || (m._lp = { x: sx, y: sy }), fast = Math.hypot(sx - p.x, sy - p.y) > .35; p.x = sx; p.y = sy;   // gliding: smooth sub-pixel moves; resting: whole pixels, so the letters stay crisp
-        const tx = fast ? sx.toFixed(2) + 'px ' + sy.toFixed(2) + 'px' : Math.round(sx) + 'px ' + Math.round(sy) + 'px'; if (m.btn.style.translate !== tx) m.btn.style.translate = tx; } }
+    if (m.btn.querySelector('.mr-word')) { m.btn.style.left = '0px'; m.btn.style.top = '0px'; { const tx = `translate3d(${sx.toFixed(2)}px, ${sy.toFixed(2)}px, 0)`; if (m.btn.style.transform !== tx) m.btn.style.transform = tx; } }   // the label is drawn once as its own layer and slid with its circle, so it follows exactly and never re-draws or flickers
     else { m.btn.style.left = sx + 'px'; m.btn.style.top = sy + 'px'; }
     m.btn.style.width = m.btn.style.height = (rpx * 1.9) + 'px';
     { const w = m.btn.querySelector('.mr-word');
@@ -2611,6 +2610,7 @@
   }
 
   // ======== Site navigation + section pages ========
+  const PAGE_MAX = 1440;   // on big screens the pages stop growing at this width and sit centred in black
   const SV = document.getElementById('section-view'), svInner = SV.querySelector('.sv-inner');
   const navBtns = [...document.querySelectorAll('.site-nav button')];
   // the corner wordmark: SANDY / HEIDEBRECHT in the Artist area, SEENIK / DOME IMMERSION everywhere else
@@ -2875,7 +2875,7 @@
     const title = key === 'proj' ? FILM_ITEMS[arg][0] : pg.title;
     svInner.innerHTML = `<div class="sv-head"><h2 class="sv-title"><span class="sv-t">${title}</span>${pg.sub ? `<span class="sv-sub">${pg.sub}</span>` : ''}</h2></div><div class="sv-body${pg.spaced ? ' spaced' : ''}">${pg.render(arg)}</div>`;
     SV.classList.add('on'); SV.scrollTop = 0;
-    SV.style.setProperty('--vw', SV.clientWidth + 'px');
+    SV.style.setProperty('--vw', Math.min(SV.clientWidth, PAGE_MAX) + 'px');
     setNav(key === 'studio' || key === 'mirror' ? key : 'artist');
     const artBtn = navBtns.find(b => b.dataset.go === 'artist');
     artBtn.textContent = pg.back === 'film' ? 'Film Work' : 'The Artist';
@@ -3379,7 +3379,7 @@
   addEventListener('keydown', e => { if (e.key === 'Escape' && !document.querySelector('.sv-lightbox')) { const sh = document.querySelector('.art-sheet'); if (sh) sh.remove(); } });
   addEventListener('keydown', e => { const b = document.querySelector('.sv-lightbox'); if (!b) return;
     if (e.key === 'Escape') { const v = b.querySelector('video'); if (v) v.pause(); b.remove(); } else if (e.key === 'ArrowRight' && b._step) b._step(1); else if (e.key === 'ArrowLeft' && b._step) b._step(-1); });
-  addEventListener('resize', () => { SV.style.setProperty('--vw', SV.clientWidth + 'px'); if (svKey === 'art') layoutWall(); });
+  addEventListener('resize', () => { SV.style.setProperty('--vw', Math.min(SV.clientWidth, PAGE_MAX) + 'px'); if (svKey === 'art') layoutWall(); });
   // the six filmstrip frames open their sections
   const FRAME_KEYS = ['film', 'social', 'photo'];
   // Art & Photography: the film rolls on its own (drag or scroll it any time, click to choose);
@@ -3399,8 +3399,8 @@
     const tick = now => { requestAnimationFrame(tick); const v = document.getElementById('pano-view'), r = SV.querySelector('.ph-roll .row');
       if (!v || !r) { pre = false; row = null; return; }
       if (r !== row) hook(r);
-      { const W = document.documentElement.clientWidth;   // the big picture and every film roll: the same black border on both sides
-        SV.querySelectorAll('.pano, .ph-roll, .art-rolls').forEach(pn => { const L = pn.parentElement.getBoundingClientRect().left, ml = Math.round(24 - L) + 'px';
+      { const W0 = document.documentElement.clientWidth, W = Math.min(W0, PAGE_MAX), side = (W0 - W) / 2;   // the big picture and every film roll: the same black border on both sides
+        SV.querySelectorAll('.pano, .ph-roll, .art-rolls').forEach(pn => { const L = pn.parentElement.getBoundingClientRect().left, ml = Math.round(side + 24 - L) + 'px';
           if (pn.style.marginLeft !== ml) { pn.style.marginLeft = ml; pn.style.width = (W - 48) + 'px'; pn.style.justifySelf = 'start'; pn.style.overflow = 'hidden'; } }); }
       if (!pre) { pre = true; PHOTO_ORDER.forEach(n => { const i = new Image(); i.src = IMG('photo-' + P2(n - 1)) + PHV(n - 1); }); last = now - 5000; prev = now; r.querySelectorAll('.fr.sel').forEach(x => r.querySelectorAll(`.fr[data-p="${x.dataset.p}"]`).forEach(y => y.classList.add('sel'))); }
       const dt = Math.min(.05, (now - prev) / 1000); prev = now;
