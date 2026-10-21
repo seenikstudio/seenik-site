@@ -1147,6 +1147,33 @@
   @media (min-width: 761px) { .st-top { margin-top: 36px; } }   /* desktop: logo + contact sit a little lower */
   @media (min-width: 861px) { .reel-txt { gap: 18px; } .reel-txt p { font-size: 16px; line-height: 1.75; } }   /* Digital Media: paragraph readable beside the reels, still centred on the row */
   @media (min-width: 861px) { .reel-sec { grid-template-columns: minmax(0, 1fr) minmax(0, 390px); } .reel-sec .reel-txt { box-sizing: border-box; width: 100%; min-height: 340px; align-self: center; transform: translateY(16px); align-content: center; padding: 34px 32px; border-radius: 14px; border: 1px solid rgba(255,255,255,.14); background: linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.015) 55%, rgba(0,0,0,.2)); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 -1px 0 rgba(0,0,0,.6), 0 18px 40px rgba(0,0,0,.55), 0 2px 6px rgba(0,0,0,.5); } }   /* Digital Media: each write-up sits on a matching raised plaque */
+
+  .ct-open { display: none; }
+  /* PHONE Contact: the photo hangs from the title on two strings beside a "Send a message" button; the email and links float below as the jellyfish; the form opens full screen */
+  @media (max-width: 760px) {
+    #section-view:has(.ct-sleek) .sv-t { display: inline-block; padding: 12px 22px 12px calc(22px + .3em); border: 1px solid rgba(255,255,255,.4); border-radius: 999px; }
+    .contact-wrap.ct-sleek { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; column-gap: 18px; row-gap: 0; align-items: center; padding: 34px 16px 0 !important; }
+    .ct-sleek .contact-pic { grid-column: 1 !important; width: 100% !important; justify-self: stretch !important; padding: 9px; border: 1px solid rgba(255,255,255,.4); border-radius: 28px; background: transparent; overflow: visible; box-sizing: border-box; touch-action: none; will-change: transform; }
+    .ct-sleek .contact-pic img { border-radius: 20px; pointer-events: none; user-select: none; }
+    .ct-sleek .cform.st-form { display: none !important; }
+    .ct-open { display: inline-block; grid-column: 2; justify-self: center; background: none; color: var(--fg); border: 1px solid rgba(255,255,255,.6); border-radius: 999px; padding: 14px 18px; font: 400 10px/1 var(--mono); letter-spacing: .24em; text-transform: uppercase; cursor: pointer; white-space: nowrap; }
+    .ct-sleek .contact-extra { grid-column: 1 / -1 !important; position: relative; height: 300px; margin-top: 8px; display: block; pointer-events: none; }
+    .ct-sleek .contact-extra .contact-mail, .ct-sleek .contact-extra .socials a { pointer-events: auto; }
+    .ct-sleek .contact-extra .contact-mail { position: absolute; transform: translate(-50%, -50%); font-size: 12px; background: rgba(10,11,14,.92); border: 1px solid rgba(255,255,255,.35); border-radius: 999px; padding: 10px 16px; white-space: nowrap; z-index: 1; touch-action: none; user-select: none; }
+    .ct-sleek .contact-extra .socials { display: contents; }
+    .ct-sleek .contact-extra .socials a { position: absolute; transform: translate(-50%, -50%); border: 1px solid rgba(229,239,255,.4); background: rgba(10,11,14,.92); z-index: 1; }
+    .ct-sleek .contact-extra svg.jl { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+    .ct-sleek .contact-extra .socials svg { width: 30px; height: 30px; padding: 4px; box-sizing: border-box; border-radius: 50%; fill: #fff; }
+    .ct-sleek .contact-extra .socials a[aria-label="Facebook"] svg { background: #1877F2; }
+    .ct-sleek .contact-extra .socials a[aria-label="YouTube"] svg { background: #FF0000; }
+    .ct-sleek .contact-extra .socials a[aria-label="Instagram"] svg { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+    .ct-sleek .contact-extra .jl-grab { position: absolute; width: 120px; height: 70px; border-radius: 50% 50% 20% 20%; pointer-events: auto; touch-action: none; z-index: 2; }
+    svg.ct-teth { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 7; clip-path: inset(var(--teth-top, 150px) 0 0 0); }
+    .ct-sheet { position: fixed; inset: 0; z-index: 100; background: #000; display: grid; align-content: center; padding: 70px 28px calc(40px + env(safe-area-inset-bottom, 0px)); overflow-y: auto; }
+    .ct-sheet .cform { display: grid !important; gap: 26px; width: 100%; padding: 0 !important; }
+    .ct-sheet .cform textarea { min-height: 160px; }
+    .ct-sheet .sheet-x { position: absolute; top: calc(18px + env(safe-area-inset-top, 0px)); right: 16px; }
+  }
 </style>
 
 
@@ -2384,7 +2411,7 @@
       const go = () => { tug.on = false; tug.tx = tug.ty = 0; p.classList.remove('drag'); }; p.addEventListener('pointerup', go); p.addEventListener('pointercancel', go);
       p.addEventListener('click', e => e.stopPropagation(), true); };
     const T0 = performance.now();
-    const frame = now => { requestAnimationFrame(frame); const p = SV.classList.contains('on') && innerWidth > 760 ? SV.querySelector('.ct-sleek .contact-pic') : null;
+    const frame = now => { requestAnimationFrame(frame); const p = SV.classList.contains('on') ? SV.querySelector('.ct-sleek .contact-pic') : null;
       if (!p) { pic = null;
         const op = SV.classList.contains('on') && innerWidth > 760 ? SV.querySelector('.reel-intro.st-intro, .reel-intro.mir-open') : null, ti = op && SV.querySelector('.sv-t');
         if (!op || !ti || !op.offsetHeight) { if (teth.innerHTML) teth.innerHTML = ''; return; }
@@ -2426,7 +2453,7 @@
       if (p !== pic) hook(p);
       const t = (now - T0) / 1000;
       tug.vx += (tug.tx - tug.x) * .08; tug.vy += (tug.ty - tug.y) * .08; tug.vx *= .86; tug.vy *= .86; tug.x += tug.vx; tug.y += tug.vy;
-      const bx = 50 + tug.x + Math.sin(t * .6) * 6 + Math.sin(t * 1.3) * 2, by = tug.y + Math.sin(t * .9) * 9, rot = Math.sin(t * .7) * 1.2 + tug.x * .03 + tug.vx * .4;
+      const bx = (innerWidth > 760 ? 50 : 0) + tug.x + Math.sin(t * .6) * 6 + Math.sin(t * 1.3) * 2, by = tug.y + Math.sin(t * .9) * 9, rot = Math.sin(t * .7) * 1.2 + tug.x * .03 + tug.vx * .4;
       p.style.transform = `translate(${bx.toFixed(1)}px, ${by.toFixed(1)}px) rotate(${rot.toFixed(2)}deg)`;
       const ti = SV.querySelector('.sv-t'), tr = ti.getBoundingClientRect(), pr = p.getBoundingClientRect();
       const a = rot * Math.PI / 180, cx = pr.left + pr.width / 2, cy = pr.top + pr.height / 2, w = p.offsetWidth / 2 - 24, h = p.offsetHeight / 2 - 4;
@@ -2449,7 +2476,7 @@
         [g, mail].forEach(el => { el.addEventListener('pointerdown', down); el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up); }); }
       const D = fl._d; { const fr2 = fl.getBoundingClientRect(); D.tx = Math.max(-fr2.left - W * .5 + 90, Math.min(innerWidth - fr2.left - W * .62 - 90, D.tx)); D.ty = Math.max(-fr2.top + 90, Math.min(innerHeight - fr2.top - 300, D.ty)); }
       D.x += (D.tx - D.x) * (D.on ? .25 : .08); D.y += (D.ty - D.y) * (D.on ? .25 : .08);
-      const jx = Math.max(125, Math.min(W - 125, W * .62 + Math.sin(t * .13) * W * .14 + Math.sin(t * .31) * 10)) + D.x, jy = 74 - lift * 22 + Math.sin(t * .21) * 10 + D.y, pu = 1 - squeeze * .14;
+      const jm = innerWidth > 760 ? 125 : 110, jx = Math.max(jm, Math.min(W - jm, W * (innerWidth > 760 ? .62 : .5) + Math.sin(t * .13) * W * .14 + Math.sin(t * .31) * 10)) + D.x, jy = 74 - lift * 22 + Math.sin(t * .21) * 10 + D.y, pu = 1 - squeeze * .14;
       fl._grab.style.left = (jx - 70) + 'px'; fl._grab.style.top = (jy - 50) + 'px';
       const J = fl._j || (fl._j = { m: { x: jx, y: jy + 62, vx: 0, vy: 0 }, s: socs.map((_, i) => ({ x: jx + (i - 1) * 70, y: jy + 212, vx: 0, vy: 0 })) });
       const spring = (o, tx, ty, k, d) => { o.vx += (tx - o.x) * k; o.vy += (ty - o.y) * k; o.vx *= d; o.vy *= d; o.x += o.vx; o.y += o.vy; };
@@ -2462,6 +2489,19 @@
         sv += `<path d="M${J.m.x + off * .2} ${J.m.y + 18} Q${(J.m.x + off * .3 + o.x) / 2 + (J.m.x - o.x) * .25} ${(J.m.y + o.y) / 2 + 10} ${o.x} ${o.y - 22}" stroke="rgba(229,239,255,.35)" fill="none"/>`; });
       jl.innerHTML = sv; };
     requestAnimationFrame(frame); })();
+
+  (function contactSheet() {   // phone Contact: "Send a message" opens the form full screen
+    let sheet = null, home = null;
+    const close = () => { if (!sheet) return; const f = sheet.querySelector('.cform'); if (home && f) home.after(f); sheet.remove(); sheet = null; };
+    document.addEventListener('click', e => {
+      if (e.target.closest('.ct-open')) { const f = SV.querySelector('.ct-sleek .cform'); if (!f) return; home = SV.querySelector('.ct-sleek .ct-open');
+        sheet = document.createElement('div'); sheet.className = 'ct-sheet'; sheet.setAttribute('role', 'dialog'); sheet.innerHTML = '<button type="button" class="sheet-x" aria-label="Close">×</button>';
+        sheet.appendChild(f); document.body.appendChild(sheet); sheet.addEventListener('pointerdown', ev => ev.stopPropagation()); return; }
+      if (sheet && e.target.closest('.ct-sheet .sheet-x')) close();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    window.addEventListener('hashchange', close);
+  })();
   (function equalGaps() {   // desktop, every page with an intro: the space from the intro to whatever comes next equals the space from the title to the intro
     const box = el => { if (el.tagName !== 'P') { const r = el.getBoundingClientRect(); return [r.top, r.bottom]; }
       const rg = document.createRange(); rg.selectNodeContents(el); const rs = [...rg.getClientRects()].filter(r => r.height); return rs.length ? [Math.min(...rs.map(r => r.top)), Math.max(...rs.map(r => r.bottom))] : null; };
@@ -2840,7 +2880,7 @@
         <div class="art-words"><h3 class="art-head">There are no <em>mistakes</em>, only new directions</h3><p class="art-text">${ART_TEXT.split(/(?<=\.) /).map(t => `<span>${t}</span>`).join(' ')}</p></div>
         <div class="art-rolls">${roll(ART_BW, 'rtl', 50, 'bw')}</div>`; } },
     resume: { title: 'Experience', back: 'film', spaced: true, render: () => `<div class="reel-strip cv-strip"><div class="sprockets" aria-hidden="true"></div><div class="cv-row">${[0, 1].map(k => `<button type="button" class="cv-pg" data-t="Resume" data-s="Page ${k + 1}"><span class="lab">Page ${k + 1}</span><span class="m"><img alt="Sandy Heidebrecht CV, page ${k + 1}" src="${IMG('resume-0' + k)}?v=2"></span></button>`).join('')}</div><div class="sprockets" aria-hidden="true"></div></div>` },
-    contact: { title: 'Contact', back: 'artist', spaced: true, render: () => `<div class="contact-wrap ct-sleek"><div class="contact-pic"><img alt="Sandy Heidebrecht" src="${IMG('contact')}?v=2"></div><form class="cform st-form" data-to="artist" novalidate>
+    contact: { title: 'Contact', back: 'artist', spaced: true, render: () => `<div class="contact-wrap ct-sleek"><div class="contact-pic"><img alt="Sandy Heidebrecht" src="${IMG('contact')}?v=2"></div><button type="button" class="ct-open">Send a message</button><form class="cform st-form" data-to="artist" novalidate>
           <label class="sf"><input name="name" type="text" autocomplete="name" placeholder="Name" required><i aria-hidden="true"></i></label>
           <label class="sf"><input name="email" type="email" autocomplete="email" placeholder="Email" required><i aria-hidden="true"></i></label>
           <label class="sf"><textarea name="message" rows="2" placeholder="Message" required></textarea><i aria-hidden="true"></i></label>
