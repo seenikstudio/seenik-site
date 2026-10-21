@@ -1178,14 +1178,27 @@
   .ev-ph { display: none; }
   /* PHONE Art & Photography: the text in even full-width lines (as The Studio), the photos as one two-row film that runs by itself, the drawings a little smaller */
   @media (max-width: 760px) {
-    .reel-intro:has(.ev-ph), .art-text:has(.ev-ph) { --fs: calc((100vw - 80px) / 29.4); display: grid !important; gap: 0 !important; justify-items: center; width: 100% !important; max-width: none !important; padding: 0 !important; margin-inline: auto !important;
+    .reel-intro:has(.ev-ph), .art-text:has(.ev-ph), .reel-txt p:has(.ev-ph), .slate-v:has(.ev-ph), .clip-head .art-head:has(.ev-ph) { --fs: calc((100vw - 80px) / 29.4); display: grid !important; gap: 0 !important; justify-items: center; width: 100% !important; max-width: none !important; padding: 0 !important; margin-inline: auto !important;
       font: 400 var(--fs)/1.9 var(--mono) !important; letter-spacing: 0 !important; text-align: center !important; text-transform: none !important; color: var(--fg) !important; }
     .reel-intro span.ev, .art-text span.ev { display: none !important; }
-    span.ev-ph { display: block; white-space: nowrap; letter-spacing: calc((var(--fs) * 46 * .64 - var(--fs) * .6 * var(--n)) / var(--n)) !important; }
+    span.ev-ph { display: block; white-space: nowrap; letter-spacing: calc((var(--fs) * var(--N) * .64 - var(--fs) * .6 * var(--n)) / var(--n)) !important; }   /* every line as wide as the paragraph's longest, so nothing stretches */
     .ph-roll .row { display: grid !important; grid-auto-flow: column; grid-template-rows: repeat(2, auto); grid-auto-columns: max-content; gap: 8px !important; row-gap: 8px !important; padding: 10px 0 !important; flex-wrap: nowrap !important; justify-content: start !important; overflow-x: auto; }
     .ph-roll .fr { --w: calc((100vw - 64px) / 2.5) !important; }
     .ph-roll .fr .cap { display: none !important; }
     .art-roll .ap { height: 86px !important; }
+  }
+
+  /* PHONE Digital Media and Video Clips: every title gets the same two-line slot so all frames sit level; one title size; text in even lines, centred; Video Clips three across, full width */
+  @media (max-width: 760px) {
+    :has(> .ev-ph) > .dk, .reel-intro:has(.ev-ph) > span:not(.ev-ph) { display: none !important; }
+    .reel .lab, .reel.clip .lab { display: grid !important; grid-template-rows: 2.5em auto; align-items: end; justify-items: center; gap: 6px !important; font: 400 9px/1.25 var(--mono) !important; letter-spacing: .14em !important; white-space: normal !important; text-wrap: balance; }
+    .reel-txt { text-align: center; justify-items: center; }
+    .reel-txt a { justify-self: center; }
+    .reel-txt h3 { font: 400 13px/1.5 var(--mono) !important; letter-spacing: .22em !important; text-transform: uppercase; }
+    .clip-head { gap: 14px; }
+    .slate { margin: 0 !important; justify-self: center; text-align: center; }
+    .clip-sec .reel-row { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 16px !important; padding: 18px 14px !important; }
+    .clip-sec { width: 100% !important; }
   }
 </style>
 
@@ -2798,12 +2811,12 @@
     for (let k = 1; k < w.length; k++) { const a = w.slice(0, k).join(' '), b = w.slice(k).join(' '), d = Math.abs(a.length - b.length); if (!best || d < best[0]) best = [d, a, b]; }
     const N = Math.max(best[1].length, best[2].length);
     return [best[1], best[2]].map(l => `<span class="ev" style="--n:${l.length};--N:${N}">${l}</span>`).join(''); };   // two even lines, no taper
-  const evenPh = txt => { const w = txt.split(' '), n = w.length, M = 46, L = (a, b) => w.slice(a, b).join(' ').length;   // phone: the fewest lines that fit, as even as possible
+  const evenPh = txt => { const w = txt.split(' '), n = w.length, M = 47, L = (a, b) => w.slice(a, b).join(' ').length;   // phone: the fewest lines that fit, as even as possible
     for (let k = 2; k <= 8; k++) { const t = txt.length / k; let D = Array(n + 1).fill(null); D[0] = [0, []];
       for (let i = 1; i <= k; i++) { const N = Array(n + 1).fill(null);
         for (let j = 1; j <= n; j++) for (let p = 0; p < j; p++) { if (!D[p]) continue; const l = L(p, j); if (l > M) continue; const c = D[p][0] + (l - t) ** 2; if (!N[j] || c < N[j][0]) N[j] = [c, D[p][1].concat(j)]; }
         D = N; }
-      if (D[n]) { let a = 0; return D[n][1].map(b => { const l = w.slice(a, b).join(' '); a = b; return `<span class="ev-ph" style="--n:${l.length}">${l}</span>`; }).join(''); } }
+      if (D[n]) { let a = 0; const ls = D[n][1].map(b => { const l = w.slice(a, b).join(' '); a = b; return l; }), N = Math.max(...ls.map(l => l.length)); return ls.map(l => `<span class="ev-ph" style="--n:${l.length};--N:${N}">${l}</span>`).join(''); } }
     return ''; };
   const evenBoth = txt => even2(txt) + evenPh(txt);
   const ART_TEXT = 'Meditative work done in pen and ink, coloured pencil and watercolour pencil, made between 1995 and 2016. Every unexpected turn becomes part of the design, and the pattern follows it somewhere new.';
@@ -2864,9 +2877,9 @@
       const cell = ([t, y], i) => `<button type="button" class="reel clip" data-vid="../vid/clip-${P2(i)}.mp4" data-ar="16 / 9" data-t="${t}" data-s="${y}"><span class="lab">${t}<em>${y}</em></span><span class="m"><img alt="" loading="lazy" src="${IMG('clip-' + P2(i))}"></span></button>`;
       const strip3 = list => `<div class="reel-strip clip-strip"><div class="sprockets" aria-hidden="true"></div><div class="reel-row">${list.join('')}</div><div class="sprockets" aria-hidden="true"></div></div>`;
       const f = CLIP_ITEMS.map(cell);
-      return `<div class="clip-head"><div class="slate"><span class="slate-v">Therapy sessions in digital media, illustrating inner dialogue and self-discovery.</span></div><h3 class="art-head">A visual language of symmetry, flow and kaleidoscopic patterns.</h3></div><section class="fx-gate clip-sec">${strip3(f.slice(0, 3))}${strip3(f.slice(3))}</section>`; } },
-    social: { title: 'Digital Media', back: 'artist', spaced: true, render: () => `<p class="reel-intro"><span>What's the soundtrack to your life right now?</span><span>Every moment is telling a story, and it's really fun to capture.</span></p>` + REEL_ROWS.map((r, ri) => `<section class="reel-sec fx-${r.fx}">
-        <div class="reel-txt"><span class="kicker">${P2(ri + 1)} · ${r.k}</span><h3>${r.t}</h3><p>${r.p}</p>${r.link ? `<a href="${r.link[1]}" target="_blank" rel="noopener">${r.link[0]} ↗</a>` : ''}</div>
+      return `<div class="clip-head"><div class="slate"><span class="slate-v"><span class="dk">Therapy sessions in digital media, illustrating inner dialogue and self-discovery.</span>${evenPh('Therapy sessions in digital media, illustrating inner dialogue and self-discovery.')}</span></div><h3 class="art-head"><span class="dk">A visual language of symmetry, flow and kaleidoscopic patterns.</span>${evenPh('A visual language of symmetry, flow and kaleidoscopic patterns.')}</h3></div><section class="fx-gate clip-sec">${strip3(f.slice(0, 3))}${strip3(f.slice(3))}</section>`; } },
+    social: { title: 'Digital Media', back: 'artist', spaced: true, render: () => `<p class="reel-intro"><span>What's the soundtrack to your life right now?</span><span>Every moment is telling a story, and it's really fun to capture.</span>${evenPh("What's the soundtrack to your life right now? Every moment is telling a story, and it's really fun to capture.")}</p>` + REEL_ROWS.map((r, ri) => `<section class="reel-sec fx-${r.fx}">
+        <div class="reel-txt"><span class="kicker">${P2(ri + 1)} · ${r.k}</span><h3>${r.t}</h3><p><span class="dk">${r.p}</span>${evenPh(r.p)}</p>${r.link ? `<a href="${r.link[1]}" target="_blank" rel="noopener">${r.link[0]} ↗</a>` : ''}</div>
         <div class="reel-strip"><div class="sprockets" aria-hidden="true"></div><div class="reel-row">${r.v.map(([id, t, y, ar, note]) => `<button type="button" class="reel" data-vid="../vid/${id}.mp4" data-ar="${ar}"${note ? ` data-note="${note}"` : ''} data-t="${t}" data-s="${y}"><span class="lab">${t}<em>${y}</em></span><span class="m"><img alt="" loading="lazy" src="${IMG(id)}?v=10"></span></button>`).join('')}</div><div class="sprockets" aria-hidden="true"></div></div>
       </section>`).join('') },
     photo: { title: 'Art & Photography', back: 'artist', spaced: true, render: () => {
