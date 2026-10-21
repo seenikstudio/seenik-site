@@ -1148,21 +1148,22 @@
   @media (min-width: 861px) { .reel-txt { gap: 18px; } .reel-txt p { font-size: 16px; line-height: 1.75; } }   /* Digital Media: paragraph readable beside the reels, still centred on the row */
   @media (min-width: 861px) { .reel-sec { grid-template-columns: minmax(0, 1fr) minmax(0, 390px); } .reel-sec .reel-txt { box-sizing: border-box; width: 100%; min-height: 340px; align-self: center; transform: translateY(16px); align-content: center; padding: 34px 32px; border-radius: 14px; border: 1px solid rgba(255,255,255,.14); background: linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.015) 55%, rgba(0,0,0,.2)); box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 -1px 0 rgba(0,0,0,.6), 0 18px 40px rgba(0,0,0,.55), 0 2px 6px rgba(0,0,0,.5); } }   /* Digital Media: each write-up sits on a matching raised plaque */
 
-  /* PHONE: same words as the desktop — the Studio and Mirror intros and the Artist tagline, set as one balanced paragraph */
+  /* PHONE: same words as the desktop, in the phone's small even-line style (Studio intro, Mirror intro, Mirror first statement, Artist tagline) */
   @media (max-width: 760px) {
-    #section-view .st-intro, #section-view .mir-open { display: block !important; width: 100% !important; max-width: 34ch; margin-inline: auto !important; padding: 0 !important;
-      font: 400 13px/1.8 var(--mono) !important; letter-spacing: .02em !important; text-transform: none !important; text-align: center !important; text-wrap: balance; color: var(--fg) !important; animation: none; }
+    #section-view .st-intro, #section-view .mir-open, .mir-first { --fs: calc((100vw - 80px) / 29.4); }
+    #section-view .st-intro, #section-view .mir-open { display: block !important; width: auto !important; max-width: none !important; margin: 0 !important; padding: 0 16px !important;
+      font: 400 var(--fs)/1.9 var(--mono) !important; letter-spacing: .04em !important; text-transform: none !important; text-align: center !important; text-wrap: balance; color: var(--fg) !important; animation: none; }
     #section-view .st-intro > span, #section-view .mir-open > span, #section-view .mir-open .phl { display: inline !important; white-space: normal !important; font: inherit !important; letter-spacing: inherit !important; text-transform: none !important; color: inherit !important; }
-    #section-view .st-intro > span + span::before { content: " " !important; }
-    #section-view .mir-open > span + span::before { content: " " !important; }
-    .mir-first .mir-big, .mir-first .mir-small { display: block !important; }
-    #artist-view .who .sub { display: grid !important; justify-items: center; gap: 16px; }
-    #artist-view .who .sub .sub-sep { display: none; }
-    #artist-view .who .sub span { display: block !important; font-size: 10px !important; letter-spacing: .18em !important; text-align: center; }
+    #section-view .st-intro > span + span::before, #section-view .mir-open > span + span::before { content: " " !important; }
+    .mir-first .mir-big, .mir-first .mir-small { display: inline !important; font: 400 var(--fs)/1.9 var(--mono) !important; letter-spacing: .04em !important; text-transform: none !important; white-space: normal !important; color: var(--fg) !important; }
+    .mir-first .mir-big .ph-br, .mir-first .mir-small .ph-br { display: none !important; }
+    .mir-first .mir-small { text-transform: lowercase !important; }
+    .mir-first .mir-small::before { content: ", "; }
+    .mir-first .mir-small::after { content: "."; }
+    .mir-sing.mir-first { display: block !important; text-align: center; width: calc(100vw - 96px) !important; max-width: calc(100vw - 96px) !important; margin-inline: auto !important; padding-inline: 0 !important; text-wrap: balance; }
     #section-view { -webkit-mask: linear-gradient(transparent 0, transparent calc(var(--av-head, 110px) + 76px), #000 calc(var(--av-head, 110px) + 116px)) !important;
       mask: linear-gradient(transparent 0, transparent calc(var(--av-head, 110px) + 76px), #000 calc(var(--av-head, 110px) + 116px)) !important; }   /* content dissolves softly under the menu instead of showing cut in half */
   }
-  .sub-sep { font-style: normal; }
 </style>
 
 
@@ -1189,7 +1190,7 @@
     <div class="stage">
       <header class="who">
         <h1 class="name waiting" id="av-name">Sandy Heidebrecht</h1>
-        <div class="sub"><span>Film &amp; TV · Immersive · Creator of The Mirror<i class="sub-sep"> ·</i></span><a href="#contact" id="av-contact">Contact</a></div>
+        <div class="sub"><span>Film &amp; TV · Immersive · Creator of The Mirror ·</span><a href="#contact" id="av-contact">Contact</a></div>
       </header>
       <div class="rows" id="av-rows"></div>
     </div>
