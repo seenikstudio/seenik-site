@@ -1283,7 +1283,7 @@
 
   /* PHONE: GRAPHICS FIRST — the big pictures run off both edges; the thumbnails fill the width with hairline frames */
   @media (max-width: 760px) {
-    #section-view .mir-stage { width: 150vw !important; margin-left: calc(50% - 75vw) !important; justify-self: start !important; }   /* the eye: so big its sides leave the screen */
+    #section-view .mir-stage { margin-top: 6px !important; width: 150vw !important; margin-left: calc(50% - 75vw) !important; justify-self: start !important; }   /* the eye: so big its sides leave the screen */
     #section-view .fr.mir-wide { --w: 130vw !important; width: 130vw !important; margin-left: calc(50% - 65vw) !important; justify-self: start !important; }   /* the sound wave and the other wide pictures */
     #section-view .fr.mir-wide:not(.mir-lined) { --w: 100vw !important; width: 100vw !important; margin-left: calc(50% - 50vw) !important; }   /* the four elementals are one picture: exactly edge to edge, nothing cut */
     #section-view .st-lead { overflow: visible; width: 100% !important; justify-self: stretch !important; }
@@ -1302,6 +1302,7 @@
     #section-view .mir-big.evcap { container-type: inline-size; display: grid !important; width: 100% !important; max-width: none !important; justify-self: stretch !important; padding: 0 16px !important; box-sizing: border-box; margin: 0 !important;
       font: 400 var(--pfs)/1.75 var(--mono) !important; text-transform: uppercase !important; text-align: left !important; white-space: normal !important; }
     #section-view .mir-big.evcap > .dk { display: none !important; }
+    #section-view .mir-big.evcap { justify-items: center !important; text-align: center !important; }
     #section-view .st-stage .mir-big.evcap { padding: 0 12px !important; }   /* the Studio column sits 4px further in: same 28px edge as every other block */
     #section-view .mir-sing:has(.evcap) { width: 100% !important; justify-items: stretch !important; padding-inline: 0 !important; }
     /* the three pages: a line of light under the page you are on, which glides to the next page when you switch */
@@ -2686,9 +2687,10 @@
         const D = fl._d, down = e => { D.on = true; D.sx = e.clientX - D.tx; D.sy = e.clientY - D.ty; e.currentTarget.setPointerCapture(e.pointerId); fl.classList.add('drag'); e.stopPropagation(); e.preventDefault(); };
         const move = e => { if (!D.on) return; D.tx = e.clientX - D.sx; D.ty = e.clientY - D.sy; }, up = () => { D.on = false; fl.classList.remove('drag'); };
         [g, mail].forEach(el => { el.addEventListener('pointerdown', down); el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up); }); }
-      const D = fl._d; { const fr2 = fl.getBoundingClientRect(); D.tx = Math.max(-fr2.left - W * .5 + 90, Math.min(innerWidth - fr2.left - W * .62 - 90, D.tx)); D.ty = Math.max(-fr2.top + 90, Math.min(innerHeight - fr2.top - 300, D.ty)); }
+      const D = fl._d; { const fr2 = fl.getBoundingClientRect(); if (innerWidth > 760) { D.tx = Math.max(-fr2.left - W * .5 + 90, Math.min(innerWidth - fr2.left - W * .62 - 90, D.tx)); D.ty = Math.max(-fr2.top + 90, Math.min(innerHeight - fr2.top - 300, D.ty)); }
+        else { const bx = W * .6, by = 40; D.tx = Math.max(-fr2.left - bx, Math.min(innerWidth - fr2.left - bx, D.tx)); D.ty = Math.max(-fr2.top - by + 120, Math.min(innerHeight - fr2.top - by - 40, D.ty)); } }   // phone: free to roam, its centre can reach any edge (so it can float half out of frame)
       D.x += (D.tx - D.x) * (D.on ? .25 : .08); D.y += (D.ty - D.y) * (D.on ? .25 : .08);
-      const Q = innerWidth > 760 ? 1 : .58, jm = innerWidth > 760 ? 125 : W * .42, jx = Math.max(jm, Math.min(W - jm, W * (innerWidth > 760 ? .62 : .5) + Math.sin(t * .13) * W * .14 * Q + Math.sin(t * .31) * 10 * Q)) + D.x, jy = (74 - lift * 22 + Math.sin(t * .21) * 10) * Q + D.y, pu = 1 - squeeze * .14;   // phone: a smaller jellyfish (Q), floating in its own column
+      const Q = innerWidth > 760 ? 1 : .58, jm = innerWidth > 760 ? 125 : W * .35, jx = Math.max(jm, Math.min(W - jm + (innerWidth > 760 ? 0 : W * .2), W * (innerWidth > 760 ? .62 : .6) + Math.sin(t * .13) * W * .14 * Q + Math.sin(t * .31) * 10 * Q)) + D.x, jy = (74 - lift * 22 + Math.sin(t * .21) * 10) * Q + D.y, pu = 1 - squeeze * .14;   // phone: a smaller jellyfish (Q), floating in its own column
       fl._grab.style.left = (jx - 70 * Q) + 'px'; fl._grab.style.top = (jy - 50 * Q) + 'px';
       const J = fl._j || (fl._j = { m: { x: jx, y: jy + 62 * Q, vx: 0, vy: 0 }, s: socs.map((_, i) => ({ x: jx + (i - 1) * 70 * Q, y: jy + 212 * Q, vx: 0, vy: 0 })) });
       const spring = (o, tx, ty, k, d) => { o.vx += (tx - o.x) * k; o.vy += (ty - o.y) * k; o.vx *= d; o.vy *= d; o.x += o.vx; o.y += o.vy; };
@@ -3210,12 +3212,16 @@
       const X = [25, 1179, 409, 792];   // top: murmurations, kaleidoscope; bottom: cymatics, fractals — the pictures tell it, no names   // each picture's square inside the 1540 x 462 image (333 px), without the label strip
       f.insertAdjacentHTML('beforeend', `<span class="el4">${X.map((x, k) => `<i style="background-image:url('${src}');background-position:${(x / (1540 - 333) * 100).toFixed(3)}% ${(89 / (462 - 333) * 100).toFixed(3)}%"></i>`).join('')}</span>`); });
     const caps = () => SV.querySelectorAll('.st-say .mir-big, .st-based .mir-big, .mir-wind .mir-big, .mir-close .mir-big').forEach(el => { if (el.classList.contains('evcap')) return;
-      const t = el.textContent.replace(/\s+/g, ' ').trim(); el.innerHTML = `<span class="dk">${el.innerHTML}</span>` + (t.length <= 52 ? `<span class="ev-ph one">${t}</span>` : evenPh(t)); el.classList.add('evcap'); });
+      const t = el.textContent.replace(/\s+/g, ' ').trim(); el.innerHTML = `<span class="dk">${el.innerHTML}</span>` + (t.length <= 30 ? `<span class="ev-ph one">${t}</span>` : (() => { const w = t.split(' '); let best = null; for (let i = 1; i < w.length; i++) { const a = w.slice(0, i).join(' '), b = w.slice(i).join(' '), d = Math.abs(a.length - b.length); if (!best || d < best[0]) best = [d, a, b]; } return `<span class="ev-ph">${best[1]}</span><span class="ev-ph">${best[2]}</span>`; })()); el.classList.add('evcap'); });
     const fit = () => { if (innerWidth > 760) return; caps(); dots(); folds(); quads(); SV.querySelectorAll('span.ev-ph.one').forEach(sp => { if (!sp.offsetParent) return;   // one line: the size that exactly fills the width
         const box = sp.parentElement, cs = getComputedStyle(box), W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), f0 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pfs')) || 13.5;
         sp.style.setProperty('letter-spacing', '0px', 'important'); sp.style.setProperty('font-size', f0 + 'px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = '';
         sp.style.setProperty('font-size', (f0 * W / w * .999).toFixed(2) + 'px', 'important'); });
-      new Set([...SV.querySelectorAll('span.ev-ph:not(.one)')].filter(sp => sp.offsetParent).map(sp => sp.parentElement)).forEach(box => {   // one block at a time
+      { const blocks = [...SV.querySelectorAll('.mir-big.evcap')].filter(b => b.offsetParent); let k = 1e9; const meas = [];   // every caps statement on the page: the same size, the same spacing
+        blocks.forEach(b => { const cs = getComputedStyle(b), W = b.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+          b.querySelectorAll('span.ev-ph').forEach(sp => { sp.style.setProperty('letter-spacing', '.1em', 'important'); sp.style.setProperty('font-size', '13.5px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = ''; meas.push(sp); k = Math.min(k, W / w); }); });
+        meas.forEach(sp => sp.style.setProperty('font-size', (13.5 * Math.min(k, 1.2)).toFixed(2) + 'px', 'important')); }
+      new Set([...SV.querySelectorAll('span.ev-ph:not(.one)')].filter(sp => sp.offsetParent && !sp.parentElement.classList.contains('evcap')).map(sp => sp.parentElement)).forEach(box => {   // one block at a time
         const cs = getComputedStyle(box), W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), f0 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pfs')) || 13.5;
         const sps = [...box.querySelectorAll(':scope > span.ev-ph:not(.one)')], ws = sps.map(sp => { sp.style.setProperty('letter-spacing', '0px', 'important'); sp.style.setProperty('font-size', f0 + 'px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = ''; return w; });   // layout widths: unaffected by the flip-in animations
         const k = Math.min(1, W / Math.max(...ws));   // a narrow column: the whole block steps down a size together, never a line poking out
@@ -3439,7 +3445,7 @@
   // and the ring of light at the circle's edge keeps growing, whole, until it has left the screen
   (function stIris() {
     let seen = null;
-    const play = lo => {
+    const play = lo => { return;   // the iris and its ring of light are retired: the logo simply appears
       const r0 = lo.getBoundingClientRect(), cx = r0.left + r0.width / 2, cy = r0.top + r0.height / 2;
       const far = Math.max(Math.hypot(cx, cy), Math.hypot(innerWidth - cx, cy), Math.hypot(cx, innerHeight - cy), Math.hypot(innerWidth - cx, innerHeight - cy)) + 60;
       const logoR = Math.hypot(r0.width, r0.height) / 2, ring = document.createElement('i'); ring.className = 'st-ring'; document.body.appendChild(ring);
@@ -3451,7 +3457,8 @@
         if (k < 1) requestAnimationFrame(f); else { ring.remove(); lo.style.clipPath = ''; } })();
     };
     const tick = () => { requestAnimationFrame(tick); const lo = document.querySelector('.st-logo'); if (!lo) { seen = null; return; }
-      if (lo !== seen) { lo.style.clipPath = 'circle(0px at 50% 50%)'; const r = lo.getBoundingClientRect(); if (r.width > 10 && r.top < innerHeight * .85 && r.bottom > 0) { seen = lo; setTimeout(() => play(lo), 120); } } };
+      if (lo !== seen) { seen = lo; return;   // retired: no iris
+        const r = lo.getBoundingClientRect(); if (r.width > 10 && r.top < innerHeight * .85 && r.bottom > 0) { seen = lo; setTimeout(() => play(lo), 120); } } };
     requestAnimationFrame(tick);
   })();
   // The Mirror's galaxy, built in 3D: a spiral of glowing stars with a warm core and blue arms, turning slowly.
