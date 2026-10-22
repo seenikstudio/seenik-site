@@ -1387,6 +1387,16 @@
   }
   @keyframes gdGather { 0% { transform: translate(var(--x), var(--y)); opacity: 0; } 15% { opacity: 1; } 55% { transform: translate(0, 0); opacity: 1; } 60%, 100% { transform: translate(0, 0); opacity: 0; } }
   @keyframes gdFlare { 0%, 52% { transform: scale(1); } 62% { transform: scale(1.9); box-shadow: 0 0 10px 4px rgba(230,240,255,1), 0 0 26px 8px rgba(150,190,255,.6); } 80%, 100% { transform: scale(1); } }
+
+  /* Independent on its own film roll, frames the same size as Commercial (desktop) */
+  @media (min-width: 761px) {
+    .fw-indie-fs { width: 100%; }
+    .fw-indie-fs .row.fw-indie { gap: var(--tile-gap); padding: 12px 24px; justify-content: space-between; align-items: flex-start; }
+    .fw-indie-fs .fw-card { width: calc((var(--vw, 100vw) - 48px - 3 * var(--tile-gap)) / 4) !important; flex: none; }
+    .fw-indie-fs .frl .m { box-shadow: none !important; }
+    .fw-indie-fs .fw-card { box-shadow: none !important; outline: 0 !important; border: 1px solid rgba(255,255,255,.14) !important; align-self: flex-start; aspect-ratio: 3 / 4; height: auto !important; }
+  }
+  @media (max-width: 760px) { .fw-indie-fs > .sprockets { display: none; } .fw-indie-fs { width: 100% !important; } }
 </style>
 
 
@@ -3061,10 +3071,10 @@
     film: { title: 'Film Work', back: 'artist', spaced: true, render: () => {
       const w = 'calc((var(--vw, 100vw) - 48px - 3 * var(--tile-gap)) / 4)';
       const f = FILM_ITEMS.map(([t, y], i) => frameL(filmImgs[i], t, y, w, '3 / 4', `data-proj="${i}"`));
-      const fi = FILM_ITEMS.slice(0, 3).map(([t, y], i) => frameL(filmImgs[i], t, y, 'min(270px, calc((var(--vw, 100vw) - 48px - 3 * 34px) / 4))', '3 / 4', `data-proj="${i}"`));
+      const fi = FILM_ITEMS.slice(0, 3).map(([t, y], i) => frameL(filmImgs[i], t, y, w, '3 / 4', `data-proj="${i}"`));   // the same size as the Commercial frames
       return `<p class="reel-intro fw-block"><span>Since 2013 I've worked in film and television with IATSE, learning many roles in set</span><span>decoration under real pressure and real deadlines. I build each set digitally first, so</span><span>producers and directors can see the world before it's made, and then we build it for real.</span>${evenPh("Since 2013 I've worked in film and television with IATSE, learning many roles in set decoration under real pressure and real deadlines. I build each set digitally first, so producers and directors can see the world before it's made, and then we build it for real.")}</p><p class="reel-intro fw-sets">Here are some of the sets we've created</p>
         <section class="fw-sec fw-indie-sec"><div class="sec-head fw-ruled"><span class="kicker">01 · Short film</span><h3>Independent</h3></div>
-          <div class="fw-indie"><div class="fw-card"><p class="fw-card-t">Production<br class="ph-br"> Designer</p><p class="fw-just"><span>Film people find solutions,</span><span>making the impossible real.</span><span>It's amazing what a small</span><span>team of professionals can do.</span></p></div>${fi.join('')}</div></section>
+          <div class="fs fw-indie-fs" style="--fs-w:100%"><div class="sprockets" aria-hidden="true"></div><div class="row fw-indie"><div class="fw-card"><p class="fw-card-t">Production<br class="ph-br"> Designer</p><p class="fw-just"><span>Film people find solutions,</span><span>making the impossible real.</span><span>It's amazing what a small</span><span>team of professionals can do.</span></p></div>${fi.join('')}</div><div class="sprockets" aria-hidden="true"></div></div></section>
         <section class="fw-sec"><div class="sec-head"><span class="kicker">02 · Film &amp; television</span><h3>Commercial</h3></div><div class="fw-two">${strip(f.slice(3, 7), '100%')}${strip(f.slice(7, 11), '100%')}</div><div class="fw-one">${strip(f.slice(3, 11), '100%', 'left')}</div></section>
         <div class="fw-end"><button type="button" class="fw-go" data-go="contact">Contact</button><button type="button" class="fw-go" data-go="resume">CV</button></div>`; } },
     clips: { title: 'Video Clips', sub: 'Made in the pandemic', back: 'artist', spaced: true, render: () => {
