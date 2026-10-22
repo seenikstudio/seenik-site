@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Glowing Dot Options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root { --fg: #f2f4f7; --muted: rgba(242,244,247,.55); --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #000; color: var(--fg); font: 400 13.5px/1.75 var(--mono); }
+  main { max-width: 520px; margin: 0 auto; padding: 28px 16px 60px; }
+  h1 { margin: 0 0 6px; font-size: 18px; letter-spacing: .2em; text-transform: uppercase; font-weight: 400; text-align: center; }
+  .lead { margin: 0 0 30px; color: var(--muted); text-align: center; font-size: 12px; }
+  section { border-top: 1px solid rgba(255,255,255,.12); padding: 26px 0 30px; display: grid; justify-items: center; gap: 6px; }
+  .opt { font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--muted); }
+  h2 { margin: 0; font-size: 14px; letter-spacing: .2em; text-transform: uppercase; font-weight: 400; cursor: pointer; }
+  .how { margin: 0; font-size: 11px; color: var(--muted); text-align: center; }
+  .words { display: none; margin: 4px 0 0; transform-origin: 50% 0; }
+  section.open .words { display: block; animation: flip 1.1s cubic-bezier(.25,.7,.3,1) both; }
+  @keyframes flip { from { opacity: 0; transform: perspective(500px) rotateX(-70deg); } to { opacity: 1; transform: none; } }
+
+  .dot { position: relative; width: 48px; height: 48px; padding: 0; border: 0; background: none; cursor: pointer; margin: 4px 0; -webkit-tap-highlight-color: transparent; }
+  .dot i, .dot::before, .dot::after { position: absolute; left: 50%; top: 50%; translate: -50% -50%; border-radius: 50%; }
+  .dot::before { content: ""; width: 7px; height: 7px; background: #fff; box-shadow: 0 0 6px 2px rgba(220,235,255,.9), 0 0 16px 5px rgba(150,190,255,.45); z-index: 2; transition: scale .5s; }
+  section.open .dot::before { scale: .6; animation: none !important; box-shadow: 0 0 4px 1px rgba(220,235,255,.6); }
+  .dot::after { content: ""; width: 24px; height: 24px; border: 1px solid rgba(220,235,255,.55); opacity: 0; transition: opacity .6s, scale .6s; scale: .3; }
+  section.open .dot::after { opacity: 1; scale: 1; animation: none !important; }
+  section.open .dot i { animation: none !important; opacity: 0 !important; }
+
+  /* A — Ripple: rings spread from the light like a drop in water */
+  .a .dot::before { animation: pulse 2.6s ease-in-out infinite; }
+  .a .dot i { width: 24px; height: 24px; border: 1px solid rgba(220,235,255,.8); opacity: 0; animation: ripple 2.6s ease-out infinite; }
+  .a .dot i + i { animation-delay: .9s; }
+  @keyframes ripple { 0% { scale: .3; opacity: .9; } 75%, 100% { scale: 1.9; opacity: 0; } }
+  @keyframes pulse { 50% { box-shadow: 0 0 3px 1px rgba(220,235,255,.6), 0 0 8px 2px rgba(150,190,255,.2); } }
+
+  /* B — Orbit: a tiny spark circles the light, like a moon */
+  .b .dot::before { animation: pulse 3s ease-in-out infinite; }
+  .b .dot i { width: 30px; height: 30px; animation: orbit 2.4s linear infinite; }
+  .b .dot i::before { content: ""; position: absolute; left: 50%; top: -1px; width: 3px; height: 3px; margin-left: -1.5px; border-radius: 50%; background: #fff; box-shadow: 0 0 6px 2px rgba(200,225,255,.8); }
+  .b .dot i + i { display: none; }
+  @keyframes orbit { to { rotate: 360deg; } }
+
+  /* C — Heartbeat: two quick beats, then rest */
+  .c .dot::before { animation: beat 2.2s ease-in-out infinite; }
+  .c .dot i { width: 30px; height: 30px; background: radial-gradient(rgba(170,205,255,.35), transparent 70%); animation: beatGlow 2.2s ease-in-out infinite; }
+  .c .dot i + i { display: none; }
+  @keyframes beat { 0%, 40%, 100% { scale: 1; } 8% { scale: 1.6; } 16% { scale: 1; } 24% { scale: 1.45; } }
+  @keyframes beatGlow { 0%, 40%, 100% { scale: .6; opacity: 0; } 8%, 24% { scale: 1.4; opacity: 1; } }
+
+  /* D — Trace: a line of light draws a circle round the dot, then lets go */
+  .d .dot::before { animation: pulse 3s ease-in-out infinite; }
+  .d .dot i { width: 30px; height: 30px; border-radius: 0; }
+  .d .dot i svg { width: 30px; height: 30px; display: block; overflow: visible; }
+  .d .dot circle { fill: none; stroke: rgba(225,238,255,.9); stroke-width: 1; stroke-linecap: round; stroke-dasharray: 88; stroke-dashoffset: 88; filter: drop-shadow(0 0 2px rgba(180,210,255,.9)); animation: trace 2.8s cubic-bezier(.5,0,.3,1) infinite; transform-origin: 50% 50%; rotate: -90deg; }
+  .d .dot i + i { display: none; }
+  @keyframes trace { 0% { stroke-dashoffset: 88; opacity: 1; } 55% { stroke-dashoffset: 0; opacity: 1; } 80%, 100% { stroke-dashoffset: 0; opacity: 0; } }
+
+  /* E — Gather: three sparks drift in from the dark and meet in the light, which flares */
+  .e .dot::before { animation: flare 3s ease-in-out infinite; }
+  .e .dot i { width: 3px; height: 3px; background: #fff; box-shadow: 0 0 5px 1px rgba(200,225,255,.8); animation: gather 3s cubic-bezier(.5,0,.6,1) infinite; --x: -22px; --y: -14px; }
+  .e .dot i:nth-child(2) { --x: 22px; --y: -10px; animation-delay: .1s; }
+  .e .dot i:nth-child(3) { --x: 2px; --y: 22px; animation-delay: .2s; }
+  @keyframes gather { 0% { transform: translate(var(--x), var(--y)); opacity: 0; } 15% { opacity: 1; } 55% { transform: translate(0, 0); opacity: 1; } 60%, 100% { transform: translate(0, 0); opacity: 0; } }
+  @keyframes flare { 0%, 52% { scale: 1; } 62% { scale: 1.9; box-shadow: 0 0 10px 4px rgba(230,240,255,1), 0 0 26px 8px rgba(150,190,255,.6); } 80%, 100% { scale: 1; } }
+
+  @media (prefers-reduced-motion: reduce) { .dot::before, .dot i, .dot circle { animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>The glowing dot</h1>
+  <p class="lead">Five ways the light can call for a tap. Tap any of them to see it open.</p>
+
+  <section class="a"><span class="opt">A · Ripple</span><h2>Squamish Windsports</h2><button class="dot" aria-label="Show the words"><i></i><i></i></button><p class="how">Rings spread out like a drop in water.</p><p class="words">There is something so inspiring about watching people tap into the raw power of the wind in Squamish.</p></section>
+
+  <section class="b"><span class="opt">B · Orbit</span><h2>Squamish Windsports</h2><button class="dot" aria-label="Show the words"><i></i><i></i></button><p class="how">A tiny spark circles the light, like a moon.</p><p class="words">There is something so inspiring about watching people tap into the raw power of the wind in Squamish.</p></section>
+
+  <section class="c"><span class="opt">C · Heartbeat</span><h2>Squamish Windsports</h2><button class="dot" aria-label="Show the words"><i></i><i></i></button><p class="how">Two quick beats, then a rest. Alive.</p><p class="words">There is something so inspiring about watching people tap into the raw power of the wind in Squamish.</p></section>
+
+  <section class="d"><span class="opt">D · Trace</span><h2>Squamish Windsports</h2><button class="dot" aria-label="Show the words"><i><svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="14"/></svg></i><i></i></button><p class="how">A line of light draws a circle round it, then lets go.</p><p class="words">There is something so inspiring about watching people tap into the raw power of the wind in Squamish.</p></section>
+
+  <section class="e"><span class="opt">E · Gather</span><h2>Squamish Windsports</h2><button class="dot" aria-label="Show the words"><i></i><i></i><i></i></button><p class="how">Three sparks drift in and meet in the light, which flares. Like the Mirror triangles.</p><p class="words">There is something so inspiring about watching people tap into the raw power of the wind in Squamish.</p></section>
+</main>
+<script>
+  document.querySelectorAll('section').forEach(s => s.addEventListener('click', e => { if (e.target.closest('.dot, h2')) s.classList.toggle('open'); }));
+</script>
+</body>
+</html>
