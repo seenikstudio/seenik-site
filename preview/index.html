@@ -1405,7 +1405,7 @@
 
   /* PHONE Studio: the logo arrives with a gentle zoom — a little out, a little in, then it lands */
   @media (max-width: 760px) {
-    #section-view .st-lead .st-logo { animation: stLogoIn 1.2s ease .2s both, stLogoDrift 16s cubic-bezier(.45,.05,.55,.95) .2s infinite alternate; transform-origin: 50% 50%; }   /* fades in, then a slow zoom in (16 s) and back out, never quite still */
+    #section-view .st-lead .st-logo { animation: stLogoDrift 16s cubic-bezier(.45,.05,.55,.95) infinite alternate; transform-origin: 50% 50%; }   /* fades in, then a slow zoom in (16 s) and back out, never quite still */
   }
   @keyframes stLogoIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes stLogoDrift { from { transform: scale(1); } to { transform: scale(1.12); } }
