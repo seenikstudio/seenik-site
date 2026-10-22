@@ -1320,20 +1320,22 @@
     #section-view .reel-txt.open > p, #section-view .reel-txt.open > a { animation: subMirror 1.1s cubic-bezier(.25,.7,.3,1) both; transform-origin: 50% 0; }
     #section-view .reel-txt h3 { cursor: pointer; }
     .gdot { display: block; justify-self: center; position: relative; width: 34px; height: 34px; margin: -6px 0 -4px; padding: 0; border: 0; background: none; cursor: pointer; }
-    .gdot::before { content: ""; position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: #fff;
+    .gdot::before { content: ""; position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; margin: 0; translate: -50% -50%; border-radius: 50%; background: #fff;
       box-shadow: 0 0 6px 2px rgba(220,235,255,.9), 0 0 16px 5px rgba(150,190,255,.45); animation: gdotPulse 2.6s ease-in-out infinite; transition: transform .5s, background .5s, box-shadow .5s; }
-    .gdot::after { content: ""; position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; border: 1px solid rgba(220,235,255,.0); transform: scale(.3); transition: transform .6s cubic-bezier(.2,.8,.2,1), border-color .6s; }
+    .gdot::after { content: ""; position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: 0; translate: -50% -50%; box-sizing: border-box; border-radius: 50%; border: 1px solid rgba(220,235,255,.7); transform: scale(.3); opacity: 0; animation: gdotRipple 2.6s ease-out infinite; transition: transform .6s cubic-bezier(.2,.8,.2,1), border-color .6s, opacity .6s; }   /* closed: a ripple keeps spreading from the light, saying tap */
     .reel-txt.open .gdot::before { transform: scale(.55); box-shadow: 0 0 4px 1px rgba(220,235,255,.6); animation: none; }
-    .reel-txt.open .gdot::after { transform: scale(1); border-color: rgba(220,235,255,.55); }   /* open: the light settles into a small ring */
+    .reel-txt.open .gdot::after { transform: scale(1); opacity: 1; border-color: rgba(220,235,255,.55); animation: none; }   /* open: the light settles into a small ring */
   }
+  @keyframes gdotRipple { 0% { transform: scale(.3); opacity: .9; } 70%, 100% { transform: scale(1.6); opacity: 0; } }
   @keyframes gdotPulse { 50% { box-shadow: 0 0 3px 1px rgba(220,235,255,.6), 0 0 8px 2px rgba(150,190,255,.2); } }
 
   .el4 { display: none; }
   @media (max-width: 760px) {
     #section-view .fr.mir-wide:not(.mir-lined) { aspect-ratio: auto !important; height: auto !important; background: none !important; }
     #section-view .fr.mir-wide:not(.mir-lined) > img { display: none !important; }
-    #section-view .el4 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; width: 100%; }
-    #section-view .el4 i { display: block; aspect-ratio: 385 / 462; background-size: 400% 100%; background-repeat: no-repeat; }
+    #section-view .el4 { display: grid; grid-template-columns: 1fr 1fr; gap: 0; width: 100%; }
+    #section-view .el4 i { display: block; position: relative; aspect-ratio: 1; background-size: 462.462% auto; background-repeat: no-repeat; }
+    #section-view .el4 b { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 8px 8px; font: 400 9px/1 var(--mono); letter-spacing: .24em; text-transform: uppercase; color: #fff; text-align: center; background: linear-gradient(transparent, rgba(0,0,0,.6)); }
   }
 </style>
 
@@ -3152,7 +3154,8 @@
       const d = document.createElement('button'); d.type = 'button'; d.className = 'gdot'; d.setAttribute('aria-label', 'Show the words'); d.setAttribute('aria-expanded', 'false'); h.after(d); });
     SV.addEventListener('click', e => { const t = e.target.closest('.gdot, .reel-txt h3'); if (!t || innerWidth > 760) return; const r = t.closest('.reel-txt'); const on = r.classList.toggle('open'); const d = r.querySelector('.gdot'); if (d) d.setAttribute('aria-expanded', on); });
     const quads = () => SV.querySelectorAll('.fr.mir-wide:not(.mir-lined)').forEach(f => { if (f.querySelector('.el4')) return; const src = f.querySelector('img').src;   // the four elementals: one picture, shown as two rows of two
-      f.insertAdjacentHTML('beforeend', `<span class="el4">${[0, 1, 2, 3].map(k => `<i style="background-image:url('${src}');background-position:${(k * 100 / 3).toFixed(3)}% 0"></i>`).join('')}</span>`); });
+      const X = [25, 409, 792, 1179], N = ['Murmurations', 'Cymatics', 'Fractals', 'Kaleidoscopes'];   // each picture's square inside the 1540 x 462 image (333 px), without the label strip
+      f.insertAdjacentHTML('beforeend', `<span class="el4">${X.map((x, k) => `<i style="background-image:url('${src}');background-position:${(x / (1540 - 333) * 100).toFixed(3)}% ${(89 / (462 - 333) * 100).toFixed(3)}%"><b>${N[k]}</b></i>`).join('')}</span>`); });
     const caps = () => SV.querySelectorAll('.st-say .mir-big, .st-based .mir-big, .mir-wind .mir-big, .mir-close .mir-big').forEach(el => { if (el.classList.contains('evcap')) return;
       const t = el.textContent.replace(/\s+/g, ' ').trim(); el.innerHTML = `<span class="dk">${el.innerHTML}</span>` + (t.length <= 52 ? `<span class="ev-ph one">${t}</span>` : evenPh(t)); el.classList.add('evcap'); });
     const fit = () => { if (innerWidth > 760) return; caps(); dots(); quads(); SV.querySelectorAll('span.ev-ph.one').forEach(sp => { if (!sp.offsetParent) return;   // one line: the size that exactly fills the width
