@@ -1234,6 +1234,14 @@
     .pj-info { display: inline-block; background: none; color: var(--fg); border: 1px solid rgba(255,255,255,.6); border-radius: 999px; padding: 11px 26px; font: 400 10px/1 var(--mono); letter-spacing: .3em; text-transform: uppercase; cursor: pointer; }
     .proj .info.open .pj-info { border-color: rgba(255,255,255,.3); color: var(--muted); }
   }
+
+  /* PHONE playback cards: smaller captions, never more than three lines */
+  @media (max-width: 760px) {
+    .pj-item figcaption { padding: 10px 10px 12px !important; gap: 4px !important; }
+    .pj-item figcaption b { font-size: 9px !important; letter-spacing: .2em !important; }
+    .pj-item figcaption > span { font: 400 9px/1.5 var(--mono) !important; letter-spacing: 0 !important; }
+    .proj .info.open > p, .pj-con.open > .pj-note { font: 400 calc((100vw - 80px) / 29.4)/1.9 var(--mono) !important; letter-spacing: .02em !important; text-align: center !important; text-wrap: pretty; color: var(--fg) !important; padding-inline: 8px !important; }   /* opened write-ups: the same size as the rest of the phone text */
+  }
 </style>
 
 
