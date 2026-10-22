@@ -3328,7 +3328,7 @@
   (function mirTri() {
     let cv = null, g, W, H, HH, pts = [], cl = [], links = [], seams = [], last = 0, mx = -1e4, my = -1e4, drag = null, boxes = [], noClick = false;
     let fly = null, ov = null, og = null, calmT = -1e9, edge = 1;   // edge: just below the thin line along the top of the eye; nothing is ever drawn above it   // the hand-off from the opening: its pieces travel on a screen overlay until they land
-    const near = (x, y) => { let best = null, bd = 30; for (const p of pts) { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = p; } } return best; };
+    const near = (x, y, r = 30) => { let best = null, bd = r; for (const p of pts) { const d = Math.hypot(p.x - x, p.y - y); if (d < bd) { bd = d; best = p; } } return best; };
     const measure = () => {   // the canvas runs from the top of the eye to the bottom of the first statement
       const st = cv.parentElement, hero = st.querySelector('.mir-hero'), first = SV.querySelector('.mir-first'), sr = st.getBoundingClientRect();
       W = sr.width; HH = hero.getBoundingClientRect().height; H = first ? first.getBoundingClientRect().bottom - sr.top : HH; edge = hero.getBoundingClientRect().top - sr.top + 1;
@@ -3409,11 +3409,15 @@
       const st = cv.parentElement.querySelector('.mir-par'), b = cv.parentElement.querySelector('.mir-hero').getBoundingClientRect();   // the eye leans a little toward the cursor
       if (e.clientY < b.bottom && e.clientY > b.top) st.style.transform = `translate(${((e.clientX - b.left) / b.width - .5) * -14}px, ${((e.clientY - b.top) / b.height - .5) * -9}px)`; else st.style.transform = '';
     });
-    SV.addEventListener('pointerdown', e => { if (!cv || !cv.isConnected || fly) return; const [x, y] = rel(e), p = near(x, y); if (!p) return;
+    SV.addEventListener('pointerdown', e => { if (!cv || !cv.isConnected || fly) return; const [x, y] = rel(e), p = near(x, y, e.pointerType === 'touch' ? 46 : 30); if (!p) return;
       const q = cl[p.k]; drag = { k: p.k, dx: x - q.x, dy: y - q.y }; q.free = 1; e.preventDefault(); SV.style.cursor = 'grabbing'; });
     addEventListener('pointerup', () => { if (!drag) return; cl[drag.k].free = 1; drag = null; noClick = true; setTimeout(() => noClick = false, 60); });
     SV.addEventListener('click', e => { if (noClick) { e.stopPropagation(); e.preventDefault(); } }, true);
     SV.addEventListener('dragstart', e => { if (e.target.closest('.mir-stage')) e.preventDefault(); });
+    SV.addEventListener('touchstart', e => { if (!cv || !cv.isConnected || fly || e.touches.length > 1) return; const t = e.touches[0], b = cv.getBoundingClientRect();   // phone: a finger that lands on a triangle holds it instead of scrolling the page
+      if (near(t.clientX - b.left, t.clientY - b.top, 46)) e.preventDefault(); }, { passive: false });
+    const lift = e => { if (e.pointerType === 'touch') { mx = my = -1e4; const st = cv && cv.parentElement.querySelector('.mir-par'); if (st) st.style.transform = ''; } };   // finger off: nothing keeps pushing
+    addEventListener('pointerup', lift); addEventListener('pointercancel', lift);
     const glow = r => .72 * (.4 + (1 - r) * .6) * Math.min(1, (1 - r) * 3) * FOG;   // the field's link brightness for a link at r = length / link distance
     const tick = now => {
       requestAnimationFrame(tick);
