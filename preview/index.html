@@ -1405,10 +1405,10 @@
 
   /* PHONE Studio: the logo arrives with a gentle zoom — a little out, a little in, then it lands */
   @media (max-width: 760px) {
-    #section-view .st-lead .st-logo { animation: stLogoDrift 12s cubic-bezier(.42,0,.38,1) both; transform-origin: 50% 50%; }   /* fades in, then a slow zoom in (16 s) and back out, never quite still */
+    #section-view .st-lead .st-logo { animation: stLogoDrift 4s cubic-bezier(.42,0,.38,1) both; transform-origin: 50% 50%; }   /* fades in, then a slow zoom in (16 s) and back out, never quite still */
   }
   @keyframes stLogoIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes stLogoDrift { from { transform: translateX(16.3vw) scale(.78); } to { transform: none; } }   /* starts centred on the eye swirl, glides to land with the word sEEnik centred */   /* starts further away, one slow, even zoom in (12 s), soft start and soft landing, then rests where it lands */
+  @keyframes stLogoDrift { from { transform: translateX(16.3vw) scale(.78); } to { transform: none; } }   /* starts centred on the eye swirl, glides to land with the word sEEnik centred */   /* starts further away, one smooth zoom in (4 s), soft start and soft landing, then rests where it lands */
   @keyframes stLogoLand { 0% { opacity: 0; transform: scale(.86); } 35% { opacity: 1; transform: scale(1.06); } 65% { transform: scale(.985); } 100% { opacity: 1; transform: scale(1); } }
   @media (prefers-reduced-motion: reduce) { #section-view .st-lead .st-logo { animation: none; } }
 
@@ -1425,6 +1425,12 @@
     #section-view .reel-row { padding: 12px 0 10px !important; row-gap: 16px !important; }
     #section-view .reel { gap: 8px !important; }
     #section-view .reel .lab, #section-view .reel.clip .lab { padding-top: 4px; gap: 3px !important; }
+  }
+
+  /* PHONE Studio: the two pictures without frames, edge to edge */
+  @media (max-width: 760px) {
+    #section-view .st-photo, #section-view .st-pier { outline: 0 !important; border: 0 !important; padding: 0 !important; box-shadow: none !important; width: 100vw !important; max-width: none !important; margin-left: calc(50% - 50vw) !important; justify-self: start !important; }
+    #section-view .st-photo img, #section-view .st-pier img { outline: 0 !important; border: 0 !important; width: 100% !important; }
   }
 </style>
 
@@ -3435,6 +3441,8 @@
           c = mix(c, vec3(.93, .95, .98), clamp(cl, 0., .6)); gl_FragColor = vec4(c, 1.); }` })));
       h.addEventListener('pointermove', e => { const r = h.getBoundingClientRect(); mx = (e.clientX - r.left) / r.width; my = (e.clientY - r.top) / r.height; on = true; });
       h.addEventListener('pointerleave', () => { on = false; });
+      const tch = e => { const t = e.touches[0]; if (!t) return; const r = h.getBoundingClientRect(); mx = (t.clientX - r.left) / r.width; my = (t.clientY - r.top) / r.height; on = true; };   // phone: a finger on the picture moves the water too (scrolling still works)
+      h.addEventListener('touchstart', tch, { passive: true }); h.addEventListener('touchmove', tch, { passive: true }); h.addEventListener('touchend', () => { setTimeout(() => { on = false; }, 900); }, { passive: true });
     };
     const tick = () => { requestAnimationFrame(tick);
       const h = document.querySelector('.st-photo'); if (!h) { if (R) { R.dispose(); R = null; } host = null; return; }
