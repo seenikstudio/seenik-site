@@ -1441,10 +1441,10 @@
     #section-view .mir-big.evcap span.ev-ph { font-family: var(--mono) !important; color: var(--fg) !important; line-height: 1.75 !important; }
   }
 
-  /* PHONE: no page titles (the glowing tab names the page); Contact keeps its pill, which the photo hangs from */
+  /* PHONE: page titles off where they repeat what's already on screen */
   @media (max-width: 760px) {
-    #section-view:not(:has(.ct-sleek)) .sv-head { display: none !important; }
-    #section-view:not(:has(.ct-sleek)) .sv-body { padding-top: 10px !important; }
+    #section-view:has(.st-stage) .sv-head, #section-view:has(.mir-stage) .sv-head, #section-view:has(.proj) .sv-head { display: none !important; }   /* only The Studio, The Mirror and the film projects: their tab or poster already names them */
+    #section-view:has(.st-stage) .sv-body, #section-view:has(.mir-stage) .sv-body, #section-view:has(.proj) .sv-body { padding-top: 10px !important; }
     .site-nav button { overflow: hidden; text-overflow: clip; }
     .site-nav button.long { font-size: 9.5px !important; letter-spacing: .06em !important; }
   }
@@ -3231,7 +3231,7 @@
     SV.style.setProperty('--vw', Math.min(SV.clientWidth, PAGE_MAX) + 'px');
     setNav(key === 'studio' || key === 'mirror' ? key : 'artist');
     const artBtn = navBtns.find(b => b.dataset.go === 'artist');
-    artBtn.textContent = pg.back === 'film' ? 'Film Work' : (innerWidth <= 760 && key !== 'contact' && pg.back === 'artist') ? title : 'The Artist';   // phone: the glowing tab names the page, so the page needs no title
+    artBtn.textContent = pg.back === 'film' ? 'Film Work' : 'The Artist';
     artBtn.dataset.back = pg.back === 'film' ? 'film' : '';
     navBtns.forEach(b => b.classList.toggle('deep', !!pg.back && b.dataset.go === 'artist')); artBtn.classList.toggle('long', artBtn.textContent.length > 13);
     if (key === 'art') requestAnimationFrame(layoutWall);
