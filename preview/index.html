@@ -2146,15 +2146,17 @@
   skipIntro.addEventListener('pointerdown', e => e.stopPropagation());
   skipIntro.addEventListener('click', e => { e.stopPropagation(); if (skipping) return; skipping = true;
     if (phase === 'idle') startReveal();
-    if (phase === 'burst' || phase === 'dance') { frameEl.classList.remove('show'); finishMusic(); }   // no square frame: the video it framed isn't here yet
+    if (phase === 'burst' || phase === 'dance') { frameEl.classList.toggle('show', innerWidth > 760); finishMusic(); }   // desktop: the square frame is up, exactly as at the end of the video; phone: no square, straight from the burst
     if (phase !== 'end') { skipping = false; return; }
     // the end shape is already gathered into the geodesic wall, as if the music had played through
     endT = 200; endVis = 1;
     { const half = frameSize / 2, dyL = frameSize / (WROWS - 1), dxL = dyL * 2 / Math.sqrt(3), x0 = -((WCOLS - 0.5) * dxL) / 2;
-      for (let i = 0; i < SN; i++) { const a = Math.random() * Math.PI * 2, r = Math.sqrt(Math.random()) * half * .5, sp = .02 + Math.random() * .05;   // straight from the burst: the points fly outward from the centre (no square grid)
-        ePts[i].set(Math.cos(a) * r, Math.sin(a) * r, 0.3); eVel[i].set(Math.cos(a) * sp, Math.sin(a) * sp, 0); } }
-    frameEl.classList.remove('show');
-    setTimeout(() => { skipping = false; if (phase === 'end') openMenu(); }, 30); });
+      const ph = innerWidth <= 760;   // phone: straight from the burst, the points fly outward from the centre (no square grid); desktop: the geodesic wall in the square, as before
+      for (let i = 0; i < SN; i++) { if (ph) { const a = Math.random() * Math.PI * 2, rr = Math.sqrt(Math.random()) * half * .5, sp = .02 + Math.random() * .05; ePts[i].set(Math.cos(a) * rr, Math.sin(a) * rr, 0.3); eVel[i].set(Math.cos(a) * sp, Math.sin(a) * sp, 0); continue; }
+        const r = (i / WCOLS) | 0, c = i % WCOLS, gx = x0 + (c + (r % 2 ? 0.5 : 0)) * dxL, gy = half - r * dyL;
+        ePts[i].set(Math.max(-half, Math.min(half, gx)), gy, 0.3); eVel[i].set(0, 0, 0); } }
+    if (innerWidth <= 760) frameEl.classList.remove('show');
+    setTimeout(() => { skipping = false; if (phase === 'end') openMenu(); }, innerWidth <= 760 ? 30 : 450); });
   (function skipShow() { requestAnimationFrame(skipShow); const want = innerWidth > 760 && !document.body.classList.contains('artist-on') && (phase === 'idle' || phase === 'burst' || phase === 'dance' || phase === 'end');
     if (skipIntro.hidden === want) skipIntro.hidden = !want; })();
 
