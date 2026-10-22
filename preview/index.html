@@ -1293,6 +1293,25 @@
     #section-view .fx-mat-light .reel .m { box-shadow: 0 0 0 2px #ebe7df !important; }
     #section-view .reel .m img { width: 100% !important; height: 100% !important; margin: 0 !important; outline: 0 !important; object-fit: cover !important; }
   }
+
+  /* PHONE: the caps statements (Our focus…, Seenik is based…, Experience the power…, The same patterns…) as even edge-to-edge blocks, in caps */
+  @media (max-width: 760px) {
+    #section-view .mir-big.evcap { container-type: inline-size; display: grid !important; width: 100% !important; max-width: none !important; justify-self: stretch !important; padding: 0 16px !important; box-sizing: border-box; margin: 0 !important;
+      font: 400 var(--pfs)/1.75 var(--mono) !important; text-transform: uppercase !important; text-align: left !important; white-space: normal !important; }
+    #section-view .mir-big.evcap > .dk { display: none !important; }
+    #section-view .st-stage .mir-big.evcap { padding: 0 12px !important; }   /* the Studio column sits 4px further in: same 28px edge as every other block */
+    #section-view .mir-sing:has(.evcap) { width: 100% !important; justify-items: stretch !important; padding-inline: 0 !important; }
+    /* the three pages: a line of light under the page you are on, which glides to the next page when you switch */
+    .site-nav { position: fixed; }
+    .site-nav button { border-bottom: 1px solid rgba(255,255,255,.12) !important; transition: color .5s !important; }
+    .site-nav button[aria-current="page"] { border-bottom-color: rgba(255,255,255,.12) !important; color: #fff !important; text-shadow: 0 0 12px rgba(200,225,255,.55); }
+    .site-nav::after { content: ""; position: absolute; left: 12px; bottom: 0; width: calc((100% - 24px) / 3); height: 2px; pointer-events: none;
+      transform: translateX(calc(var(--ix, 2) * 100%)); transition: transform .7s cubic-bezier(.2,.8,.2,1);
+      background: linear-gradient(90deg, transparent, rgba(220,235,255,.95) 30%, #fff 50%, rgba(220,235,255,.95) 70%, transparent);
+      box-shadow: 0 0 10px 1px rgba(170,205,255,.7), 0 0 22px 2px rgba(120,170,255,.35); animation: navGlow 3.2s ease-in-out infinite; }
+  }
+  @keyframes navGlow { 50% { opacity: .55; } }
+  @media (prefers-reduced-motion: reduce) { .site-nav::after { animation: none; transition: none; } }
 </style>
 
 
@@ -2815,7 +2834,7 @@
       mk.getAnimations().forEach(x => x.cancel());
     }, 1400);
   }
-  function setNav(key) { setMark(key === 'artist'); navBtns.forEach(b => { if (b.dataset.go === key) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }); }
+  function setNav(key) { setMark(key === 'artist'); navBtns.forEach((b, i) => { if (b.dataset.go === key) { b.setAttribute('aria-current', 'page'); b.parentElement.style.setProperty('--ix', i); } else b.removeAttribute('aria-current'); }); }
   // --- placeholders, a different look for each section
   const ph = {
     film(seed, s = 600) {   // cinematic duotone: a lit figure-like shape, grain, vignette
@@ -3106,7 +3125,9 @@
   }, 300);
   SV.addEventListener('pointerdown', e => e.stopPropagation());
   (function evenFit() {   // phone: stretch each line of an even block to the block's full width, measured, not guessed
-    const fit = () => { if (innerWidth > 760) return; SV.querySelectorAll('span.ev-ph').forEach(sp => { if (!sp.offsetParent) return;
+    const caps = () => SV.querySelectorAll('.st-say .mir-big, .st-based .mir-big, .mir-wind .mir-big, .mir-close .mir-big').forEach(el => { if (el.classList.contains('evcap')) return;
+      const t = el.textContent.replace(/\s+/g, ' ').trim(); el.innerHTML = `<span class="dk">${el.innerHTML}</span>${evenPh(t)}`; el.classList.add('evcap'); });
+    const fit = () => { if (innerWidth > 760) return; caps(); SV.querySelectorAll('span.ev-ph').forEach(sp => { if (!sp.offsetParent) return;
       const box = sp.parentElement, cs = getComputedStyle(box), W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), n = sp.textContent.length;
       sp.style.setProperty('letter-spacing', '0px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = '';   // layout width: unaffected by the flip-in animations
       sp.style.setProperty('letter-spacing', Math.max(0, (W - w) / n).toFixed(3) + 'px', 'important'); }); };
