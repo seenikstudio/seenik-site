@@ -1453,6 +1453,13 @@
   @media (max-width: 760px) {
     #section-view .reel-intro.fw-sets { white-space: nowrap !important; font-size: calc((100vw - 56px) / 27.3) !important; letter-spacing: .1em !important; padding-inline: 0 !important; text-align: center; }
   }
+
+  /* PHONE Mirror statements: arrive at their size, then slowly grow 10 % and settle (the words scale as a whole, so spacing stays in proportion) */
+  @media (max-width: 760px) {
+    #section-view .mir-wind .mir-big.evcap, #section-view .mir-close .mir-big.evcap { scale: 1; transition: scale 2.4s cubic-bezier(.33,.1,.25,1); transform-origin: 50% 50%; }
+    #section-view .mir-wind .mir-big.evcap.grow, #section-view .mir-close .mir-big.evcap.grow { scale: 1.1; }
+  }
+  @media (prefers-reduced-motion: reduce) { #section-view .mir-big.evcap { transition: none !important; } }
 </style>
 
 
@@ -3319,7 +3326,9 @@
     let q = 0; const soon = () => { cancelAnimationFrame(q); q = requestAnimationFrame(fit); };
     new MutationObserver(soon).observe(SV, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
     addEventListener('resize', soon); if (document.fonts) document.fonts.ready.then(soon); SV.addEventListener('click', () => setTimeout(soon, 30));
-    SV.addEventListener('load', soon, true);   // pictures arriving change the spaces we balance
+    SV.addEventListener('load', soon, true);
+    const growIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('grow'); growIO.unobserve(e.target); } }), { threshold: .9 });
+    new MutationObserver(() => SV.querySelectorAll('.mir-wind .mir-big.evcap:not(.grow), .mir-close .mir-big.evcap:not(.grow)').forEach(el => growIO.observe(el))).observe(SV, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });   // pictures arriving change the spaces we balance
     SV.addEventListener('animationend', soon, true); setInterval(() => { if (innerWidth <= 760 && SV.querySelector('.st-say, .mir-wind')) soon(); }, 1500);
   })();
   function svClick(e) {
