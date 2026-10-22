@@ -1405,10 +1405,10 @@
 
   /* PHONE Studio: the logo arrives with a gentle zoom — a little out, a little in, then it lands */
   @media (max-width: 760px) {
-    #section-view .st-lead .st-logo { animation: stLogoDrift 16s cubic-bezier(.45,.05,.55,.95) infinite alternate; transform-origin: 50% 50%; }   /* fades in, then a slow zoom in (16 s) and back out, never quite still */
+    #section-view .st-lead .st-logo { animation: stLogoDrift 12s cubic-bezier(.42,0,.38,1) both; transform-origin: 50% 50%; }   /* fades in, then a slow zoom in (16 s) and back out, never quite still */
   }
   @keyframes stLogoIn { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes stLogoDrift { from { transform: scale(1); } to { transform: scale(1.12); } }
+  @keyframes stLogoDrift { from { transform: scale(.78); } to { transform: scale(1); } }   /* starts further away, one slow, even zoom in (12 s), soft start and soft landing, then rests where it lands */
   @keyframes stLogoLand { 0% { opacity: 0; transform: scale(.86); } 35% { opacity: 1; transform: scale(1.06); } 65% { transform: scale(.985); } 100% { opacity: 1; transform: scale(1); } }
   @media (prefers-reduced-motion: reduce) { #section-view .st-lead .st-logo { animation: none; } }
 
