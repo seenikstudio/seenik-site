@@ -3294,7 +3294,7 @@
         const text = el => { const r = document.createRange(); r.selectNodeContents(el.querySelector('.mir-big')); return r.getBoundingClientRect(); };
         const mid = (el, top, bot) => { const t = text(el), m = parseFloat(el.style.marginTop) || 0, shift = ((t.top - top) - (bot - t.bottom)) / 2; if (Math.abs(shift) > .5) el.style.setProperty('margin-top', (m - shift).toFixed(1) + 'px', 'important'); };
         if (lo && say && ph) { const r = lo.getBoundingClientRect(), mt = new DOMMatrix(getComputedStyle(lo).transform), h = r.height / mt.a, cy = r.top + r.height / 2 - mt.f;
-          mid(say, cy - h / 2 + h * .84, ph.getBoundingClientRect().top); }   // the logo art ends at 84 % of its picture
+          mid(say, cy - h / 2 + h * .858, ph.getBoundingClientRect().top); }   // where the logo visibly ends (its faint glow included), measured from screenshots
         if (based && ph && pier) mid(based, ph.getBoundingClientRect().bottom, pier.getBoundingClientRect().top); }
       new Set([...SV.querySelectorAll('span.ev-ph:not(.one)')].filter(sp => sp.offsetParent && !sp.parentElement.classList.contains('evcap')).map(sp => sp.parentElement)).forEach(box => {   // one block at a time
         { const cs0 = getComputedStyle(box), W0 = box.clientWidth - parseFloat(cs0.paddingLeft) - parseFloat(cs0.paddingRight), sp0 = box.querySelector(':scope > span.ev-ph'), ff = getComputedStyle(sp0).fontFamily, key = W0 + '|' + ff + '|' + (document.fonts ? document.fonts.status : '');
