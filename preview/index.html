@@ -1409,6 +1409,14 @@
   }
   @keyframes stLogoLand { 0% { opacity: 0; transform: scale(.86); } 35% { opacity: 1; transform: scale(1.06); } 65% { transform: scale(.985); } 100% { opacity: 1; transform: scale(1); } }
   @media (prefers-reduced-motion: reduce) { #section-view .st-lead .st-logo { animation: none; } }
+
+  /* PHONE: every frame's title and year sit together; the space comes after the year, before the next row */
+  @media (max-width: 760px) {
+    #section-view .frl .lab, #section-view .fw-sec .frl .lab { display: flex !important; flex-direction: column; align-items: center; gap: 3px !important; min-height: 0; padding-bottom: 0; line-height: 1.25 !important; }
+    #section-view .frl .lab em { display: block; margin: 0; line-height: 1.25; }
+    #section-view .frl { gap: 7px !important; }
+    #section-view .fw-indie-fs .row.fw-indie, #section-view .fw-one .row { row-gap: 26px !important; }
+  }
 </style>
 
 
