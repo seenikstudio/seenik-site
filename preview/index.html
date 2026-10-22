@@ -1303,7 +1303,7 @@
       font: 400 var(--pfs)/1.75 var(--mono) !important; text-transform: uppercase !important; text-align: left !important; white-space: normal !important; }
     #section-view .mir-big.evcap > .dk { display: none !important; }
     #section-view .mir-big.evcap { justify-items: center !important; text-align: center !important; }
-    #section-view .st-stage .mir-big.evcap { padding: 0 12px !important; }   /* the Studio column sits 4px further in: same 28px edge as every other block */
+    #section-view .st-say .mir-big.evcap { padding: 0 4px !important; }   /* the Studio statements run to the page's 16px edges, so they can be a size bigger */
     #section-view .mir-sing:has(.evcap) { width: 100% !important; justify-items: stretch !important; padding-inline: 0 !important; }
     /* the three pages: a line of light under the page you are on, which glides to the next page when you switch */
     .site-nav { position: fixed; }
@@ -3290,6 +3290,12 @@
         blocks.forEach(b => { const cs = getComputedStyle(b), W = b.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
           b.querySelectorAll('span.ev-ph').forEach(sp => { sp.style.setProperty('letter-spacing', '.1em', 'important'); sp.style.setProperty('font-size', '13.5px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = ''; meas.push(sp); k = Math.min(k, W / w); }); });
         meas.forEach(sp => sp.style.setProperty('font-size', (13.5 * Math.min(k, 1.2)).toFixed(2) + 'px', 'important')); }
+      { const lo = SV.querySelector('.st-lead .st-logo'), say = SV.querySelector('.st-say:not(.st-based)'), based = SV.querySelector('.st-based'), ph = SV.querySelector('.st-photo'), pier = SV.querySelector('.st-pier');   // The Studio: each statement sits in the middle of its space
+        const text = el => { const r = document.createRange(); r.selectNodeContents(el.querySelector('.mir-big')); return r.getBoundingClientRect(); };
+        const mid = (el, top, bot) => { const t = text(el), m = parseFloat(el.style.marginTop) || 0, shift = ((t.top - top) - (bot - t.bottom)) / 2; if (Math.abs(shift) > .5) el.style.setProperty('margin-top', (m - shift).toFixed(1) + 'px', 'important'); };
+        if (lo && say && ph) { const r = lo.getBoundingClientRect(), mt = new DOMMatrix(getComputedStyle(lo).transform), h = r.height / mt.a, cy = r.top + r.height / 2 - mt.f;
+          mid(say, cy - h / 2 + h * .84, ph.getBoundingClientRect().top); }   // the logo art ends at 84 % of its picture
+        if (based && ph && pier) mid(based, ph.getBoundingClientRect().bottom, pier.getBoundingClientRect().top); }
       new Set([...SV.querySelectorAll('span.ev-ph:not(.one)')].filter(sp => sp.offsetParent && !sp.parentElement.classList.contains('evcap')).map(sp => sp.parentElement)).forEach(box => {   // one block at a time
         { const cs0 = getComputedStyle(box), W0 = box.clientWidth - parseFloat(cs0.paddingLeft) - parseFloat(cs0.paddingRight), sp0 = box.querySelector(':scope > span.ev-ph'), ff = getComputedStyle(sp0).fontFamily, key = W0 + '|' + ff + '|' + (document.fonts ? document.fonts.status : '');
           if (box.dataset.split !== key) { box.dataset.split = key;   // re-split by measured width in the real font: the fewest lines that fit, as even as possible
@@ -3306,6 +3312,8 @@
     let q = 0; const soon = () => { cancelAnimationFrame(q); q = requestAnimationFrame(fit); };
     new MutationObserver(soon).observe(SV, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
     addEventListener('resize', soon); if (document.fonts) document.fonts.ready.then(soon); SV.addEventListener('click', () => setTimeout(soon, 30));
+    SV.addEventListener('load', soon, true);   // pictures arriving change the spaces we balance
+    SV.addEventListener('animationend', soon, true); setInterval(() => { if (innerWidth <= 760 && SV.querySelector('.st-say')) soon(); }, 1500);
   })();
   function svClick(e) {
     const cv = e.target.closest('[data-vid]');
