@@ -1312,6 +1312,21 @@
   }
   @keyframes navGlow { 50% { opacity: .55; } }
   @media (prefers-reduced-motion: reduce) { .site-nav::after { animation: none; transition: none; } }
+
+  /* PHONE: words on request — a point of light under each title; tap it (or the title) and the words unfold; tap again and they fold away */
+  .gdot { display: none; }
+  @media (max-width: 760px) {
+    #section-view .reel-txt:not(.open) > p, #section-view .reel-txt:not(.open) > a { display: none !important; }
+    #section-view .reel-txt.open > p, #section-view .reel-txt.open > a { animation: subMirror 1.1s cubic-bezier(.25,.7,.3,1) both; transform-origin: 50% 0; }
+    #section-view .reel-txt h3 { cursor: pointer; }
+    .gdot { display: block; justify-self: center; position: relative; width: 34px; height: 34px; margin: -6px 0 -4px; padding: 0; border: 0; background: none; cursor: pointer; }
+    .gdot::before { content: ""; position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: #fff;
+      box-shadow: 0 0 6px 2px rgba(220,235,255,.9), 0 0 16px 5px rgba(150,190,255,.45); animation: gdotPulse 2.6s ease-in-out infinite; transition: transform .5s, background .5s, box-shadow .5s; }
+    .gdot::after { content: ""; position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; margin: -11px 0 0 -11px; border-radius: 50%; border: 1px solid rgba(220,235,255,.0); transform: scale(.3); transition: transform .6s cubic-bezier(.2,.8,.2,1), border-color .6s; }
+    .reel-txt.open .gdot::before { transform: scale(.55); box-shadow: 0 0 4px 1px rgba(220,235,255,.6); animation: none; }
+    .reel-txt.open .gdot::after { transform: scale(1); border-color: rgba(220,235,255,.55); }   /* open: the light settles into a small ring */
+  }
+  @keyframes gdotPulse { 50% { box-shadow: 0 0 3px 1px rgba(220,235,255,.6), 0 0 8px 2px rgba(150,190,255,.2); } }
 </style>
 
 
@@ -3125,9 +3140,16 @@
   }, 300);
   SV.addEventListener('pointerdown', e => e.stopPropagation());
   (function evenFit() {   // phone: stretch each line of an even block to the block's full width, measured, not guessed
+    const dots = () => SV.querySelectorAll('.reel-txt').forEach(r => { if (r.querySelector('.gdot')) return; const h = r.querySelector('h3'); if (!h) return;
+      const d = document.createElement('button'); d.type = 'button'; d.className = 'gdot'; d.setAttribute('aria-label', 'Show the words'); d.setAttribute('aria-expanded', 'false'); h.after(d); });
+    SV.addEventListener('click', e => { const t = e.target.closest('.gdot, .reel-txt h3'); if (!t || innerWidth > 760) return; const r = t.closest('.reel-txt'); const on = r.classList.toggle('open'); const d = r.querySelector('.gdot'); if (d) d.setAttribute('aria-expanded', on); });
     const caps = () => SV.querySelectorAll('.st-say .mir-big, .st-based .mir-big, .mir-wind .mir-big, .mir-close .mir-big').forEach(el => { if (el.classList.contains('evcap')) return;
-      const t = el.textContent.replace(/\s+/g, ' ').trim(); el.innerHTML = `<span class="dk">${el.innerHTML}</span>${evenPh(t)}`; el.classList.add('evcap'); });
-    const fit = () => { if (innerWidth > 760) return; caps(); SV.querySelectorAll('span.ev-ph').forEach(sp => { if (!sp.offsetParent) return;
+      const t = el.textContent.replace(/\s+/g, ' ').trim(); el.innerHTML = `<span class="dk">${el.innerHTML}</span>` + (t.length <= 52 ? `<span class="ev-ph one">${t}</span>` : evenPh(t)); el.classList.add('evcap'); });
+    const fit = () => { if (innerWidth > 760) return; caps(); dots(); SV.querySelectorAll('span.ev-ph.one').forEach(sp => { if (!sp.offsetParent) return;   // one line: the size that exactly fills the width
+        const box = sp.parentElement, cs = getComputedStyle(box), W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), f0 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pfs')) || 13.5;
+        sp.style.setProperty('letter-spacing', '0px', 'important'); sp.style.setProperty('font-size', f0 + 'px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = '';
+        sp.style.setProperty('font-size', (f0 * W / w * .999).toFixed(2) + 'px', 'important'); });
+      SV.querySelectorAll('span.ev-ph:not(.one)').forEach(sp => { if (!sp.offsetParent) return;
       const box = sp.parentElement, cs = getComputedStyle(box), W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), n = sp.textContent.length;
       sp.style.setProperty('letter-spacing', '0px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = '';   // layout width: unaffected by the flip-in animations
       sp.style.setProperty('letter-spacing', Math.max(0, (W - w) / n).toFixed(3) + 'px', 'important'); }); };
