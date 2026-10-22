@@ -1277,6 +1277,22 @@
     .proj .info p > span.dk, .pj-note > span.dk { display: inline !important; font: inherit !important; letter-spacing: inherit !important; text-transform: inherit !important; color: inherit !important; }
     .reel-txt p > span.dk, .slate-v > span.dk, .art-head > span.dk { display: inline !important; font: inherit !important; letter-spacing: inherit !important; text-transform: inherit !important; color: inherit !important; }
   }
+
+  /* PHONE: GRAPHICS FIRST — the big pictures run off both edges; the thumbnails fill the width with hairline frames */
+  @media (max-width: 760px) {
+    #section-view .mir-stage { width: 150vw !important; margin-left: calc(50% - 75vw) !important; justify-self: start !important; }   /* the eye: so big its sides leave the screen */
+    #section-view .fr.mir-wide { --w: 130vw !important; width: 130vw !important; margin-left: calc(50% - 65vw) !important; justify-self: start !important; }   /* the sound wave and the other wide pictures */
+    #section-view .fr.mir-wide:not(.mir-lined) { --w: 100vw !important; width: 100vw !important; margin-left: calc(50% - 50vw) !important; }   /* the four elementals are one picture: exactly edge to edge, nothing cut */
+    #section-view .st-lead { overflow: visible; width: 100% !important; justify-self: stretch !important; }
+    #section-view .st-lead .st-logo { width: 165vw !important; max-width: none !important; margin-left: calc(50% - 82.5vw - 10.9vw) !important; justify-self: start !important; }   /* the Seenik logo, the word centred, the wings off the edges */
+    #section-view .reel-strip { width: 100vw !important; margin-left: calc(50% - 50vw) !important; justify-self: start !important; }
+    #section-view .reel-row { gap: 3px !important; padding: 6px 0 !important; }
+    #section-view .reel { gap: 4px !important; }
+    #section-view .reel .lab, #section-view .reel.clip .lab { grid-template-rows: auto auto !important; gap: 1px !important; font-size: 8px !important; letter-spacing: .08em !important; line-height: 1.2 !important; min-height: 2.4em; align-content: end; }
+    #section-view .reel .m { box-shadow: 0 0 0 1px rgba(255,255,255,.22) !important; outline: 0 !important; border-radius: 0 !important; overflow: hidden !important; }
+    #section-view .fx-mat-light .reel .m { box-shadow: 0 0 0 2px #ebe7df !important; }
+    #section-view .reel .m img { width: 100% !important; height: 100% !important; margin: 0 !important; outline: 0 !important; object-fit: cover !important; }
+  }
 </style>
 
 
@@ -2607,6 +2623,7 @@
   })();
 
   document.addEventListener('click', e => { const b = e.target.closest('.pj-info'); if (!b) return; const on = b.closest('.info, .pj-con').classList.toggle('open'); b.setAttribute('aria-expanded', on); });   // phone: the write-up opens under its Info button
+
   (function equalGaps() {   // desktop, every page with an intro: the space from the intro to whatever comes next equals the space from the title to the intro
     const box = el => { if (el.tagName !== 'P') { const r = el.getBoundingClientRect(); return [r.top, r.bottom]; }
       const rg = document.createRange(); rg.selectNodeContents(el); const rs = [...rg.getClientRects()].filter(r => r.height); return rs.length ? [Math.min(...rs.map(r => r.top)), Math.max(...rs.map(r => r.bottom))] : null; };
@@ -3088,6 +3105,15 @@
     if (k && (k === 'artist' || PAGES[k] || /^proj-\d+$/.test(k))) jumpTo(k, y);
   }, 300);
   SV.addEventListener('pointerdown', e => e.stopPropagation());
+  (function evenFit() {   // phone: stretch each line of an even block to the block's full width, measured, not guessed
+    const fit = () => { if (innerWidth > 760) return; SV.querySelectorAll('span.ev-ph').forEach(sp => { if (!sp.offsetParent) return;
+      const box = sp.parentElement, cs = getComputedStyle(box), W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), n = sp.textContent.length;
+      sp.style.setProperty('letter-spacing', '0px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = '';   // layout width: unaffected by the flip-in animations
+      sp.style.setProperty('letter-spacing', Math.max(0, (W - w) / n).toFixed(3) + 'px', 'important'); }); };
+    let q = 0; const soon = () => { cancelAnimationFrame(q); q = requestAnimationFrame(fit); };
+    new MutationObserver(soon).observe(SV, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+    addEventListener('resize', soon); if (document.fonts) document.fonts.ready.then(soon); SV.addEventListener('click', () => setTimeout(soon, 30));
+  })();
   function svClick(e) {
     const cv = e.target.closest('[data-vid]');
     if (cv) {   // a video clip: play it in a dark viewer, with sound, its own controls, and Previous / Next through the page's videos
