@@ -1214,6 +1214,26 @@
     .fw-one .row { display: grid !important; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px 16px !important; padding: 14px 24px !important; flex-wrap: nowrap !important; }
     .fw-sec .frl .lab { display: grid !important; grid-template-rows: 2.5em auto; align-items: start; justify-items: center; gap: 6px !important; font: 400 9px/1.25 var(--mono) !important; letter-spacing: .14em !important; text-wrap: balance; }
   }
+
+  .pj-info { display: none; }
+  /* PHONE project pages: the picture leads; credits as clean lines (no dots); the write-up waits behind an Info button */
+  @media (max-width: 760px) {
+    .proj.wide { width: calc(100vw - 32px) !important; gap: 20px !important; padding: 14px !important; }
+    .proj.wide .info dt { white-space: nowrap; }
+    .pj-con > .pj-note { display: none; }
+    .pj-con.open > .pj-note { display: block; animation: svIn .5s ease both; }
+    .pj-con > .pj-info { justify-self: center; margin-block: 4px 18px; }
+    .pj-con > .fw-group { justify-self: center; text-align: center; }
+    .proj.wide .info { justify-items: center; text-align: center; gap: 16px !important; }
+    .proj.wide .info dl { display: grid !important; grid-template-columns: auto auto; justify-content: center; gap: 10px 12px !important; align-items: baseline; text-align: left; }
+    .proj.wide .info dd + dt::before { content: none !important; }
+    .proj.wide .info dd { margin: 0 !important; }
+    .proj.wide .info ul { text-align: left; justify-self: center; }
+    .proj .info > p { display: none; }
+    .proj .info.open > p { display: block; text-align: left; animation: svIn .5s ease both; }
+    .pj-info { display: inline-block; background: none; color: var(--fg); border: 1px solid rgba(255,255,255,.6); border-radius: 999px; padding: 11px 26px; font: 400 10px/1 var(--mono); letter-spacing: .3em; text-transform: uppercase; cursor: pointer; }
+    .proj .info.open .pj-info { border-color: rgba(255,255,255,.3); color: var(--muted); }
+  }
 </style>
 
 
@@ -2542,6 +2562,8 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
     window.addEventListener('hashchange', close);
   })();
+
+  document.addEventListener('click', e => { const b = e.target.closest('.pj-info'); if (!b) return; const on = b.closest('.info, .pj-con').classList.toggle('open'); b.setAttribute('aria-expanded', on); });   // phone: the write-up opens under its Info button
   (function equalGaps() {   // desktop, every page with an intro: the space from the intro to whatever comes next equals the space from the title to the intro
     const box = el => { if (el.tagName !== 'P') { const r = el.getBoundingClientRect(); return [r.top, r.bottom]; }
       const rg = document.createRange(); rg.selectNodeContents(el); const rs = [...rg.getClientRects()].filter(r => r.height); return rs.length ? [Math.min(...rs.map(r => r.top)), Math.max(...rs.map(r => r.bottom))] : null; };
@@ -2915,7 +2937,7 @@
       return `<div class="proj wide${inf.key ? '' : ' poster'} k${i}"><div class="m"><img alt="" style="--ty:${['46%', '40%', '14%'][i] || '50%'}" src="${inf.key ? IMG(inf.key) : filmImgs[i]}"></div><div class="info"><span>${y}</span>
         <dl>${inf.credits.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
         ${inf.list ? `<ul>${inf.list.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}
-        <p>${inf.text || `Write-up coming: your role on ${t} and what you did.`}</p></div></div>${gal ? `<div class="gal">${gal}</div>` : ''}${inf.note ? `<section class="pj-con"><h3 class="fw-group">Grace's Phone</h3><p class="pj-note">${inf.note}</p>` : ''}${i === 0 ? reel('pj-phones', SPEC_VIDS.map(([n, d]) => [`<video src="../vid/spec-${n}.mp4" poster="${IMG('spec-' + n)}" muted loop playsinline autoplay preload="auto"></video>`, n.replace('_', ' '), d + '<span class="pj-ctl"><button type="button" class="pj-pp" aria-label="Pause"></button><span class="pj-bar"><i></i></span></span>'])) : ''}${inf.note ? '</section>' : ''}${i === 2 ? reel('pj-wide', [[`<span data-vid="../vid/vh-film.mp4" data-ar="1920 / 804" data-t="Visiting Hours" style="display:contents;cursor:pointer"><img alt="" style="cursor:pointer" src="${IMG('vh-film')}"><span class="pj-play" aria-hidden="true" style="cursor:pointer"></span></span>`, 'Visiting Hours', ''], [`<span data-vid="../vid/vh-bts.mp4" data-ar="1920 / 1012" data-t="Behind the Scenes" style="display:contents;cursor:pointer"><img alt="" style="cursor:pointer" src="${IMG('vh-bts')}"><span class="pj-play" aria-hidden="true" style="cursor:pointer"></span></span>`, 'Behind the Scenes', '']]) : ''}${inf.concepts ? inf.concepts.map(([n, l]) => `<section class="pj-con"><h3 class="fw-group">${n}</h3><div class="pj-reel pj-cr${l.length === 1 ? ' one' : ''}"><div class="pj-sp" aria-hidden="true"></div><div class="pj-row">${l.map(m => `<button type="button" class="gp pj-cb" data-t="${t}" data-s="${n} · concept"><img loading="lazy" alt="" src="${IMG(m)}"></button>`).join('')}</div><div class="pj-sp" aria-hidden="true"></div></div></section>`).join('') : ''}${sets ? `<div class="sets">${PROJ_TOP[i] ? `<section class="set set-concept"><h3 class="fw-group">Concept</h3><button type="button" class="gp" data-t="${t}" data-s="Concept board"><img loading="lazy" alt="" src="${IMG(PROJ_TOP[i])}?v=6"></button></section>` : ''}${sets}</div>` : ''}`; } },
+        <button type="button" class="pj-info" aria-expanded="false">Info</button><p>${inf.text || `Write-up coming: your role on ${t} and what you did.`}</p></div></div>${gal ? `<div class="gal">${gal}</div>` : ''}${inf.note ? `<section class="pj-con"><h3 class="fw-group">Grace's Phone</h3><button type="button" class="pj-info" aria-expanded="false">Info</button><p class="pj-note">${inf.note}</p>` : ''}${i === 0 ? reel('pj-phones', SPEC_VIDS.map(([n, d]) => [`<video src="../vid/spec-${n}.mp4" poster="${IMG('spec-' + n)}" muted loop playsinline autoplay preload="auto"></video>`, n.replace('_', ' '), d + '<span class="pj-ctl"><button type="button" class="pj-pp" aria-label="Pause"></button><span class="pj-bar"><i></i></span></span>'])) : ''}${inf.note ? '</section>' : ''}${i === 2 ? reel('pj-wide', [[`<span data-vid="../vid/vh-film.mp4" data-ar="1920 / 804" data-t="Visiting Hours" style="display:contents;cursor:pointer"><img alt="" style="cursor:pointer" src="${IMG('vh-film')}"><span class="pj-play" aria-hidden="true" style="cursor:pointer"></span></span>`, 'Visiting Hours', ''], [`<span data-vid="../vid/vh-bts.mp4" data-ar="1920 / 1012" data-t="Behind the Scenes" style="display:contents;cursor:pointer"><img alt="" style="cursor:pointer" src="${IMG('vh-bts')}"><span class="pj-play" aria-hidden="true" style="cursor:pointer"></span></span>`, 'Behind the Scenes', '']]) : ''}${inf.concepts ? inf.concepts.map(([n, l]) => `<section class="pj-con"><h3 class="fw-group">${n}</h3><div class="pj-reel pj-cr${l.length === 1 ? ' one' : ''}"><div class="pj-sp" aria-hidden="true"></div><div class="pj-row">${l.map(m => `<button type="button" class="gp pj-cb" data-t="${t}" data-s="${n} · concept"><img loading="lazy" alt="" src="${IMG(m)}"></button>`).join('')}</div><div class="pj-sp" aria-hidden="true"></div></div></section>`).join('') : ''}${sets ? `<div class="sets">${PROJ_TOP[i] ? `<section class="set set-concept"><h3 class="fw-group">Concept</h3><button type="button" class="gp" data-t="${t}" data-s="Concept board"><img loading="lazy" alt="" src="${IMG(PROJ_TOP[i])}?v=6"></button></section>` : ''}${sets}</div>` : ''}`; } },
     art: { title: 'Art', back: 'artist', spaced: true, render: (sub) => {
       const roll = (list, dir, secs, kind) => { const t = list.map(([n, w, h]) => `<button type="button" class="ap" style="--ar:${w} / ${h}" data-t="Art" data-s=""><img alt="" src="${IMG(n)}?v=5"></button>`).join('');
         return `<div class="fs art-roll" data-kind="${kind}"><div class="sprockets" aria-hidden="true"></div><div class="mq"><div class="mq-track ${dir}" style="animation-duration:${secs}s${kind === 'bw' ? `;animation-delay:-${(secs * .37).toFixed(1)}s` : ''}">${t}${t}</div></div><div class="sprockets" aria-hidden="true"></div></div>`; };
