@@ -7,7 +7,7 @@
 <title>Seenik Dome Immersion</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=Nunito:wght@900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@400&family=Nunito:wght@900&display=swap">
 <style>
   /* Layout: full-bleed black stage, the shape centred, quiet chrome in the corners */
   :root {
@@ -1405,7 +1405,7 @@
 
   /* PHONE Studio: the logo arrives with a gentle zoom — a little out, a little in, then it lands */
   @media (max-width: 760px) {
-    #section-view .st-lead .st-logo { animation: stLogoDrift 2s cubic-bezier(.42,0,.38,1) both; transform-origin: 50% 50%; }   /* fades in, then a slow zoom in (16 s) and back out, never quite still */
+    #section-view .st-lead .st-logo { animation: stLogoDrift 1s cubic-bezier(.42,0,.38,1) both; transform-origin: 50% 50%; }   /* fades in, then a slow zoom in (16 s) and back out, never quite still */
   }
   @keyframes stLogoIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes stLogoDrift { from { transform: translateX(16.3vw) scale(.78); } to { transform: none; } }   /* starts centred on the eye swirl, glides to land with the word sEEnik centred */   /* starts further away, one smooth zoom in (2 s), soft start and soft landing, then rests where it lands */
@@ -1433,6 +1433,12 @@
     #section-view .st-photo img, #section-view .st-pier img { outline: 0 !important; border: 0 !important; width: 100% !important; }
     #section-view .st-photo, #section-view .st-pier { border-top: 1px solid rgba(255,255,255,.4) !important; border-bottom: 1px solid rgba(255,255,255,.4) !important; padding: 12px 0 !important; }   /* a hairline across the full width, above and below, with the same 12 px breath the old frame had */
     #section-view .st-photo .st-water { top: 12px !important; bottom: auto !important; height: calc(100% - 24px) !important; }
+  }
+
+  /* PHONE paragraphs: IBM Plex Sans, a soft warm off-white, a little more line spacing (titles, tabs, labels and the caps statements keep Plex Mono) */
+  @media (max-width: 760px) {
+    #section-view span.ev-ph:not(.one) { font-family: 'IBM Plex Sans', system-ui, sans-serif !important; color: #e6e1d8 !important; line-height: 1.85 !important; }
+    #section-view .mir-big.evcap span.ev-ph { font-family: var(--mono) !important; color: var(--fg) !important; line-height: 1.75 !important; }
   }
 </style>
 
@@ -3052,7 +3058,7 @@
     for (let k = 1; k < w.length; k++) { const a = w.slice(0, k).join(' '), b = w.slice(k).join(' '), d = Math.abs(a.length - b.length); if (!best || d < best[0]) best = [d, a, b]; }
     const N = Math.max(best[1].length, best[2].length);
     return [best[1], best[2]].map(l => `<span class="ev" style="--n:${l.length};--N:${N}">${l}</span>`).join(''); };   // two even lines, no taper
-  const evenPh = txt => { const w = txt.split(' '), n = w.length, M = Math.max(28, Math.floor((Math.min(innerWidth, 760) - 32) / (13.5 * .6) * .95)), L = (a, b) => w.slice(a, b).join(' ').length;   // phone: the fewest lines that fit, as even as possible
+  const evenPh = txt => { const w = txt.split(' '), n = w.length, M = Math.max(28, Math.floor((Math.min(innerWidth, 760) - 32) / (14.5 * .5) * .99)),   /* phone paragraphs: Plex Sans at 14.5 px */ L = (a, b) => w.slice(a, b).join(' ').length;   // phone: the fewest lines that fit, as even as possible
     for (let k = 1; k <= 30; k++) { const t = txt.length / k; let D = Array(n + 1).fill(null); D[0] = [0, []];
       for (let i = 1; i <= k; i++) { const N = Array(n + 1).fill(null);
         for (let j = 1; j <= n; j++) for (let p = 0; p < j; p++) { if (!D[p]) continue; const l = L(p, j); if (l > M) continue; const c = D[p][0] + (l - t) ** 2; if (!N[j] || c < N[j][0]) N[j] = [c, D[p][1].concat(j)]; }
@@ -3272,7 +3278,15 @@
           b.querySelectorAll('span.ev-ph').forEach(sp => { sp.style.setProperty('letter-spacing', '.1em', 'important'); sp.style.setProperty('font-size', '13.5px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = ''; meas.push(sp); k = Math.min(k, W / w); }); });
         meas.forEach(sp => sp.style.setProperty('font-size', (13.5 * Math.min(k, 1.2)).toFixed(2) + 'px', 'important')); }
       new Set([...SV.querySelectorAll('span.ev-ph:not(.one)')].filter(sp => sp.offsetParent && !sp.parentElement.classList.contains('evcap')).map(sp => sp.parentElement)).forEach(box => {   // one block at a time
-        const cs = getComputedStyle(box), W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), f0 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pfs')) || 13.5;
+        { const cs0 = getComputedStyle(box), W0 = box.clientWidth - parseFloat(cs0.paddingLeft) - parseFloat(cs0.paddingRight), sp0 = box.querySelector(':scope > span.ev-ph'), ff = getComputedStyle(sp0).fontFamily, key = W0 + '|' + ff + '|' + (document.fonts ? document.fonts.status : '');
+          if (box.dataset.split !== key) { box.dataset.split = key;   // re-split by measured width in the real font: the fewest lines that fit, as even as possible
+            const g = (window._evc || (window._evc = document.createElement('canvas').getContext('2d'))); g.font = '400 14.5px ' + ff;
+            const sps0 = [...box.querySelectorAll(':scope > span.ev-ph:not(.one)')], w = sps0.map(x => x.textContent).join(' ').split(' '), n = w.length, sw = g.measureText(' ').width, ww = w.map(x => g.measureText(x).width);
+            const Lw = (a, b) => { let t = 0; for (let i = a; i < b; i++) t += ww[i]; return t + sw * (b - a - 1); }, tot = Lw(0, n);
+            for (let k = Math.ceil(tot / W0); k <= n; k++) { const t = tot / k; let D = Array(n + 1).fill(null); D[0] = [0, []];
+              for (let i = 1; i <= k; i++) { const N = Array(n + 1).fill(null); for (let j = 1; j <= n; j++) for (let q = 0; q < j; q++) { if (!D[q]) continue; const l = Lw(q, j); if (l > W0 * .985) continue; const c = D[q][0] + (l - t) ** 2; if (!N[j] || c < N[j][0]) N[j] = [c, D[q][1].concat(j)]; } D = N; }
+              if (D[n]) { let a = 0; const html = D[n][1].map(b => { const l = w.slice(a, b).join(' '); a = b; return `<span class="ev-ph" style="--n:${l.length}">${l}</span>`; }).join(''); sps0.forEach((x, i) => i ? x.remove() : x.insertAdjacentHTML('beforebegin', html)); sps0[0].remove(); break; } } } }
+        const cs = getComputedStyle(box), W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), f0 = 14.5;
         const sps = [...box.querySelectorAll(':scope > span.ev-ph:not(.one)')], ws = sps.map(sp => { sp.style.setProperty('letter-spacing', '0px', 'important'); sp.style.setProperty('font-size', f0 + 'px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = ''; return w; });   // layout widths: unaffected by the flip-in animations
         const k = Math.min(1, W / Math.max(...ws));   // a narrow column: the whole block steps down a size together, never a line poking out
         sps.forEach((sp, i) => { sp.style.setProperty('font-size', (f0 * k).toFixed(2) + 'px', 'important'); sp.style.setProperty('letter-spacing', Math.max(0, (W - ws[i] * k) / sp.textContent.length).toFixed(3) + 'px', 'important'); }); }); };
