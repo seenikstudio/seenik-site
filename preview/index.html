@@ -3221,7 +3221,7 @@
   }, 300);
   SV.addEventListener('pointerdown', e => e.stopPropagation());
   (function evenFit() {   // phone: stretch each line of an even block to the block's full width, measured, not guessed
-    const FOLD = '.reel-intro.fw-block, .pano ~ .art-words .art-text, .clip-head, .proj .info > p, .pj-con > .pj-note';
+    const FOLD = '.reel-intro.fw-block, .sv-body > .reel-intro:has(+ .pano), .pano ~ .art-words .art-text, .clip-head, .proj .info > p, .pj-con > .pj-note';
     const folds = () => { if (innerWidth > 760) return; SV.querySelectorAll(FOLD).forEach(el => { if (el.dataset.fold) return; el.dataset.fold = '1';
       const d = document.createElement('button'); d.type = 'button'; d.className = 'gdot fold'; d.innerHTML = '<i></i><i></i><i></i>'; d.setAttribute('aria-label', 'Show the words'); d.setAttribute('aria-expanded', 'false'); el.before(d); }); };
     SV.addEventListener('click', e => { const d = e.target.closest('.gdot.fold'); if (!d) return; e.stopPropagation(); const t = d.nextElementSibling, on = t.classList.toggle('shown'); d.classList.toggle('on', on); d.setAttribute('aria-expanded', on); soon(); setTimeout(soon, 60); });
