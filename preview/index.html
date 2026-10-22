@@ -1448,6 +1448,11 @@
     .site-nav button { overflow: hidden; text-overflow: clip; }
     .site-nav button.long { font-size: 9.5px !important; letter-spacing: .06em !important; }
   }
+
+  /* PHONE: "Here are some of the sets we've created" on one line, sized to fit */
+  @media (max-width: 760px) {
+    #section-view .reel-intro.fw-sets { white-space: nowrap !important; font-size: calc((100vw - 56px) / 27.3) !important; letter-spacing: .1em !important; padding-inline: 0 !important; text-align: center; }
+  }
 </style>
 
 
