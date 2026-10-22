@@ -3288,7 +3288,7 @@
               if (D[n]) { let a = 0; const html = D[n][1].map(b => { const l = w.slice(a, b).join(' '); a = b; return `<span class="ev-ph" style="--n:${l.length}">${l}</span>`; }).join(''); sps0.forEach((x, i) => i ? x.remove() : x.insertAdjacentHTML('beforebegin', html)); sps0[0].remove(); break; } } } }
         const cs = getComputedStyle(box), W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), f0 = 14.5;
         const sps = [...box.querySelectorAll(':scope > span.ev-ph:not(.one)')], ws = sps.map(sp => { sp.style.setProperty('letter-spacing', '0px', 'important'); sp.style.setProperty('font-size', f0 + 'px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = ''; return w; });   // layout widths: unaffected by the flip-in animations
-        const k = Math.min(1, W / Math.max(...ws));   // a narrow column: the whole block steps down a size together, never a line poking out
+        const k = Math.min(1.3, W / Math.max(...ws));   // the block grows (up to 30 %) until its longest line meets the edges, so short blocks fill with natural spacing; a narrow column steps down instead
         sps.forEach((sp, i) => { sp.style.setProperty('font-size', (f0 * k).toFixed(2) + 'px', 'important'); sp.style.setProperty('letter-spacing', Math.max(0, (W - ws[i] * k) / sp.textContent.length).toFixed(3) + 'px', 'important'); }); }); };
     let q = 0; const soon = () => { cancelAnimationFrame(q); q = requestAnimationFrame(fit); };
     new MutationObserver(soon).observe(SV, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
