@@ -1219,7 +1219,7 @@
   /* PHONE project pages: the picture leads; credits as clean lines (no dots); the write-up waits behind an Info button */
   @media (max-width: 760px) {
     .proj.wide { width: calc(100vw - 32px) !important; gap: 20px !important; padding: 14px !important; }
-    .proj.wide .info dt { white-space: nowrap; justify-self: end; text-align: right; }   /* labels end on one midline */
+    .proj.wide .info dt { white-space: nowrap; }
     .pj-con > .pj-note { display: none; }
     .pj-con.open > .pj-note { display: block; animation: svIn .5s ease both; }
     .pj-con > .pj-info { justify-self: center; margin-block: 4px 18px; }
@@ -1276,6 +1276,7 @@
   /* desktop never sees the phone's line-broken copies, and the desktop copy keeps its own look exactly */
   @media (min-width: 761px) {
     #section-view span.ev-ph { display: none !important; }
+    .info dt > span.dk { font: inherit !important; letter-spacing: inherit !important; text-transform: inherit !important; color: inherit !important; }
     .proj .info p > span.dk, .pj-note > span.dk { display: inline !important; font: inherit !important; letter-spacing: inherit !important; text-transform: inherit !important; color: inherit !important; }
     .reel-txt p > span.dk, .slate-v > span.dk, .art-head > span.dk { display: inline !important; font: inherit !important; letter-spacing: inherit !important; text-transform: inherit !important; color: inherit !important; }
   }
@@ -1339,6 +1340,52 @@
     #section-view .el4 i { display: block; position: relative; aspect-ratio: 1; background-size: 462.462% auto; background-repeat: no-repeat; }
     #section-view .el4 b { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 8px 8px; font: 400 9px/1 var(--mono); letter-spacing: .24em; text-transform: uppercase; color: #fff; text-align: center; background: linear-gradient(transparent, rgba(0,0,0,.6)); }
   }
+
+  /* ===== PHONE, the rest of the notes ===== */
+  @media (max-width: 760px) {
+    /* the glowing dot, "Gather": three sparks drift in and meet in the light, which flares; open, it rests as a small ring */
+    .gdot { display: block; justify-self: center; align-self: center; margin: 2px auto !important; }
+    .gdot::before { animation: gdFlare 3s ease-in-out infinite !important; }
+    .gdot::after { opacity: 0; animation: none !important; transform: scale(.3); }
+    .gdot i { position: absolute; left: 50%; top: 50%; width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px; border-radius: 50%; background: #fff; box-shadow: 0 0 5px 1px rgba(200,225,255,.8); opacity: 0; animation: gdGather 3s cubic-bezier(.5,0,.6,1) infinite; --x: -22px; --y: -14px; }
+    .gdot i:nth-child(2) { --x: 22px; --y: -10px; animation-delay: .1s; }
+    .gdot i:nth-child(3) { --x: 2px; --y: 20px; animation-delay: .2s; }
+    .reel-txt.open .gdot i, .gdot.on i { animation: none !important; opacity: 0 !important; }
+    .reel-txt.open .gdot::before, .gdot.on::before { animation: none !important; transform: scale(.55); box-shadow: 0 0 4px 1px rgba(220,235,255,.6); }
+    .reel-txt.open .gdot::after, .gdot.on::after { opacity: 1 !important; transform: scale(1) !important; border-color: rgba(220,235,255,.55) !important; }
+    #section-view [data-fold]:not(.shown) { display: none !important; }
+    #section-view [data-fold].shown { animation: subMirror 1.1s cubic-bezier(.25,.7,.3,1) both; transform-origin: 50% 0; }
+    #section-view .proj .info > p[data-fold].shown, #section-view .pj-con > .pj-note[data-fold].shown { display: grid !important; }
+    #section-view .pj-info { display: none !important; }
+
+    /* Contact: photo with "Send a message" under it on the left; a smaller jellyfish floats beside them */
+    .contact-wrap.ct-sleek { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr) !important; grid-template-rows: auto auto; row-gap: 16px !important; align-items: start !important; }
+    .ct-sleek .contact-pic { grid-column: 1 !important; grid-row: 1 !important; }
+    .ct-sleek .ct-open { grid-column: 1 !important; grid-row: 2 !important; justify-self: center; padding: 12px 14px; font-size: 9.5px; letter-spacing: .2em; }
+    .ct-sleek .contact-extra { grid-column: 2 !important; grid-row: 1 / span 2 !important; height: 250px !important; margin-top: -6px !important; }
+    .ct-sleek .contact-extra .contact-mail { font-size: 9.5px !important; padding: 7px 10px !important; letter-spacing: 0; }
+    .ct-sleek .contact-extra .socials svg { width: 24px !important; height: 24px !important; padding: 3px !important; }
+
+    /* Film Work card: "Production / Designer" on two lines, only its first sentence; card and posters the same size; pictures fill their frames */
+    .fw-indie .fw-card .fw-card-t { white-space: normal !important; line-height: 1.6 !important; text-align: center; font-size: 10px !important; letter-spacing: .2em !important; }
+    .fw-indie .fw-card .fw-just span:nth-child(n+3) { display: none !important; }
+    .fw-indie .fw-card { aspect-ratio: 3 / 4 !important; height: auto !important; align-self: start; overflow: hidden; border: 1px solid rgba(255,255,255,.18) !important; box-shadow: none !important; background: #0c0c0e !important; }
+    .fw-indie .fw-card .fw-just { font-size: 11px !important; }
+    .fw-indie .frl .m { box-shadow: 0 0 0 1px rgba(255,255,255,.18) !important; }
+
+    /* project credits as left-aligned lines: the year, DIRECTOR Jon Joffin, DESIGNER Sandy Heidebrecht */
+    .proj.wide .info { justify-items: start !important; text-align: left !important; }
+    .proj.wide .info > span { justify-self: start; }
+    .proj.wide .info dl { justify-content: start !important; grid-template-columns: auto 1fr !important; column-gap: 14px !important; text-align: left !important; width: 100%; }
+    .proj.wide .info dt { justify-self: start !important; text-align: left !important; }
+    .proj.wide .info dt .dk { display: none; }
+    .proj.wide .info .gdot { justify-self: start; margin-left: -12px !important; }
+
+    /* Digital Media, Pandemic: two rows of two, bigger */
+    .reel-sec.fx-gate .reel-row { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; row-gap: 10px !important; }
+  }
+  @keyframes gdGather { 0% { transform: translate(var(--x), var(--y)); opacity: 0; } 15% { opacity: 1; } 55% { transform: translate(0, 0); opacity: 1; } 60%, 100% { transform: translate(0, 0); opacity: 0; } }
+  @keyframes gdFlare { 0%, 52% { transform: scale(1); } 62% { transform: scale(1.9); box-shadow: 0 0 10px 4px rgba(230,240,255,1), 0 0 26px 8px rgba(150,190,255,.6); } 80%, 100% { transform: scale(1); } }
 </style>
 
 
@@ -2641,17 +2688,17 @@
         [g, mail].forEach(el => { el.addEventListener('pointerdown', down); el.addEventListener('pointermove', move); el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up); }); }
       const D = fl._d; { const fr2 = fl.getBoundingClientRect(); D.tx = Math.max(-fr2.left - W * .5 + 90, Math.min(innerWidth - fr2.left - W * .62 - 90, D.tx)); D.ty = Math.max(-fr2.top + 90, Math.min(innerHeight - fr2.top - 300, D.ty)); }
       D.x += (D.tx - D.x) * (D.on ? .25 : .08); D.y += (D.ty - D.y) * (D.on ? .25 : .08);
-      const jm = innerWidth > 760 ? 125 : 110, jx = Math.max(jm, Math.min(W - jm, W * (innerWidth > 760 ? .62 : .5) + Math.sin(t * .13) * W * .14 + Math.sin(t * .31) * 10)) + D.x, jy = 74 - lift * 22 + Math.sin(t * .21) * 10 + D.y, pu = 1 - squeeze * .14;
-      fl._grab.style.left = (jx - 70) + 'px'; fl._grab.style.top = (jy - 50) + 'px';
-      const J = fl._j || (fl._j = { m: { x: jx, y: jy + 62, vx: 0, vy: 0 }, s: socs.map((_, i) => ({ x: jx + (i - 1) * 70, y: jy + 212, vx: 0, vy: 0 })) });
+      const Q = innerWidth > 760 ? 1 : .58, jm = innerWidth > 760 ? 125 : W * .42, jx = Math.max(jm, Math.min(W - jm, W * (innerWidth > 760 ? .62 : .5) + Math.sin(t * .13) * W * .14 * Q + Math.sin(t * .31) * 10 * Q)) + D.x, jy = (74 - lift * 22 + Math.sin(t * .21) * 10) * Q + D.y, pu = 1 - squeeze * .14;   // phone: a smaller jellyfish (Q), floating in its own column
+      fl._grab.style.left = (jx - 70 * Q) + 'px'; fl._grab.style.top = (jy - 50 * Q) + 'px';
+      const J = fl._j || (fl._j = { m: { x: jx, y: jy + 62 * Q, vx: 0, vy: 0 }, s: socs.map((_, i) => ({ x: jx + (i - 1) * 70 * Q, y: jy + 212 * Q, vx: 0, vy: 0 })) });
       const spring = (o, tx, ty, k, d) => { o.vx += (tx - o.x) * k; o.vy += (ty - o.y) * k; o.vx *= d; o.vy *= d; o.x += o.vx; o.y += o.vy; };
-      let sv = dome(jx, jy, 62 * (2 - pu) * .5 + 31 * pu, t * .25, .9 * pu) + `<path d="M${jx - 62 * (1.5 - pu * .5)} ${jy + 4} Q${jx} ${jy + 22 + squeeze * 8} ${jx + 62 * (1.5 - pu * .5)} ${jy + 4}" stroke="rgba(229,239,255,.45)" fill="none"/>`;
-      spring(J.m, jx, jy + 62, .09, .8); mail.style.left = J.m.x + 'px'; mail.style.top = J.m.y + 'px';
-      sv += `<path d="M${jx} ${jy + 14} Q${jx} ${(jy + J.m.y) / 2} ${J.m.x} ${J.m.y - 18}" stroke="rgba(229,239,255,.35)" fill="none"/>`;
-      socs.forEach((s2, i) => { const off = (i - 1) * 70, o = J.s[i];
-        spring(o, J.m.x + off * (1 - squeeze * .25) + Math.sin(t * .7 + i * 1.7) * 10, J.m.y + 150 + Math.abs(off) * .3 + Math.sin(t * .6 + i) * 8, .025 + i * .004, .9);   // slower, so the legs trail and sway
+      let sv = dome(jx, jy, (62 * (2 - pu) * .5 + 31 * pu) * Q, t * .25, .9 * pu) + `<path d="M${jx - 62 * Q * (1.5 - pu * .5)} ${jy + 4 * Q} Q${jx} ${jy + (22 + squeeze * 8) * Q} ${jx + 62 * Q * (1.5 - pu * .5)} ${jy + 4 * Q}" stroke="rgba(229,239,255,.45)" fill="none"/>`;
+      spring(J.m, jx, jy + 62 * Q, .09, .8); mail.style.left = J.m.x + 'px'; mail.style.top = J.m.y + 'px';
+      sv += `<path d="M${jx} ${jy + 14 * Q} Q${jx} ${(jy + J.m.y) / 2} ${J.m.x} ${J.m.y - 14}" stroke="rgba(229,239,255,.35)" fill="none"/>`;
+      socs.forEach((s2, i) => { const off = (i - 1) * 70 * Q, o = J.s[i];
+        spring(o, J.m.x + off * (1 - squeeze * .25) + Math.sin(t * .7 + i * 1.7) * 10 * Q, J.m.y + 150 * Q + Math.abs(off) * .3 + Math.sin(t * .6 + i) * 8 * Q, .025 + i * .004, .9);   // slower, so the legs trail and sway
         s2.style.left = o.x + 'px'; s2.style.top = o.y + 'px';
-        sv += `<path d="M${J.m.x + off * .2} ${J.m.y + 18} Q${(J.m.x + off * .3 + o.x) / 2 + (J.m.x - o.x) * .25} ${(J.m.y + o.y) / 2 + 10} ${o.x} ${o.y - 22}" stroke="rgba(229,239,255,.35)" fill="none"/>`; });
+        sv += `<path d="M${J.m.x + off * .2} ${J.m.y + 14} Q${(J.m.x + off * .3 + o.x) / 2 + (J.m.x - o.x) * .25} ${(J.m.y + o.y) / 2 + 10 * Q} ${o.x} ${o.y - 22 * Q}" stroke="rgba(229,239,255,.35)" fill="none"/>`; });
       jl.innerHTML = sv; };
     requestAnimationFrame(frame); })();
 
@@ -2994,7 +3041,7 @@
   function featureHTML(i) {
     const [t, y] = FILM_ITEMS[i], inf = FILM_INFO[t] || { credits: [] };
     return `<div class="big"><img alt="" src="${filmImgs[i]}"></div><div class="info"><span>${y}</span><h3>${t}</h3>
-      <dl>${inf.credits.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+      <dl>${inf.credits.map(([k, v]) => `<dt>${k === 'Production Designer' ? '<span class="dk">Production </span>Designer' : k}</dt><dd>${v}</dd>`).join('')}</dl>
       ${inf.list ? `<ul>${inf.list.map(x => `<li>${x}</li>`).join('')}</ul>` : `<p>Write-up coming: a line or two on what you did on ${t}.</p>`}</div>`;
   }
   // Film Work: one featured, the other ten in two strips of five; clicking a frame swaps it into the feature
@@ -3012,7 +3059,7 @@
       const fi = FILM_ITEMS.slice(0, 3).map(([t, y], i) => frameL(filmImgs[i], t, y, 'min(270px, calc((var(--vw, 100vw) - 48px - 3 * 34px) / 4))', '3 / 4', `data-proj="${i}"`));
       return `<p class="reel-intro fw-block"><span>Since 2013 I've worked in film and television with IATSE, learning many roles in set</span><span>decoration under real pressure and real deadlines. I build each set digitally first, so</span><span>producers and directors can see the world before it's made, and then we build it for real.</span>${evenPh("Since 2013 I've worked in film and television with IATSE, learning many roles in set decoration under real pressure and real deadlines. I build each set digitally first, so producers and directors can see the world before it's made, and then we build it for real.")}</p><p class="reel-intro fw-sets">Here are some of the sets we've created</p>
         <section class="fw-sec fw-indie-sec"><div class="sec-head fw-ruled"><span class="kicker">01 · Short film</span><h3>Independent</h3></div>
-          <div class="fw-indie"><div class="fw-card"><p class="fw-card-t">Production Designer</p><p class="fw-just"><span>Film people find solutions,</span><span>making the impossible real.</span><span>It's amazing what a small</span><span>team of professionals can do.</span></p></div>${fi.join('')}</div></section>
+          <div class="fw-indie"><div class="fw-card"><p class="fw-card-t">Production<br class="ph-br"> Designer</p><p class="fw-just"><span>Film people find solutions,</span><span>making the impossible real.</span><span>It's amazing what a small</span><span>team of professionals can do.</span></p></div>${fi.join('')}</div></section>
         <section class="fw-sec"><div class="sec-head"><span class="kicker">02 · Film &amp; television</span><h3>Commercial</h3></div><div class="fw-two">${strip(f.slice(3, 7), '100%')}${strip(f.slice(7, 11), '100%')}</div><div class="fw-one">${strip(f.slice(3, 11), '100%', 'left')}</div></section>
         <div class="fw-end"><button type="button" class="fw-go" data-go="contact">Contact</button><button type="button" class="fw-go" data-go="resume">CV</button></div>`; } },
     clips: { title: 'Video Clips', sub: 'Made in the pandemic', back: 'artist', spaced: true, render: () => {
@@ -3041,7 +3088,7 @@
       }).join('') : '';
       const reel = (cls, items) => `<div class="pj-reel ${cls}"><div class="pj-sp" aria-hidden="true"></div><div class="pj-row">${items.map(([m, t, d]) => `<figure class="pj-item"><div class="pj-m">${m}</div><figcaption><b>${t}</b><span>${d}</span></figcaption></figure>`).join('')}</div><div class="pj-sp" aria-hidden="true"></div></div>`;
       return `<div class="proj wide${inf.key ? '' : ' poster'} k${i}"><div class="m"><img alt="" style="--ty:${['46%', '40%', '14%'][i] || '50%'}" src="${inf.key ? IMG(inf.key) : filmImgs[i]}"></div><div class="info"><span>${y}</span>
-        <dl>${inf.credits.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>
+        <dl>${inf.credits.map(([k, v]) => `<dt>${k === 'Production Designer' ? '<span class="dk">Production </span>Designer' : k}</dt><dd>${v}</dd>`).join('')}</dl>
         ${inf.list ? `<ul>${inf.list.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}
         <button type="button" class="pj-info" aria-expanded="false">Info</button><p><span class="dk">${inf.text || `Write-up coming: your role on ${t} and what you did.`}</span>${evenPh(inf.text || `Write-up coming: your role on ${t} and what you did.`)}</p></div></div>${gal ? `<div class="gal">${gal}</div>` : ''}${inf.note ? `<section class="pj-con"><h3 class="fw-group">Grace's Phone</h3><button type="button" class="pj-info" aria-expanded="false">Info</button><p class="pj-note"><span class="dk">${inf.note}</span>${evenPh(inf.note)}</p>` : ''}${i === 0 ? reel('pj-phones', SPEC_VIDS.map(([n, d]) => [`<video src="../vid/spec-${n}.mp4" poster="${IMG('spec-' + n)}" muted loop playsinline autoplay preload="auto"></video>`, n.replace('_', ' '), d + '<span class="pj-ctl"><button type="button" class="pj-pp" aria-label="Pause"></button><span class="pj-bar"><i></i></span></span>'])) : ''}${inf.note ? '</section>' : ''}${i === 2 ? reel('pj-wide', [[`<span data-vid="../vid/vh-film.mp4" data-ar="1920 / 804" data-t="Visiting Hours" style="display:contents;cursor:pointer"><img alt="" style="cursor:pointer" src="${IMG('vh-film')}"><span class="pj-play" aria-hidden="true" style="cursor:pointer"></span></span>`, 'Visiting Hours', ''], [`<span data-vid="../vid/vh-bts.mp4" data-ar="1920 / 1012" data-t="Behind the Scenes" style="display:contents;cursor:pointer"><img alt="" style="cursor:pointer" src="${IMG('vh-bts')}"><span class="pj-play" aria-hidden="true" style="cursor:pointer"></span></span>`, 'Behind the Scenes', '']]) : ''}${inf.concepts ? inf.concepts.map(([n, l]) => `<section class="pj-con"><h3 class="fw-group">${n}</h3><div class="pj-reel pj-cr${l.length === 1 ? ' one' : ''}"><div class="pj-sp" aria-hidden="true"></div><div class="pj-row">${l.map(m => `<button type="button" class="gp pj-cb" data-t="${t}" data-s="${n} · concept"><img loading="lazy" alt="" src="${IMG(m)}"></button>`).join('')}</div><div class="pj-sp" aria-hidden="true"></div></div></section>`).join('') : ''}${sets ? `<div class="sets">${PROJ_TOP[i] ? `<section class="set set-concept"><h3 class="fw-group">Concept</h3><button type="button" class="gp" data-t="${t}" data-s="Concept board"><img loading="lazy" alt="" src="${IMG(PROJ_TOP[i])}?v=6"></button></section>` : ''}${sets}</div>` : ''}`; } },
     art: { title: 'Art', back: 'artist', spaced: true, render: (sub) => {
@@ -3152,22 +3199,27 @@
   }, 300);
   SV.addEventListener('pointerdown', e => e.stopPropagation());
   (function evenFit() {   // phone: stretch each line of an even block to the block's full width, measured, not guessed
+    const FOLD = '.reel-intro.fw-block, .pano ~ .art-words .art-text, .clip-head, .proj .info > p, .pj-con > .pj-note';
+    const folds = () => { if (innerWidth > 760) return; SV.querySelectorAll(FOLD).forEach(el => { if (el.dataset.fold) return; el.dataset.fold = '1';
+      const d = document.createElement('button'); d.type = 'button'; d.className = 'gdot fold'; d.innerHTML = '<i></i><i></i><i></i>'; d.setAttribute('aria-label', 'Show the words'); d.setAttribute('aria-expanded', 'false'); el.before(d); }); };
+    SV.addEventListener('click', e => { const d = e.target.closest('.gdot.fold'); if (!d) return; e.stopPropagation(); const t = d.nextElementSibling, on = t.classList.toggle('shown'); d.classList.toggle('on', on); d.setAttribute('aria-expanded', on); soon(); setTimeout(soon, 60); });
     const dots = () => SV.querySelectorAll('.reel-txt').forEach(r => { if (r.querySelector('.gdot')) return; const h = r.querySelector('h3'); if (!h) return;
-      const d = document.createElement('button'); d.type = 'button'; d.className = 'gdot'; d.setAttribute('aria-label', 'Show the words'); d.setAttribute('aria-expanded', 'false'); h.after(d); });
-    SV.addEventListener('click', e => { const t = e.target.closest('.gdot, .reel-txt h3'); if (!t || innerWidth > 760) return; const r = t.closest('.reel-txt'); const on = r.classList.toggle('open'); const d = r.querySelector('.gdot'); if (d) d.setAttribute('aria-expanded', on); });
+      const d = document.createElement('button'); d.type = 'button'; d.className = 'gdot'; d.innerHTML = '<i></i><i></i><i></i>'; d.setAttribute('aria-label', 'Show the words'); d.setAttribute('aria-expanded', 'false'); h.after(d); });
+    SV.addEventListener('click', e => { const t = e.target.closest('.gdot:not(.fold), .reel-txt h3'); if (!t || innerWidth > 760) return; const r = t.closest('.reel-txt'); if (!r) return; const on = r.classList.toggle('open'); const d = r.querySelector('.gdot'); if (d) d.setAttribute('aria-expanded', on); });
     const quads = () => SV.querySelectorAll('.fr.mir-wide:not(.mir-lined)').forEach(f => { if (f.querySelector('.el4')) return; const src = f.querySelector('img').src;   // the four elementals: one picture, shown as two rows of two
       const X = [25, 1179, 409, 792];   // top: murmurations, kaleidoscope; bottom: cymatics, fractals — the pictures tell it, no names   // each picture's square inside the 1540 x 462 image (333 px), without the label strip
       f.insertAdjacentHTML('beforeend', `<span class="el4">${X.map((x, k) => `<i style="background-image:url('${src}');background-position:${(x / (1540 - 333) * 100).toFixed(3)}% ${(89 / (462 - 333) * 100).toFixed(3)}%"></i>`).join('')}</span>`); });
     const caps = () => SV.querySelectorAll('.st-say .mir-big, .st-based .mir-big, .mir-wind .mir-big, .mir-close .mir-big').forEach(el => { if (el.classList.contains('evcap')) return;
       const t = el.textContent.replace(/\s+/g, ' ').trim(); el.innerHTML = `<span class="dk">${el.innerHTML}</span>` + (t.length <= 52 ? `<span class="ev-ph one">${t}</span>` : evenPh(t)); el.classList.add('evcap'); });
-    const fit = () => { if (innerWidth > 760) return; caps(); dots(); quads(); SV.querySelectorAll('span.ev-ph.one').forEach(sp => { if (!sp.offsetParent) return;   // one line: the size that exactly fills the width
+    const fit = () => { if (innerWidth > 760) return; caps(); dots(); folds(); quads(); SV.querySelectorAll('span.ev-ph.one').forEach(sp => { if (!sp.offsetParent) return;   // one line: the size that exactly fills the width
         const box = sp.parentElement, cs = getComputedStyle(box), W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), f0 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pfs')) || 13.5;
         sp.style.setProperty('letter-spacing', '0px', 'important'); sp.style.setProperty('font-size', f0 + 'px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = '';
         sp.style.setProperty('font-size', (f0 * W / w * .999).toFixed(2) + 'px', 'important'); });
-      SV.querySelectorAll('span.ev-ph:not(.one)').forEach(sp => { if (!sp.offsetParent) return;
-      const box = sp.parentElement, cs = getComputedStyle(box), W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), n = sp.textContent.length;
-      sp.style.setProperty('letter-spacing', '0px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = '';   // layout width: unaffected by the flip-in animations
-      sp.style.setProperty('letter-spacing', Math.max(0, (W - w) / n).toFixed(3) + 'px', 'important'); }); };
+      new Set([...SV.querySelectorAll('span.ev-ph:not(.one)')].filter(sp => sp.offsetParent).map(sp => sp.parentElement)).forEach(box => {   // one block at a time
+        const cs = getComputedStyle(box), W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), f0 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pfs')) || 13.5;
+        const sps = [...box.querySelectorAll(':scope > span.ev-ph:not(.one)')], ws = sps.map(sp => { sp.style.setProperty('letter-spacing', '0px', 'important'); sp.style.setProperty('font-size', f0 + 'px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = ''; return w; });   // layout widths: unaffected by the flip-in animations
+        const k = Math.min(1, W / Math.max(...ws));   // a narrow column: the whole block steps down a size together, never a line poking out
+        sps.forEach((sp, i) => { sp.style.setProperty('font-size', (f0 * k).toFixed(2) + 'px', 'important'); sp.style.setProperty('letter-spacing', Math.max(0, (W - ws[i] * k) / sp.textContent.length).toFixed(3) + 'px', 'important'); }); }); };
     let q = 0; const soon = () => { cancelAnimationFrame(q); q = requestAnimationFrame(fit); };
     new MutationObserver(soon).observe(SV, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
     addEventListener('resize', soon); if (document.fonts) document.fonts.ready.then(soon); SV.addEventListener('click', () => setTimeout(soon, 30));
