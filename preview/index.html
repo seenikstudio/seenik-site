@@ -1265,7 +1265,9 @@
       -webkit-mask: linear-gradient(transparent 0, transparent calc(var(--av-head, 110px) + 70px), #000 calc(var(--av-head, 110px) + 86px)) !important;
       mask: linear-gradient(transparent 0, transparent calc(var(--av-head, 110px) + 70px), #000 calc(var(--av-head, 110px) + 86px)) !important; }   /* the title sits just under the tabs: no empty band */
     /* the three pages as tabs: one line each, the page you are on underlined, no arrows */
-    .site-nav { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 !important; padding: 6px 12px 0 !important; box-sizing: border-box; }
+    body:not(.artist-on) .site-nav { display: none !important; }
+    body.artist-on .site-nav { display: grid !important; }
+    .site-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 !important; padding: 6px 12px 0 !important; box-sizing: border-box; }
     .site-nav button { white-space: nowrap; font-size: 11.5px !important; letter-spacing: .12em !important; padding: 12px 0 !important; color: rgba(242,244,247,.6); border-bottom: 1px solid rgba(255,255,255,.15) !important; transform: none !important; }
     .site-nav button[aria-current="page"] { color: var(--fg) !important; border-bottom: 2px solid var(--fg) !important; }
     .site-nav button[aria-current="page"]::before, .site-nav button[aria-current="page"]::after { content: none !important; }
@@ -2114,7 +2116,7 @@
   const fieldsNow = [];   // every active force field this frame: { x, y, z, r } in world space
   function makeMenuRing(label, key, idx, scale = 1) {
     const g = new THREE.Group(); scene.add(g); g.visible = false;
-    const R = RING_R * 1.15 * scale;
+    const R = RING_R * 1.15 * scale * (innerWidth <= 760 ? 1.7 : 1);   // phone: bigger circles, so the words sit comfortably inside
     const n = 1900, pos = new Float32Array(n * 3), col = new Float32Array(n * 3), pts = [], vel = [], spec = [];
     for (let i = 0; i < n; i++) {
       pts.push(new THREE.Vector3()); vel.push(new THREE.Vector3());
@@ -2147,7 +2149,7 @@
   function layoutMenu() {
     const { visH, visW } = viewAt(RING_Z);
     const across = camera.aspect >= 0.9;
-    const gap = across ? Math.min(visW * 0.27, 1.25) : Math.min(visH * 0.24, 1.0);
+    const gap = across ? Math.min(visW * 0.27, 1.25) : innerWidth <= 760 ? Math.min(visH * 0.3, 1.2) : Math.min(visH * 0.24, 1.0);
     menuRings.forEach((m, i) => { const o = (i - 1) * gap; m.home.set(across ? o : 0, across ? 0 : -o, RING_Z); });
   }
   function openMenu() {
