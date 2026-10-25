@@ -1779,6 +1779,27 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
   html body #artist-view .frame:active .media { transform: translateY(4px) !important; box-shadow: 0 1px 0 #1b1d24, 0 4px 10px rgba(0,0,0,.6) !important; }
   html body #artist-view .rows { gap: 30px !important; }
 }
+
+/* Oct 25: the four elementals play as videos, in the same squares as the picture */
+.el-vids { display: none; }
+@media (min-width: 761px) {
+  #section-view .fr.mir-wide { position: relative; }
+  #section-view .el-vids { display: block; position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+  #section-view .el-vids video { position: absolute; top: 19.264%; width: 21.623%; aspect-ratio: 1; object-fit: cover; display: block; }
+}
+@media (max-width: 760px) {
+  #section-view .el4 i { overflow: hidden; }
+  #section-view .el4 i video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+}
+
+/* Oct 25: the elementals hold still as you scroll or pass over them (no zoom), and on the phone each sits in a thin black frame */
+html body #section-view .fr.mir-wide:not(.mir-lined) img, html body #section-view .fr.mir-wide:not(.mir-lined):hover img { transform: none !important; transition: none !important; }
+html body #section-view .fr.mir-wide:not(.mir-lined) .el-vids video, html body #section-view .el4 i, html body #section-view .el4 i video { transform: none !important; transition: none !important; animation: none !important; }
+@media (max-width: 760px) {
+  html body #section-view .el4 { gap: 14px !important; padding: 14px !important; background: transparent !important; box-sizing: border-box; }   /* space shows between them */
+  html body #section-view .fr.mir-wide:not(.mir-lined) { background: transparent !important; }
+  html body #section-view .el4 i { outline: 1px solid rgba(0,0,0,.85); box-shadow: 0 0 0 2px rgba(255,255,255,.12), 0 10px 22px rgba(0,0,0,.7); }   /* each one a floating button: a thin dark line, a faint light rim, a soft shadow; square corners, nothing cropped */
+}
 </style>
 
 
@@ -3948,9 +3969,11 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
     const dots = () => SV.querySelectorAll('.reel-txt').forEach(r => { if (r.querySelector('.gdot')) return; const h = r.querySelector('h3'); if (!h) return;
       const d = document.createElement('button'); d.type = 'button'; d.className = 'gdot'; d.innerHTML = '<i></i><i></i><i></i>'; d.setAttribute('aria-label', 'Show the words'); d.setAttribute('aria-expanded', 'false'); h.after(d); });
     SV.addEventListener('click', e => { const t = e.target.closest('.gdot:not(.fold), .reel-txt h3'); if (!t || innerWidth > 760) return; const r = t.closest('.reel-txt'); if (!r) return; const on = r.classList.toggle('open'); const d = r.querySelector('.gdot'); if (d) d.setAttribute('aria-expanded', on); });
+    const EL_V = n => `<video src="space-img/el-${n}.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`;   // Oct 25: the four elementals are videos
     const quads = () => SV.querySelectorAll('.fr.mir-wide:not(.mir-lined)').forEach(f => { if (f.querySelector('.el4')) return; const src = f.querySelector('img').src;   // the four elementals: one picture, shown as two rows of two
       const X = [25, 1179, 409, 792];   // top: murmurations, kaleidoscope; bottom: cymatics, fractals — the pictures tell it, no names   // each picture's square inside the 1540 x 462 image (333 px), without the label strip
-      f.insertAdjacentHTML('beforeend', `<span class="el4">${X.map((x, k) => `<i style="background-image:url('${src}');background-position:${(x / (1540 - 333) * 100).toFixed(3)}% ${(89 / (462 - 333) * 100).toFixed(3)}%"></i>`).join('')}</span>`); });
+      const VN = ['murmuration', 'kaleidoscope', 'cymatics', 'fractal'];
+      f.insertAdjacentHTML('beforeend', `<span class="el4">${X.map((x, k) => `<i style="background-image:url('${src}');background-position:${(x / (1540 - 333) * 100).toFixed(3)}% ${(89 / (462 - 333) * 100).toFixed(3)}%">${EL_V(VN[k])}</i>`).join('')}</span>`); });
     const caps = () => SV.querySelectorAll('.mir-thru .mir-small, .st-say .mir-big, .st-based .mir-big, .mir-wind .mir-big, .mir-close .mir-big, .mir-top .mir-big, .mir-top .mir-small, .st-ground .mir-big, .mir-first .mir-big, .mir-first .mir-small').forEach(el => { if (el.classList.contains('evcap')) return;
       const t = el.textContent.replace(/\s+/g, ' ').trim(); el.innerHTML = `<span class="dk">${el.innerHTML}</span>` + (t.length <= 30 || el.closest('.mir-top:not(.st-top-say)') || el.matches('.mir-first .mir-big') ? `<span class="ev-ph one">${t}</span>` : (() => { const w = t.split(' '); let best = null; for (let i = 1; i < w.length; i++) { const a = w.slice(0, i).join(' '), b = w.slice(i).join(' '), d = Math.abs(a.length - b.length); if (!best || d < best[0]) best = [d, a, b]; } return `<span class="ev-ph">${best[1]}</span><span class="ev-ph">${best[2]}</span>`; })()); el.classList.add('evcap'); });
     const fit0 = () => { if (innerWidth > 760) return; caps(); dots(); folds(); quads(); SV.querySelectorAll('span.ev-ph.one').forEach(sp => { if (!sp.offsetParent) return;   // one line: the size that exactly fills the width
@@ -5286,7 +5309,8 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
     if (b !== btn) { if (names) names.remove(); names = null; btn = b; if (!b) return;
       const im = b.querySelector('img'); if (im && /seenik-03c/.test(im.src)) im.src = 'space-img/elementals-clean.jpg';
       names = document.createElement('div'); names.className = 'el-names'; names.setAttribute('aria-hidden', 'true');
-      names.innerHTML = N.map(([t, x]) => `<span style="left:${x}%">${t}</span>`).join(''); b.parentElement.appendChild(names); }
+      names.innerHTML = N.map(([t, x]) => `<span style="left:${x}%">${t}</span>`).join(''); b.parentElement.appendChild(names);
+      if (!b.querySelector('.el-vids')) b.insertAdjacentHTML('beforeend', `<span class="el-vids">${[['murmuration', 25], ['cymatics', 409], ['fractal', 792], ['kaleidoscope', 1179]].map(([n, x]) => `<video style="left:${(x / 1540 * 100).toFixed(3)}%" src="space-img/el-${n}.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`).join('')}</span>`); }
     if (!btn || !names) return;
     const op = names.offsetParent || document.body, r = btn.getBoundingClientRect(), pr = op.getBoundingClientRect();
     names.style.left = (r.left - pr.left + op.scrollLeft - op.clientLeft) + 'px'; names.style.top = (r.top - pr.top + op.scrollTop - op.clientTop + r.height * (37 / 462)) + 'px'; names.style.width = r.width + 'px';
