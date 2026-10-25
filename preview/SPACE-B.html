@@ -3946,7 +3946,8 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
       return [r.top, r.bottom];
     };
     const words = el => { const rs = [...el.querySelectorAll('span.ev-ph')].filter(s => s.offsetParent).map(s => L(s)); if (!rs.length) { const r = L(el); return [r.top, r.bottom]; } return [Math.min(...rs.map(r => r.top)), Math.max(...rs.map(r => r.bottom))]; };
-    const setMT = (el, d) => { if (Math.abs(d) < .5) return; const m = parseFloat(el.dataset.bmt || '0') + d; el.dataset.bmt = m.toFixed(1); el.style.setProperty('margin-top', m.toFixed(1) + 'px', 'important'); };
+    const setMT = (el, d) => { if (Math.abs(d) < 1.5) return;   // small re-measures never nudge the page (no jitter)
+    const m = parseFloat(el.dataset.bmt || '0') + d; el.dataset.bmt = m.toFixed(1); el.style.setProperty('margin-top', m.toFixed(1) + 'px', 'important'); };
     const phoneOrder = () => {   // PHONE, The Mirror: Every visual flows from the music · the sound wave · Through photorealistic worlds… · the four elementals · Experience the power… · the galaxy · The same patterns…
       const body = SV.querySelector('.sv-body'), first = SV.querySelector('.mir-first'); if (!body || !first || body.dataset.phoneOrder) return; body.dataset.phoneOrder = '1';
       const lined = SV.querySelector('.mir-lined'), elem = SV.querySelector('.fr.mir-wide:not(.mir-lined)'), wind = SV.querySelector('.mir-wind'), close = SV.querySelector('.mir-close'), gal = SV.querySelector('.mir-galaxy'), sm = first.querySelector('.mir-small');
@@ -3974,7 +3975,7 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
           SV.querySelectorAll('.st-top-say .evcap span.ev-ph, .st-ground .evcap span.ev-ph, .st-top-desk .mir-big .evcap, .st-top-desk .mir-big span.ev-ph').forEach(x => { if (!x.offsetParent) return; const f = parseFloat(x.style.fontSize) || parseFloat(getComputedStyle(x).fontSize), w = mw(x); if (w) x.style.setProperty('font-size', (f * Wg / w).toFixed(2) + 'px', 'important'); });
           // the opening's first line spans the same width as "Grounded…"; "to the fulldome" underneath is bigger, a little bigger (15%)
           const a = SV.querySelector('.st-top-desk .mir-big span.ev-ph'), b2 = SV.querySelector('.st-top-desk .mir-small span.ev-ph');
-          if (a && b2 && a.offsetParent) b2.style.setProperty('font-size', (parseFloat(a.style.fontSize) * 1.15).toFixed(2) + 'px', 'important'); } }
+          if (a && b2 && a.offsetParent) b2.style.setProperty('font-size', '20px', 'important'); } }   // Sandy: "to the fulldome" 20px
       // 1c. even line spacing (the Capsize / text-box-trim method): each line's box is trimmed to exactly its capitals, then every gap between lines is the same
       SV.querySelectorAll('.mir-sing').forEach(b => { const sps = [...b.querySelectorAll('.evcap span.ev-ph')].filter(s => s.offsetParent); if (!sps.length) return;
         const g = Math.round(Math.min(...sps.map(s => parseFloat(s.style.fontSize) || 16)) * 1.0);
@@ -3999,7 +4000,7 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
     SV.addEventListener('load', soon, true);
     const growIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('grow'); growIO.unobserve(e.target); } }), { threshold: .9 });
     new MutationObserver(() => SV.querySelectorAll('.mir-wind .mir-big.evcap:not(.grow), .mir-close .mir-big.evcap:not(.grow)').forEach(el => growIO.observe(el))).observe(SV, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });   // pictures arriving change the spaces we balance
-    SV.addEventListener('animationend', soon, true); setInterval(() => { if (innerWidth <= 760 && SV.querySelector('.st-say, .mir-wind')) soon(); }, 1500);
+    SV.addEventListener('animationend', soon, true); let lastH = 0; setInterval(() => { if (innerWidth <= 760 && SV.querySelector('.st-say, .mir-wind') && SV.scrollHeight !== lastH) { lastH = SV.scrollHeight; soon(); } }, 1500);   // re-measure only when something actually changed size, so letters never twitch
   })();
   function svClick(e) {
     const cv = e.target.closest('[data-vid]');
@@ -5335,7 +5336,7 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
     if (wave && wave.el.isConnected) {   // "moving through a single living thing": the letters ride a wave as they appear, then settle
       const tw = (now - wave.t0) / 1000, env = tw < wave.D ? 1 : Math.max(0, 1 - (tw - wave.D) / 2.4), ls = wave.el.querySelectorAll('.wv i');
       const amp = ls.length ? parseFloat(getComputedStyle(ls[0]).fontSize) * .08 : 0;
-      ls.forEach((c, i) => c.style.transform = env > 0 ? `translateY(${(Math.sin(i * .35 - tw * 3.6) * amp * env * env).toFixed(2)}px)` : '');
+      ls.forEach((c, i) => c.style.transform = env > 0 ? `translate3d(0, ${(Math.sin(i * .35 - tw * 3.6) * amp * env * env).toFixed(3)}px, 0)` : '');   // GPU, sub-pixel: smooth
       if (env <= 0) wave = null;
     } else wave = null;
     if (!busy) { const nx = items.find(it => { if (it.done) return false; const r = it.el.getBoundingClientRect(); return r.top < innerHeight * .88 && r.bottom > 0; }); if (!nx) { if (!ret) bar.style.opacity = 0; return; } busy = nx; busy.t0 = now; }
