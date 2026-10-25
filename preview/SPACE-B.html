@@ -1585,14 +1585,12 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
 }
 /* ===== Oct 24: The Mirror title rebuilt as live type ===== */
 #section-view .mir-hero .mir-title3d { position: absolute; left: 0; right: 0; top: 49.5%; z-index: 5; display: grid; justify-items: center; pointer-events: none; perspective: 900px; transform: translateY(calc(-0.52 * clamp(46px, 8.6vw, 132px))); }   /* THE MIRROR sits on the horizon line */
-#section-view .mir-title3d .t3 { position: relative; display: grid; font: 400 clamp(46px, 8.6vw, 132px)/1 'Ubuntu', system-ui, sans-serif; letter-spacing: .015em; transform-style: preserve-3d;
+#section-view .mir-title3d .t3 { position: relative; display: grid; font: 400 clamp(46px, 8.6vw, 132px)/1 'Ubuntu', system-ui, sans-serif; letter-spacing: .015em; transform-style: flat;
   transform: rotateX(var(--trx, 0deg)) rotateY(var(--try, 0deg)); }
 #section-view .mir-title3d .t3 > span { grid-area: 1 / 1; white-space: nowrap; }
-#section-view .mir-title3d .t3 .b { color: #3d4458; transform: translateZ(-10px);
+#section-view .mir-title3d .t3 .b { color: #3d4458; transform: none; position: relative; z-index: 0;
   text-shadow: 0 1px 0 #394055, 0 2px 0 #343a4e, 0 3px 0 #2f3547, 0 4px 0 #2a2f40, 0 5px 0 #252a39, 0 6px 0 #202432, 0 7px 0 #1b1f2b, 0 8px 0 #171a24, 0 14px 22px rgba(0,0,0,.7); }
-#section-view .mir-title3d .t3 .f { color: transparent; transform: translateZ(4px);
-  background: linear-gradient(100deg, #e4e8f2 0%, #ffffff 28%, #b9c2dc 44%, #ffffff 56%, #d8deee 100%); background-size: 240% 100%; -webkit-background-clip: text; background-clip: text;
-  animation: t3sheen 8s ease-in-out infinite; }
+#section-view .mir-title3d .t3 .f { color: #eef1f8; transform: none; position: relative; z-index: 1; text-shadow: 0 0 18px rgba(200,215,255,.25); }   /* Oct 25: solid silver-white face on top of its dark extrusion (the clipped-gradient face rendered see-through in some browsers, leaving only the grey) */
 @keyframes t3sheen { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0% 0; } }
 #section-view .mir-title3d .sub { margin-top: clamp(14px, 1.8vw, 26px); font: 700 clamp(14px, 2.1vw, 33px)/1 'Roboto', system-ui, sans-serif; letter-spacing: .005em; color: #e9ecf2; text-shadow: 0 2px 14px rgba(0,0,0,.75); }
 @media (min-width: 761px) {
