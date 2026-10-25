@@ -6,7 +6,7 @@
 <title>Seenik Dome Immersion</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@400&family=Nunito:wght@900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@400&family=Nunito:wght@900&family=Ubuntu:wght@300;400;500&family=Roboto:wght@700&display=swap">
 <style>
   /* Layout: full-bleed black stage, the shape centred, quiet chrome in the corners */
   :root {
@@ -1459,11 +1459,217 @@
     #section-view .mir-wind .mir-big.evcap.grow, #section-view .mir-close .mir-big.evcap.grow { scale: 1.1; }
   }
   @media (prefers-reduced-motion: reduce) { #section-view .mir-big.evcap { transition: none !important; } }
+
+  /* ---- space preview: the real-space backdrop behind the dome ---- */
+  #space { position: fixed; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; transition: opacity 1.4s ease; }
+  #space-grade { position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 46% 52% at 50% 50%, rgba(0,0,0,.68) 0%, rgba(0,0,0,.45) 45%, rgba(0,0,0,0) 100%),
+                linear-gradient(rgba(0,0,0,.2), rgba(0,0,0,.2)),
+                radial-gradient(ellipse 120% 120% at 50% 50%, rgba(0,0,0,0) 55%, rgba(0,0,0,.5) 100%),
+                radial-gradient(ellipse 380px 200px at 0% 0%, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 100%); }
+  body.artist-on:not(.space-band):not(.space-bled) #space, body.artist-on:not(.space-band):not(.space-bled) #space-grade { opacity: 0; }
+  #space-credit { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(6px + env(safe-area-inset-bottom, 0px)); margin: 0; pointer-events: none;
+    font: 400 9px/1.4 var(--mono); letter-spacing: .08em; color: rgba(242,244,247,.38); white-space: nowrap; }
+
+  .bmask { position: fixed; left: 0; right: 0; background: #000; pointer-events: none; opacity: 0; transition: opacity 1.4s ease; }
+  #bm-top { top: 0; }  #bm-bot { bottom: 0; }  #bm-mid { }
+  #space-credit { transition: opacity .8s ease; }  body.space-bled #space-credit { opacity: 0; }  .wave-live { width: 100%; display: block; mix-blend-mode: screen; -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent); -webkit-mask-composite: source-in; mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent) intersect, linear-gradient(transparent, #000 18%, #000 82%, transparent); }  #section-view .fr.mir-lined { aspect-ratio: 1800 / 420 !important; isolation: auto; }
+  /* All the pictures (The Studio and The Mirror, desktop): no frames, stretched to both edges of the screen at any width, top and bottom fading into the space */
+  @media (min-width: 761px) {
+    #section-view .st-photo, #section-view .st-pier { outline: 0 !important; border: 0 !important; padding: 0 !important; box-shadow: none !important; width: 100vw !important; max-width: none !important; margin-left: calc(50% - 50vw) !important; justify-self: start !important; }
+    #section-view .st-stage { overflow: visible; }
+    #section-view .st-photo img, #section-view .st-pier img { width: 100% !important; outline: 0 !important; }
+    #section-view .mir-stage { width: 100vw !important; margin-left: calc(50% - 50vw) !important; justify-self: start !important; }
+    #section-view .fr.mir-wide { --w: 100vw !important; width: 100vw !important; margin-left: calc(50% - 50vw) !important; justify-self: start !important; background: transparent !important; }
+    #section-view .mir-galaxy { width: 100vw !important; margin-left: calc(50% - 50vw) !important; justify-self: start !important; -webkit-mask: none; mask: none; }
+    #section-view .st-photo, #section-view .st-pier, #section-view .mir-hero, #section-view .fr.mir-wide:not(.mir-lined), #section-view .mir-galaxy video {
+      -webkit-mask: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%); mask: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%); }
+    #section-view .mir-hero { background: transparent; aspect-ratio: 1600 / 1300 !important; width: min(100vw, calc(96vh * 1600 / 1300)); margin: 0 auto; }  #section-view .mir-hero::after, #section-view .mir-lined::after { display: none; }
+    #section-view .mir-stage::before { display: none !important; content: ""; position: absolute; top: 0; left: 0; right: 0; height: 1px; z-index: 4; pointer-events: none; background: linear-gradient(90deg, transparent 14%, rgba(255,255,255,.75) 34%, rgba(255,255,255,.75) 66%, transparent 86%); }
+    #section-view .mir-lined { background: transparent; }
+  }
+    /* The Studio: the logo floats in space (its black surround is see-through now) */
+    /* Titles and intro lines: no pill. One fine glowing line above and one below, fading at both ends, gently breathing (option 2) */
+    #section-view:has(.st-intro) .sv-t, #section-view:has(.mir-open) .sv-t, .reel-intro.st-intro, .reel-intro.mir-open { position: relative; border: 0 !important; border-radius: 0 !important; background: none !important; box-shadow: none !important; -webkit-backdrop-filter: none; backdrop-filter: none; }
+    #section-view:has(.st-intro) .sv-t::before, #section-view:has(.st-intro) .sv-t::after, #section-view:has(.mir-open) .sv-t::before, #section-view:has(.mir-open) .sv-t::after,
+    .reel-intro.st-intro::before, .reel-intro.st-intro::after, .reel-intro.mir-open::before, .reel-intro.mir-open::after {
+      content: ""; position: absolute; inset: auto -10% auto -10%; height: 1px; padding: 0; border-radius: 0; -webkit-mask: none; mask: none; pointer-events: none;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.85) 30%, rgba(255,255,255,.85) 70%, transparent); box-shadow: 0 0 8px rgba(170,200,255,.6);
+      animation: hl-sweep 6s ease-in-out infinite; }
+    #section-view:has(.st-intro) .sv-t::before, #section-view:has(.mir-open) .sv-t::before, .reel-intro.st-intro::before, .reel-intro.mir-open::before { top: 0; }
+    #section-view:has(.st-intro) .sv-t::after, #section-view:has(.mir-open) .sv-t::after, .reel-intro.st-intro::after, .reel-intro.mir-open::after { bottom: 0; animation-direction: reverse; }
+    @keyframes hl-sweep { 0%, 100% { opacity: .5; transform: scaleX(.86); } 50% { opacity: 1; transform: scaleX(1.04); } }
+  }  #space-grade { transition: opacity 3.6s ease-in-out; }  body.space-bled #space-grade { opacity: .45; }
+
+/* ===== Oct 24 DESKTOP: centring pass (phone untouched) ===== */
+@media (min-width: 761px) {
+  /* The Studio: the whole stage sits on the centre line, so the logo + contact strip and the pictures are even on both sides */
+  #section-view .st-stage { width: min(1204px, 100%) !important; margin-left: auto !important; margin-right: auto !important; justify-self: center !important; }
+  #section-view .st-stage > * { justify-self: center; }
+  #section-view .st-stage { grid-template-columns: minmax(0, 1fr) !important; }
+  #section-view .st-stage > .st-photo, #section-view .st-stage .st-photo { margin-left: calc(50% - 50vw) !important; margin-right: 0 !important; justify-self: start !important; width: 100vw !important; }   /* full-bleed: centred on the stage, which is centred on the screen */
+  /* The Mirror: the big eye is wider than the page column, so it is centred on the screen itself */
+  #section-view .mir-stage > .mir-hero, #section-view .mir-stage .mir-hero { --hw: min(1560px, calc(100vw + 120px)); width: var(--hw) !important; margin-left: calc((100% - var(--hw)) / 2) !important; margin-right: 0 !important; justify-self: start !important; }
+  /* the capital statements never run past the right edge: centred, wrapping inside the page */
+  #section-view .mir-sing { width: min(1240px, 100%) !important; margin-inline: auto !important; justify-self: center !important; }
+  #section-view .mir-sing .mir-big { max-width: 100% !important; text-wrap: balance; }
+}
+/* ===== Oct 24: The Mirror opening line — no pill: big type revealed one line at a time by a scanning line of light ===== */
+@media (min-width: 761px) {
+  html body #section-view .reel-intro.mir-open.scan { position: relative; display: grid !important; place-items: center; width: calc(100% - 32px) !important; max-width: none !important;
+    min-height: clamp(110px, 11vw, 220px); padding: 0 !important; margin: clamp(10px, 3vh, 40px) auto 0 !important; background: none !important; border: 0 !important; box-shadow: none !important;
+    -webkit-backdrop-filter: none !important; backdrop-filter: none !important; border-radius: 0 !important; transform: none !important; overflow: visible; }
+  html body #section-view .reel-intro.mir-open.scan::before, html body #section-view .reel-intro.mir-open.scan::after { content: none !important; display: none !important; }
+  html body #section-view .reel-intro.mir-open.scan > span { grid-area: 1 / 1; display: block !important; white-space: nowrap !important; text-align: center !important;
+    font: 300 clamp(26px, 3.3vw, 70px)/1.15 'Ubuntu', system-ui, sans-serif !important; letter-spacing: .01em !important; text-transform: none !important; color: #f4f6fb !important;
+    text-shadow: 0 1px 0 #9aa3bb, 0 2px 0 #7d86a0, 0 3px 0 #646c85, 0 4px 0 #4c536a, 0 5px 0 #383e52, 0 10px 22px rgba(0,0,0,.65), 0 0 40px rgba(150,170,255,.15) !important;
+    clip-path: inset(0 0 100% 0); }
+  html body #section-view .reel-intro.mir-open.scan .phl { display: inline !important; font: inherit !important; letter-spacing: inherit !important; }
+  html body #section-view .reel-intro.mir-open.scan .scanline { position: absolute; left: 50%; width: min(92%, 1400px); height: 2px; translate: -50% 0; pointer-events: none; opacity: 0;
+    background: linear-gradient(90deg, transparent, rgba(200,220,255,.9) 18%, #fff 50%, rgba(200,220,255,.9) 82%, transparent);
+    box-shadow: 0 0 12px 2px rgba(170,200,255,.75), 0 0 34px 6px rgba(120,160,255,.35); }
+  html body #section-view .mir-stage { margin-top: clamp(0px, 1vh, 16px) !important; }
+  /* the statements of The Mirror in 3D, in the same type as the title */
+  html body #section-view:has(.mir-stage) .mir-sing .mir-big, html body #section-view:has(.mir-stage) .mir-sing .mir-small ,
+  html body #section-view:has(.st-stage) .mir-sing .mir-big, html body #section-view:has(.st-stage) .mir-sing .mir-small {   /* The Studio: the same type as The Mirror */
+    font-family: 'Ubuntu', system-ui, sans-serif !important; font-weight: 400 !important; color: #f4f6fb !important;
+    text-shadow: 0 1px 0 #a7afc6, 0 2px 0 #8b93ac, 0 3px 0 #707892, 0 4px 0 #575e77, 0 5px 0 #40465c, 0 6px 0 #2d3244, 0 12px 24px rgba(0,0,0,.7) !important; }
+}
+/* Oct 24: A4 laser scan reveal (desktop). Every block of page text is written by a bar of light as it comes into view, then holds. */
+@media (min-width: 761px) {
+  html body #section-view .lz { opacity: 1 !important; animation: none !important; transition: none !important; }
+  html body #section-view .lz.lz-wait { visibility: hidden; }
+  #lz-bar { position: fixed; left: 0; top: 0; height: 2px; pointer-events: none; z-index: 8; opacity: 0;
+    background: linear-gradient(90deg, transparent, rgba(200,220,255,.9) 14%, #fff 50%, rgba(200,220,255,.9) 86%, transparent);
+    box-shadow: 0 0 12px 2px rgba(170,200,255,.75), 0 0 34px 6px rgba(120,160,255,.35); }
+}
+/* The Mirror's opening, desktop: two lines set exactly like "Every visual decision…" (bold 3D top line, the line under it, each sized to fill the width) */
+.mir-sing.mir-top .h1, .mir-sing.mir-top .h2 { display: inline-block; }
+.mir-sing.mir-top .ww { display: inline-block; white-space: nowrap; }
+.mir-sing.mir-top .wv i { display: inline-block; font-style: normal; will-change: transform; }
+.mir-sing.mir-top, .mir-sing.mir-tp { padding-top: clamp(18px, 4vh, 48px) !important; padding-bottom: clamp(10px, 2vh, 24px) !important; }
+@media (min-width: 761px) { .mir-sing.mir-top { display: grid !important; justify-items: center; row-gap: clamp(14px, 2vh, 26px); } .mir-sing.mir-top > p { margin: 0 !important; } }   /* the two opening lines, one under the other */   /* both lines share one place: one becomes the other */
+@media (max-width: 760px) { .mir-sing.mir-top, .mir-sing.mir-tp { display: none !important; } }
+html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase !important; }   /* A SINGLE LIVING THING YOU MOVE THROUGH: all caps */
+/* Oct 24: The Mirror, desktop: the elementals' names as live type */
+.el-names { display: none; }
+@media (min-width: 761px) {
+  #section-view .el-names { display: block !important; position: absolute; height: 0; z-index: 20; pointer-events: none; opacity: 1 !important; }
+  #section-view .el-names span { position: absolute; top: 0; transform: translate(-50%, -50%); white-space: nowrap; font: 300 clamp(11px, .85vw, 16px)/1 'Ubuntu', system-ui, sans-serif;
+    letter-spacing: .38em; padding-left: .38em; text-transform: uppercase; color: rgba(242,244,247,.6); text-shadow: 0 1px 8px rgba(0,0,0,.8); }   /* quiet labels, not the message */
+}
+/* Oct 24: The Studio, desktop: more room round the bigger statements: the mountains-and-leaf picture sits lower, and the gap between the two pictures at the bottom matches */
+@media (min-width: 761px) {
+  html body #section-view .st-stage .mir-sing.st-say, html body #section-view .mir-sing.st-say.st-based { padding-top: clamp(50px, 8vh, 120px) !important; padding-bottom: clamp(50px, 8vh, 120px) !important; margin-block: 0 !important; }
+}
+/* Oct 24: The Studio, desktop: "Grounded in earth imagery…" after the logo and contact, then the fern picture edge to edge, its top and bottom fading into space */
+.st-ground, .st-fern { display: none; }
+@media (min-width: 761px) {
+  html body #section-view .st-stage .mir-sing.st-ground { display: grid; justify-items: center; padding-top: clamp(50px, 8vh, 120px) !important; padding-bottom: clamp(30px, 5vh, 70px) !important; margin: 0 !important; }
+  html body #section-view .st-stage .st-fern { display: block; margin: 0 0 0 calc(50% - 50vw) !important; width: 100vw !important; justify-self: start !important;
+    -webkit-mask: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%); mask: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%); }
+  html body #section-view .st-stage .st-fern img { display: block; width: 100%; height: auto; max-width: none; }
+}
+/* Oct 24: desktop menu a little bigger, growing with the window (15px on a laptop, up to 18px on big screens) */
+@media (min-width: 761px) { html body .site-nav button, html body .site-nav button[aria-current="page"], html body .site-nav button.deep[aria-current="page"] { font-size: clamp(13px, 1.05vw, 18px) !important; } }
+/* Oct 24: The Studio, desktop: room above and below the logo and contact; the contact form bigger and bolder, in the same type as the statements */
+@media (min-width: 761px) {
+  html body #section-view .st-stage .st-top { margin-top: clamp(40px, 7vh, 110px) !important; margin-bottom: clamp(40px, 7vh, 110px) !important; }
+  html body #section-view .st-stage .st-form { gap: 26px !important; }
+  html body #section-view .st-stage .st-form h3 { font: 500 clamp(20px, 1.7vw, 28px)/1 'Ubuntu', system-ui, sans-serif !important; letter-spacing: .3em !important; color: #f4f6fb !important;
+    text-shadow: 0 1px 0 #a7afc6, 0 2px 0 #8b93ac, 0 3px 0 #707892, 0 4px 0 #575e77, 0 8px 16px rgba(0,0,0,.7) !important; }
+  html body #section-view .st-stage .st-form .sf input, html body #section-view .st-stage .st-form .sf textarea { font: 400 17px/1.5 'Ubuntu', system-ui, sans-serif !important; letter-spacing: .04em !important; padding: 12px 0 !important; border-bottom-color: rgba(255,255,255,.4) !important; }
+  html body #section-view .st-stage .st-form .sf input::placeholder, html body #section-view .st-stage .st-form .sf textarea::placeholder { font: 500 13px/1.5 'Ubuntu', system-ui, sans-serif; letter-spacing: .22em; color: rgba(242,244,247,.7); }
+  html body #section-view .st-stage .st-form button { font: 500 14px/1 'Ubuntu', system-ui, sans-serif !important; letter-spacing: .3em !important; padding: 15px 34px !important; }
+}
+/* ===== Oct 24: The Mirror title rebuilt as live type ===== */
+#section-view .mir-hero .mir-title3d { position: absolute; left: 0; right: 0; top: 49.5%; z-index: 5; display: grid; justify-items: center; pointer-events: none; perspective: 900px; transform: translateY(calc(-0.52 * clamp(46px, 8.6vw, 132px))); }   /* THE MIRROR sits on the horizon line */
+#section-view .mir-title3d .t3 { position: relative; display: grid; font: 400 clamp(46px, 8.6vw, 132px)/1 'Ubuntu', system-ui, sans-serif; letter-spacing: .015em; transform-style: preserve-3d;
+  transform: rotateX(var(--trx, 0deg)) rotateY(var(--try, 0deg)); }
+#section-view .mir-title3d .t3 > span { grid-area: 1 / 1; white-space: nowrap; }
+#section-view .mir-title3d .t3 .b { color: #3d4458; transform: translateZ(-10px);
+  text-shadow: 0 1px 0 #394055, 0 2px 0 #343a4e, 0 3px 0 #2f3547, 0 4px 0 #2a2f40, 0 5px 0 #252a39, 0 6px 0 #202432, 0 7px 0 #1b1f2b, 0 8px 0 #171a24, 0 14px 22px rgba(0,0,0,.7); }
+#section-view .mir-title3d .t3 .f { color: transparent; transform: translateZ(4px);
+  background: linear-gradient(100deg, #e4e8f2 0%, #ffffff 28%, #b9c2dc 44%, #ffffff 56%, #d8deee 100%); background-size: 240% 100%; -webkit-background-clip: text; background-clip: text;
+  animation: t3sheen 8s ease-in-out infinite; }
+@keyframes t3sheen { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0% 0; } }
+#section-view .mir-title3d .sub { margin-top: clamp(14px, 1.8vw, 26px); font: 700 clamp(14px, 2.1vw, 33px)/1 'Roboto', system-ui, sans-serif; letter-spacing: .005em; color: #e9ecf2; text-shadow: 0 2px 14px rgba(0,0,0,.75); }
+@media (min-width: 761px) {
+  #section-view .mir-title3d .sub.pre { opacity: 0; }
+  #section-view .mir-title3d .sub.enter { animation: subIn 2s cubic-bezier(.2,.7,.2,1) both; }
+  @keyframes subIn { 0% { opacity: 0; letter-spacing: .9em; filter: blur(10px); } 60% { opacity: 1; } 100% { opacity: 1; letter-spacing: .005em; filter: blur(0); } }
+}
+@media (max-width: 760px) { #section-view .mir-title3d .t3 { font-size: 13vw; } #section-view .mir-title3d .sub { font-size: 3.4vw; } }
+/* ===== Oct 23 PM DESKTOP: the three-page menu like the phone (phone untouched) ===== */
+@media (min-width: 761px) {
+  body.artist-on .site-nav { display: grid !important; }
+  .site-nav { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 !important; width: min(620px, 46vw); padding: 0 !important; box-sizing: border-box; position: absolute; }
+  .site-nav button { white-space: nowrap; font-size: 12.5px !important; letter-spacing: .2em !important; padding: 14px 0 !important; color: rgba(242,244,247,.6) !important; border-bottom: 1px solid rgba(255,255,255,.12) !important; transform: none !important; transition: color .5s !important; }
+  .site-nav button:hover { color: var(--fg) !important; }
+  .site-nav button[aria-current="page"], .site-nav button.deep[aria-current="page"] { color: #fff !important; font-size: 12.5px !important; border-bottom-color: rgba(255,255,255,.12) !important; text-shadow: 0 0 12px rgba(200,225,255,.55); transform: none !important; }
+  .site-nav button[aria-current="page"]::before, .site-nav button[aria-current="page"]::after { content: none !important; }
+  .site-nav::after { content: ""; position: absolute; left: 0; bottom: 0; width: calc(100% / 3); height: 2px; pointer-events: none;
+    transform: translateX(calc(var(--ix, 2) * 100%)); transition: transform .7s cubic-bezier(.2,.8,.2,1);
+    background: linear-gradient(90deg, transparent, rgba(220,235,255,.95) 30%, #fff 50%, rgba(220,235,255,.95) 70%, transparent);
+    box-shadow: 0 0 10px 1px rgba(170,205,255,.7), 0 0 22px 2px rgba(120,170,255,.35); animation: navGlow 3.2s ease-in-out infinite; }
+}
+/* ===== Oct 23 PM DESKTOP: Digital Media (phone untouched) ===== */
+@media (min-width: 861px) {
+  #section-view:has(.reel-sec) .sv-body > .reel-intro:not(.fw-block), #section-view:has(.reel-sec) .sv-body > .reel-intro:not(.fw-block) span { font-size: clamp(18px, 1.6vw, 24px) !important; line-height: 1.75 !important; }   /* Digital Media only */
+  .reel-sec { grid-template-columns: minmax(0, 1fr) minmax(0, 310px) !important; align-items: center !important; }
+  .reel-sec .reel-txt { min-height: 0 !important; height: auto; transform: translateY(14px) !important; align-self: center !important; align-content: center; gap: 14px !important; padding: 30px 28px !important; }
+  .reel-txt p { font-size: 14px !important; line-height: 1.75 !important; }
+  #section-view .reel-intro.fw-block span { white-space: nowrap !important; }   /* Film Work: each line stays one line, so justify never opens big gaps */
+  .reel-txt h3 { font-size: 14px !important; }
+  /* thumbnail titles: the name on one line, the year under it, so the name can be as big as the thumbnail allows */
+  #section-view .reel .lab { display: grid !important; justify-items: center; gap: 4px !important; white-space: nowrap; }
+  #section-view .reel .lab em { font-size: .8em; }
+}
+/* ===== Oct 23 DESKTOP changes (phone untouched) ===== */
+@media (min-width: 761px) {
+  /* no page title on The Studio, The Mirror or the film pages: the pill, the eye and the posters already name them */
+  #section-view:has(.st-stage) .sv-head, #section-view:has(.mir-stage) .sv-head, #section-view:has(.proj) .sv-head { display: none !important; }
+  #section-view:has(.st-stage) .sv-body, #section-view:has(.mir-stage) .sv-body, #section-view:has(.proj) .sv-body { padding-top: clamp(30px, 6vh, 64px) !important; }
+
+  /* the opening lines of The Studio and The Mirror: the dark pill (A) — black, its own thing, a faint edge, a soft light gliding along beneath; well clear of the eye */
+  #section-view .reel-intro.st-intro, #section-view .reel-intro.mir-open {
+    position: relative; overflow: visible; isolation: isolate; box-sizing: border-box;
+    width: auto !important; max-width: calc(100% - 24px) !important; justify-self: center !important;
+    padding: clamp(24px, 2.4vw, 34px) clamp(46px, 4.6vw, 70px) !important; border-radius: 999px !important; border: 1px solid rgba(255,255,255,.1) !important;
+    background: rgba(4,5,10,.88) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.6), 0 18px 40px -18px #000, inset 0 1px 0 rgba(255,255,255,.05) !important; transform: none !important; animation: none !important; margin-top: 0 !important; }
+  #section-view .reel-intro.st-intro::before, #section-view .reel-intro.mir-open::before { content: none !important; display: none !important; }
+  #section-view .reel-intro.st-intro::after, #section-view .reel-intro.mir-open::after {
+    content: "" !important; position: absolute !important; left: 50% !important; right: auto !important; top: auto !important; bottom: -1px !important; width: 90px !important; height: 2px !important; z-index: 1 !important;
+    border: 0 !important; border-radius: 50% !important; box-shadow: none !important; opacity: 1; -webkit-mask: none !important; mask: none !important; translate: -50% 0;
+    background: radial-gradient(ellipse, rgba(255,255,255,.95), rgba(160,190,255,.45) 45%, transparent 75%) !important; filter: blur(.4px); animation: pillGlide 7s ease-in-out infinite !important; }
+  @keyframes pillGlide { 0%, 100% { translate: -260% 0; opacity: .25; } 50% { translate: 160% 0; opacity: 1; } }
+  #section-view .reel-intro.st-intro, #section-view .reel-intro.st-intro > span,
+  #section-view .reel-intro.mir-open, #section-view .reel-intro.mir-open > span, #section-view .reel-intro.mir-open .phl {
+    font-size: clamp(17px, 1.55vw, 23px) !important; text-shadow: 0 6px 20px rgba(0,0,0,.6); }
+  #section-view .mir-stage { margin-top: clamp(80px, 12vh, 150px) !important; }
+  #section-view .reel-intro.st-intro > span, #section-view .reel-intro.mir-open > span { white-space: nowrap !important; max-width: none !important; width: auto !important; }
+  #section-view .reel-intro.st-intro, #section-view .reel-intro.st-intro > span { font-size: clamp(15px, 1.3vw, 19px) !important; }
+  /* the capital statements on The Studio and The Mirror: one size, halfway between the two */
+  #section-view .mir-sing .mir-big, #section-view .mir-sing .mir-small, #section-view .mir-first .mir-small, #section-view .st-say .mir-big {
+    font-size: min(23px, calc((var(--vw, 100vw) - 48px) * .95 / 56)) !important; letter-spacing: .3em !important; }
+
+  /* the eye: bigger, centred, and no black block behind it, so it floats in space */
+  #section-view .mir-stage { width: 100% !important; margin-left: 0 !important; justify-self: center !important; display: grid; justify-items: center; }
+  #section-view .mir-hero { width: min(1560px, calc(var(--vw, 100vw) + 120px)) !important; height: auto !important; aspect-ratio: 1600 / 1300 !important;
+    background: transparent !important; overflow: visible !important; margin-inline: auto !important; }
+  #section-view .mir-hero .mir-par img { mix-blend-mode: screen; }
+
+}
 </style>
 
 
+<canvas id="space" aria-hidden="true"></canvas>
+<div id="space-grade" aria-hidden="true"></div>
+<div class="bmask" id="bm-top"></div><div class="bmask" id="bm-mid"></div><div class="bmask" id="bm-bot"></div>
 <canvas id="stage" aria-label="A floating geometric shape made of particles that scatters when you move through it"></canvas>
 <canvas id="stars" aria-hidden="true"></canvas>
+<p id="space-credit">Space imagery: ESA/Hubble &amp; ESA/Webb (CC BY 4.0)</p>
 
 <div class="chrome">
   <div class="top">
@@ -1504,13 +1710,347 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="preview/space-img/contact-data.js"></script>
+<script src="preview/space-img/space-data.js"></script>
+<script>
+// ===== Seenik: floating through real space (preview) =====
+// Stars, gas layers and the globular cluster are real 3D objects; the camera drifts forward through them.
+// Imagery: ESA/Hubble & ESA/Webb (CC BY 4.0). Stars were removed from the nebula photos and rebuilt as 3D points.
+(function () {
+  const D = window.SPACE_DATA; if (!D || !window.THREE) return;
+  const PHONE = Math.min(innerWidth, innerHeight) <= 760 && matchMedia('(pointer: coarse)').matches || innerWidth <= 760;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Desktop and phone have their own settings: phone changes never touch the desktop look
+  const Q = PHONE ? {
+    dpr: 1, stars: 3200, cluster: 2200, haze: 0, tex: '-m', octaves: 3, starScale: 1.0, xs: 0.42, ys: 1.5, wash: 0, gas: 0.8, cl: [-14, -62]
+  } : {
+    dpr: Math.min(devicePixelRatio, 1.5), stars: 9000, cluster: 5000, haze: 0, tex: '', octaves: 4, starScale: 1.0, xs: 1, ys: 1, wash: 0, gas: 0.8, cl: [-64, -26]
+  };
+  const L = 380;            // length of the looping stretch of space we drift through
+  const SPEED = reduced ? 0.35 : 1.7;   // units per second, forward
+
+  const canvas = document.getElementById('space');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: 'high-performance' });
+  renderer.setPixelRatio(Q.dpr);
+  renderer.setClearColor(0x000000, 1);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, 1, 0.5, 3000);
+  const U = { uTime: { value: 0 }, uTravel: { value: 0 }, uRes: { value: new THREE.Vector2(1, 1) }, uPx: { value: 500 } };
+
+  const loadTex = (src) => { const t = new THREE.Texture(); const im = new Image(); im.onload = () => { t.image = im; t.needsUpdate = true; }; im.src = src;
+    t.minFilter = THREE.LinearMipmapLinearFilter; t.magFilter = THREE.LinearFilter; t.generateMipmaps = true; return t; };
+  const TEX = { orion: loadTex(D['orion' + Q.tex]), pillars: loadTex(D['pillars' + Q.tex]), cigar: loadTex(D['cigar' + Q.tex]), contact: loadTex(window.CONTACT_DATA ? (PHONE ? CONTACT_DATA.imgM : CONTACT_DATA.img) : D['orion' + Q.tex]) };
+
+  // ---------- shared GLSL noise ----------
+  const NOISE = `
+    float h21(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }
+    float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f*f*(3.0-2.0*f);
+      return mix(mix(h21(i), h21(i+vec2(1,0)), f.x), mix(h21(i+vec2(0,1)), h21(i+vec2(1,1)), f.x), f.y); }
+    float fbm(vec2 p){ float s = 0.0, a = 0.5; for (int i = 0; i < ${Q.octaves}; i++){ s += a*vn(p); p = p*2.03 + 17.1; a *= 0.5; } return s; }`;
+
+  // ---------- gas layers: thin, see-through sheets of real nebula gas at many depths ----------
+  const gasVert = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
+  const gasFrag = `
+    precision highp float;
+    uniform sampler2D map; uniform float uTime, uOpacity, uBias, uLo, uHi, uWisp, uFlow, uSeed, uCalm, uOver, uGain, uSoft;
+    uniform vec2 uRes, uUvOff, uUvScale; uniform vec3 uTint;
+    varying vec2 vUv;
+    ${NOISE}
+    void main(){
+      vec2 p = vUv;
+      float t = uTime * 0.018;
+      // slow flowing distortion: the gas breathes and drifts instead of sitting still like a photo
+      vec2 q = vec2(fbm(p*2.2 + vec2(t, -t*0.7) + uSeed), fbm(p*2.2 + vec2(-t*0.6, t) + uSeed*1.7)) - 0.5;
+      vec2 suv = uUvOff + (p + q * uFlow) * uUvScale;
+      vec3 c = texture2D(map, suv, uBias).rgb;
+      float lum = max(c.r, max(c.g, c.b));
+      float m = smoothstep(uLo, uHi, lum);
+      // wispy layers: a moving mist mask so only curls of the gas show, and they change over time
+      float w = fbm(p*3.1 + q*1.5 + vec2(t*0.5, t*0.3) + uSeed*3.0);
+      m *= mix(1.0, smoothstep(0.38, 0.72, w), uWisp);
+      // soft, irregular edges: never a rectangle
+      float d = length((p - 0.5) * 2.0);
+      float edge = 1.0 - smoothstep(0.2, 0.95, d + (fbm(p*3.7 + uSeed) - 0.5) * 0.55);   // melts into black sooner
+      // keep the centre calm for the dome and logo
+      vec2 sc = gl_FragCoord.xy / uRes - 0.5; sc.x *= uRes.x / uRes.y;
+      float calm = mix(uCalm, 1.0, smoothstep(0.10, 0.48, length(sc)));
+      float a = m * edge * calm * uOpacity;
+      c = c * uTint * uGain;
+      // softer: the white-hot core is pulled down and turned to a soft pink
+      float wh = smoothstep(0.28, 0.8, min(c.r, min(c.g, c.b)));
+      c = mix(c, vec3(0.8, 0.5, 0.66) * max(c.r, max(c.g, c.b)), wh * 0.85 * uSoft);
+      c = mix(c, c / (1.0 + c * 1.4), uSoft) * (1.0 - 0.15 * uSoft);
+      c = c / (1.0 + c * 0.55) * 1.3;
+      if (uOver > 0.5) gl_FragColor = vec4(c, a);        // dark dust that hides what is behind it
+      else gl_FragColor = vec4(c * a, 1.0);              // glowing gas: light adds up
+    }`;
+  const gasLayers = [];
+  function gas(o) {
+    if (PHONE && o.desk) return null;   // phone: fewer sheets, lighter work
+    const mat = new THREE.ShaderMaterial({
+      uniforms: { map: { value: TEX[o.tex] }, uTime: U.uTime, uRes: U.uRes, uOpacity: { value: 0 }, uBias: { value: o.bias || 0 },
+        uLo: { value: o.lo ?? 0.04 }, uHi: { value: o.hi ?? 0.5 }, uWisp: { value: o.wisp || 0 }, uFlow: { value: o.flow ?? 0.06 },
+        uSeed: { value: Math.random() * 10 }, uCalm: { value: o.calm ?? 0.25 }, uOver: { value: o.over ? 1 : 0 },
+        uGain: { value: o.gain || 1 }, uSoft: { value: o.soft || 0 }, uTint: { value: new THREE.Color(o.tint || 0xffffff) },
+        uUvOff: { value: new THREE.Vector2(...(o.uvOff || [0, 0])) }, uUvScale: { value: new THREE.Vector2(...(o.uvScale || [1, 1])) } },
+      vertexShader: gasVert, fragmentShader: gasFrag, transparent: true, depthWrite: false, depthTest: false,
+      blending: o.over ? THREE.NormalBlending : THREE.AdditiveBlending });
+    const asp = o.asp || 1;
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(o.size * asp, o.size), mat);
+    mesh.rotation.z = o.rot || 0; mesh.renderOrder = o.order || 0;
+    scene.add(mesh);
+    gasLayers.push({ mesh, mat, o });
+    return mesh;
+  }
+  const PA = 1335 / 1280, CA = 863 / 1280;   // image shapes (height / width)
+
+  // Orion: three sheets at different depths (deep glow, main structure, fine wisps)
+  gas({ tex: 'orion', size: 330, x: -95, y: 42, z0: 0,   bias: 4, lo: 0.02, hi: 0.6, opacity: 0.38, flow: 0.04, order: 1, soft: 1, only: ['', 'studio'], arr: true });
+  gas({ tex: 'orion', size: 270, x: -80, y: 34, z0: 45,  bias: 0.5, lo: 0.10, hi: 0.75, opacity: 0.6, flow: 0.05, order: 2, soft: 1, only: ['', 'studio'], arr: true });
+  gas({ tex: 'orion', size: 230, x: -70, y: 28, z0: 85,  bias: 1.5, lo: 0.12, hi: 0.8, wisp: 0.9, opacity: 0.5, flow: 0.08, order: 3, rot: 0.15, desk: true, soft: 1, only: ['', 'studio'], arr: true });
+  // Pillars of Creation, on the opposite side and half a loop later: its glow, then the dark dust columns in front
+  // The Mirror: its own soft pink haze, the same glow on both sides, nothing sharp or pointy
+  gas({ tex: 'orion', size: 340, x: -95, y: 34, z0: L * 0.5, only: ['mirror', ''], arr: -440, bias: 4, lo: 0.02, hi: 0.6, opacity: 0.42, flow: 0.05, order: 1, soft: 1, uvOff: [0.08, 0.08], uvScale: [0.84, 0.84], rot: 0.35 });
+  gas({ tex: 'orion', size: 340, x: 95, y: 34, z0: L * 0.5, only: ['mirror', ''], arr: -440, bias: 4, lo: 0.02, hi: 0.6, opacity: 0.42, flow: 0.05, order: 1, soft: 1, uvOff: [0.92, 0.08], uvScale: [-0.84, 0.84], rot: -0.35 });
+  gas({ tex: 'orion', size: 270, x: -82, y: 28, z0: L * 0.5 + 45, only: ['mirror', ''], arr: -395, bias: 1.6, lo: 0.12, hi: 0.8, wisp: 0.9, opacity: 0.4, flow: 0.09, order: 2, soft: 1, uvOff: [0.15, 0.2], uvScale: [0.6, 0.6], desk: true });
+  gas({ tex: 'orion', size: 270, x: 82, y: 28, z0: L * 0.5 + 45, only: ['mirror', ''], arr: -395, bias: 1.6, lo: 0.12, hi: 0.8, wisp: 0.9, opacity: 0.4, flow: 0.09, order: 2, soft: 1, uvOff: [0.85, 0.2], uvScale: [-0.6, 0.6], desk: true });
+  const CA2 = (window.CONTACT_DATA && CONTACT_DATA.asp) || 1;
+  gas({ tex: 'contact', size: 400, asp: CA2, x: 0, y: 6, z0: 0, zN: 646 - 330 - 60, bias: 0.3, lo: 0.0, hi: 0.05, opacity: 1, gain: 2.6, flow: 0.03, calm: 0.9, order: 1, near: true, only: ['contact'], arr: true });
+  gas({ tex: 'contact', size: 360, asp: CA2, x: 0, y: 6, z0: 0, zN: 646 - 260 - 60, bias: 1.5, lo: 0.08, hi: 0.5, wisp: 0.9, opacity: 0.35, gain: 2, flow: 0.09, calm: 0.9, order: 2, near: true, only: ['contact'], desk: true, arr: true });
+  // drifting haze close by: crops of the real gas, misty and faint, that you pass through
+  const crops = [[0.15, 0.2], [0.45, 0.35], [0.3, 0.55], [0.55, 0.1], [0.1, 0.5], [0.5, 0.55], [0.25, 0.05], [0.6, 0.6], [0.05, 0.3], [0.4, 0.15]];
+  for (let i = 0; i < Q.haze; i++) {
+    const side = i % 2 ? 1 : -1, ang = Math.random() * Math.PI * 2;
+    const r = 30 + Math.random() * 60;
+    gas({ tex: 'orion', size: 70 + Math.random() * 80, x: Math.cos(ang) * r, y: Math.sin(ang) * r * 0.7,
+      z0: (i + 0.5) / Q.haze * L, bias: 2.5, lo: 0.08, hi: 0.7, wisp: 1, flow: 0.12, opacity: 0.32, calm: 0.05,
+      uvOff: crops[i % crops.length], uvScale: [0.4, 0.4], rot: Math.random() * 6.28, order: 0 });
+  }
+  // the Cigar Galaxy, very far away; it never comes closer
+  const cigar = gas({ tex: 'cigar', size: 34, asp: 1 / CA, x: 0, y: 0, z0: 0, bias: 0, lo: 0.03, hi: 0.5, opacity: 0.9, flow: 0.0, calm: 0.5, rot: -0.5, order: -1, far: true });
+  // a faint wash of colour far behind everything, so space is never flat black
+  const wash1 = gas({ tex: 'orion', size: 2600, x: 0, y: 0, z0: 0, bias: 7, lo: 0.0, hi: 0.9, opacity: 0.22, flow: 0.1, calm: 0.4, order: -3, far: true, rot: 0.6 });
+  const wash2 = gas({ tex: 'orion', size: 2400, x: 0, y: 0, z0: 0, bias: 7, lo: 0.0, hi: 0.9, opacity: 0.14, flow: 0.1, calm: 0.4, order: -2, far: true, rot: 2.4, tint: 0xb8c8ff });
+  const FAR = [[cigar, 260 * Q.xs, 150 * Q.ys, -1500], [wash1, -500, 260, -1900], [wash2, 600, -420, -1800]];
+
+  // ---------- stars: round, soft, different sizes and colours, scattered at every depth ----------
+  const starVert = `
+    precision highp float;
+    attribute vec3 color; attribute float size; attribute float phase;
+    uniform float uTime, uTravel, uPx, uL, uCluster, uFade;
+    varying vec3 vCol; varying float vA;
+    void main(){
+      vec3 p = position;
+      float fade = 1.0;
+      if (uCluster < 0.5) {
+        p.z = mod(p.z + uTravel, uL) - uL * 0.85;
+        fade = smoothstep(-uL * 0.85, -uL * 0.6, p.z);
+      }
+      vec4 mv = modelViewMatrix * vec4(p, 1.0);
+      float dist = max(-mv.z, 0.1);
+      float px = size * uPx / dist;                 // true size on screen
+      float tw = 0.82 + 0.18 * sin(uTime * (1.3 + fract(phase * 7.0) * 2.2) + phase * 40.0);
+      float b = 1.0;
+      if (px < 1.6) { b = (px * px) / (1.6 * 1.6); px = 1.6; }   // tiny stars: dimmer, not smaller (no flicker)
+      gl_PointSize = min(px * 2.6, 64.0);           // room for the soft glow around the core
+      vA = uFade * b * fade * mix(1.0, tw, smoothstep(5.0, 1.0, px)) * smoothstep(0.5, 4.0, dist);
+      vCol = color;
+      gl_Position = projectionMatrix * mv;
+    }`;
+  const starFrag = `
+    precision highp float;
+    varying vec3 vCol; varying float vA;
+    void main(){
+      vec2 d = gl_PointCoord - 0.5; float r2 = dot(d, d) * 4.0 * 6.76;   // r = 1 at the core edge
+      float core = exp(-r2 * 1.6);
+      float glow = exp(-r2 * 0.25) * 0.16;
+      float a = (core + glow) * vA;
+      if (a < 0.003) discard;
+      gl_FragColor = vec4(vCol * a + vec3(core * core * 0.25 * vA), 1.0);
+    }`;
+  function starMat(cluster) {
+    return new THREE.ShaderMaterial({ uniforms: { uTime: U.uTime, uTravel: U.uTravel, uPx: U.uPx, uL: { value: L }, uCluster: { value: cluster ? 1 : 0 }, uFade: { value: 1 } },
+      vertexShader: starVert, fragmentShader: starFrag, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending });
+  }
+  const PALETTE = [[0.62, 0.74, 1.0], [0.75, 0.84, 1.0], [0.9, 0.94, 1.0], [1.0, 1.0, 1.0], [1.0, 0.95, 0.86], [1.0, 0.86, 0.66], [1.0, 0.72, 0.5]];
+  const PW = [0.10, 0.16, 0.2, 0.2, 0.16, 0.12, 0.06];
+  const pick = () => { let r = Math.random(); for (let i = 0; i < PW.length; i++) { r -= PW[i]; if (r <= 0) return PALETTE[i]; } return PALETTE[3]; };
+  {
+    const N = Q.stars, pos = new Float32Array(N * 3), col = new Float32Array(N * 3), sz = new Float32Array(N), ph = new Float32Array(N);
+    for (let i = 0; i < N; i++) {
+      let x, y; do { x = (Math.random() * 2 - 1) * 170; y = (Math.random() * 2 - 1) * 120; } while (Math.hypot(x, y * 1.4) < 7);
+      pos[i * 3] = x; pos[i * 3 + 1] = y; pos[i * 3 + 2] = Math.random() * L;
+      const c = pick(), br = 0.35 + Math.pow(Math.random(), 3) * 1.3;
+      col[i * 3] = c[0] * br; col[i * 3 + 1] = c[1] * br; col[i * 3 + 2] = c[2] * br;
+      sz[i] = (0.05 + Math.pow(Math.random(), 4) * 0.32 + (Math.random() < 0.025 ? 0.35 + Math.random() * 0.4 : 0)) * Q.starScale; ph[i] = Math.random();
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    g.setAttribute('size', new THREE.BufferAttribute(sz, 1)); g.setAttribute('phase', new THREE.BufferAttribute(ph, 1));
+    const pts = new THREE.Points(g, starMat(false)); pts.frustumCulled = false; pts.renderOrder = 6; scene.add(pts);
+  }
+  // a deep, fixed background of very distant stars (they barely move)
+  {
+    const N = PHONE ? 1500 : 4000, pos = new Float32Array(N * 3), col = new Float32Array(N * 3), sz = new Float32Array(N), ph = new Float32Array(N);
+    for (let i = 0; i < N; i++) {
+      const u = Math.random() * 2 - 1, a = Math.random() * Math.PI * 2, s = Math.sqrt(1 - u * u), R = 1400;
+      pos[i * 3] = Math.cos(a) * s * R; pos[i * 3 + 1] = u * R * 0.8; pos[i * 3 + 2] = -Math.abs(Math.sin(a) * s * R) - 200;
+      const c = pick(), br = 0.25 + Math.pow(Math.random(), 4) * 0.9;
+      col[i * 3] = c[0] * br; col[i * 3 + 1] = c[1] * br; col[i * 3 + 2] = c[2] * br;
+      sz[i] = 0.4 + Math.random() * 1.2; ph[i] = Math.random();
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    g.setAttribute('size', new THREE.BufferAttribute(sz, 1)); g.setAttribute('phase', new THREE.BufferAttribute(ph, 1));
+    var deep = new THREE.Points(g, starMat(true)); deep.frustumCulled = false; deep.renderOrder = -1; scene.add(deep);
+  }
+
+  // ---------- NGC 1466: the globular cluster as a real 3D ball of stars ----------
+  // star positions, brightness and colour come from the Hubble image; depth is rebuilt so it is a sphere you can see around
+  const cluster = new THREE.Group();   // built but not shown (removed from view at Sandy's request)
+  {
+    const S = D.stars, total = S.length / 6, N = Math.min(Q.cluster, total), R = 16;
+    const pos = new Float32Array(N * 3), col = new Float32Array(N * 3), sz = new Float32Array(N), ph = new Float32Array(N);
+    const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(6.283 * v); };
+    for (let i = 0, j = 0; i < N && j < total; j++) {
+      const nx = S[j * 6], ny = S[j * 6 + 1], rn = Math.hypot(nx, ny);
+      if (rn > 0.92 || Math.random() < Math.pow(rn / 0.92, 3) * 0.8) continue;   // round ball: the photo's square corners are left out
+      const x = nx * R, y = ny * R, f = S[j * 6 + 2];
+      const rp = Math.hypot(x, y), depth = Math.sqrt(Math.max(R * R * 0.55 - rp * rp, 0)) * 0.55 + 1.6;
+      pos[i * 3] = x; pos[i * 3 + 1] = y; pos[i * 3 + 2] = gauss() * depth;
+      const br = 0.45 + Math.min(f, 1) * 1.1;
+      col[i * 3] = S[j * 6 + 3] * br; col[i * 3 + 1] = S[j * 6 + 4] * br; col[i * 3 + 2] = S[j * 6 + 5] * br;
+      sz[i] = 0.08 + Math.pow(Math.min(f, 1), 1.2) * 0.26; ph[i] = Math.random(); i++;
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+    g.setAttribute('size', new THREE.BufferAttribute(sz, 1)); g.setAttribute('phase', new THREE.BufferAttribute(ph, 1));
+    const pts = new THREE.Points(g, starMat(true)); pts.frustumCulled = false; cluster.add(pts);
+    // the soft unresolved glow of countless fainter stars in the core
+    const c = document.createElement('canvas'); c.width = c.height = 128; const x2 = c.getContext('2d');
+    const gr = x2.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gr.addColorStop(0, 'rgba(255,246,228,0.55)'); gr.addColorStop(0.25, 'rgba(240,232,222,0.18)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+    x2.fillStyle = gr; x2.fillRect(0, 0, 128, 128);
+    const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false, transparent: true, opacity: 0.6 }));
+    glow.scale.set(R * 1.6, R * 1.6, 1); cluster.add(glow); cluster.userData.glow = glow;
+  }
+  const CL = { x: Q.cl[0], y: Q.cl[1], z0: L * 0.25 };
+
+  // ---------- camera: slow forward drift + parallax from the mouse, touch or phone tilt ----------
+  const look = { x: 0, y: 0, tx: 0, ty: 0 };
+  addEventListener('pointermove', e => { look.tx = (e.clientX / innerWidth - 0.5) * 2; look.ty = (e.clientY / innerHeight - 0.5) * 2; }, { passive: true });
+  let tilt0 = null;
+  function onTilt(e) {
+    if (e.gamma == null) return;
+    if (!tilt0) tilt0 = { b: e.beta, g: e.gamma };
+    look.tx = Math.max(-1, Math.min(1, (e.gamma - tilt0.g) / 25));
+    look.ty = Math.max(-1, Math.min(1, (e.beta - tilt0.b) / 25));
+  }
+  if (PHONE) {
+    addEventListener('deviceorientation', onTilt, { passive: true });
+    addEventListener('touchend', function ask() {   // iPhone asks for permission to read tilt
+      removeEventListener('touchend', ask);
+      if (window.DeviceOrientationEvent && DeviceOrientationEvent.requestPermission) DeviceOrientationEvent.requestPermission().catch(() => {});
+    }, { passive: true });
+  }
+
+  function resize() {
+    const w = innerWidth, h = innerHeight;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+    U.uRes.value.set(w * Q.dpr, h * Q.dpr);
+    U.uPx.value = (h * Q.dpr * 0.5) / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+  }
+  addEventListener('resize', resize); resize();
+
+  const wrapZ = z0 => ((z0 + travel) % L + L) % L - L * 0.85;
+  // nebulae sit off to the side in the dark: you drift past the edge of one, it fades before you are inside it, then black space until the next
+  const LN = 760;
+  const nebZ0 = z0 => z0 >= L * 0.7 ? LN * 0.75 + (z0 - L * 0.75) : z0 >= L * 0.45 ? LN * 0.5 + (z0 - L * 0.5) : (z0 > 5 && z0 < 10) ? LN * 0.25 : z0;
+  const wrapN = z0 => ((nebZ0(z0) + nebT) % LN + LN) % LN - LN * 0.85;
+  let nebT = LN * 0.12;
+  const SPOT = { studio: 246, mirror: 626, artist: 436, contact: 100 };   // each page its own place: Studio = Orion, Mirror = pink haze both sides, Artist = black space and stars only
+  let homeSet = false, curPage = '', warpDone = 0, warpAt = -1e9, warpGoal = null, warpJumped = true, gasK = 1, scrollBoost = 0;
+  const BACK = 40, GLIDE = 120, TAU = 0.55;   // a short glide (most of it in the first ~2 s), ending a little short of the new nebula
+  const lastScroll = new WeakMap();
+  addEventListener('scroll', e => { const el = e.target === document ? document.scrollingElement : e.target; if (!el || !el.scrollTop && !el.scrollLeft && !lastScroll.has(el)) return;
+    const v = (el.scrollTop || 0) + (el.scrollLeft || 0), d = Math.abs(v - (lastScroll.get(el) ?? v)); lastScroll.set(el, v); scrollBoost += Math.min(d, 200) * 0.12; }, true);
+  let menuK = 0, travel = 0, last = performance.now(), t0 = last;
+  function frame(now) {
+    requestAnimationFrame(frame);
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (document.body.classList.contains('artist-on') && !document.body.classList.contains('space-bled')) return;   // pages without the space world: nothing to draw
+    // menu open: the space world fills with colour so the black band reads clearly against it
+    menuK += ((document.body.classList.contains('space-band') ? 1 : 0) - menuK) * Math.min(1, dt * 0.8);
+    // pages: each one has its own place in space. Choosing a page flies you there (fast, then easing in);
+    // scrolling a page also carries you forward, so near stars stream past faster than far ones
+    const SVc = document.querySelector('#section-view.on .ct-sleek');
+    const pg = document.body.classList.contains('space-bled') ? (SVc ? 'contact' : document.body.dataset.spacePage) : '';
+    // travelling between pages: one smooth glide. Speed rises and then eases away (t·e^-t/τ) until only the normal
+    // slow float is left, so there is no stop and restart. The flight covers a short, fixed distance; the new page's
+    // nebula is put in place while the gas is briefly faded out at the start of the glide.
+    // travelling between pages: one continuous glide, no fade-out and no gap. The new page's nebula is already out
+    // ahead in the dark and you fly up to it while the last one slips away behind you and fades.
+    if (pg !== curPage || !homeSet) { homeSet = true;
+      warpAt = now; warpDone = 0;
+      for (const G of gasLayers) { const o = G.o; if (!o.arr) continue;
+        const a = o.arr === true ? (o.zN != null ? o.zN + SPOT.contact - BACK - LN * 0.85 : o.z0 + SPOT.studio - BACK - LN * 0.85) : o.arr;
+        if ([].concat(o.only).includes(pg)) o.zLive = a - GLIDE; }
+    }
+    curPage = pg || '';
+    let extra = 0;
+    {
+      const ts = (now - warpAt) / 1000;
+      if (ts >= 0 && ts < 8) {
+        const f = 1 - (1 + ts / TAU) * Math.exp(-ts / TAU);
+        extra += GLIDE * f - warpDone; warpDone = GLIDE * f;
+      }
+      gasK = 1;
+    }
+    extra += scrollBoost; scrollBoost = 0;
+    travel = (travel + dt * SPEED + extra) % L; nebT = (nebT + dt * SPEED + extra) % LN;
+    U.uTime.value = (now - t0) / 1000; U.uTravel.value = travel;
+    // parallax: the camera slides a little, so near things move more than far things
+    look.x += (look.tx - look.x) * Math.min(1, dt * 1.6); look.y += (look.ty - look.y) * Math.min(1, dt * 1.6);
+    const tt = U.uTime.value;
+    const sx = Math.sin(tt * 0.031) * 3 + look.x * 7, sy = Math.cos(tt * 0.023) * 2 - look.y * 4.5;
+    camera.position.set(sx, sy, 0);
+    camera.lookAt(sx * 0.35 + Math.sin(tt * 0.017) * 6, sy * 0.35 + Math.cos(tt * 0.013) * 3, -100);
+    camera.rotation.z += Math.sin(tt * 0.011) * 0.03;
+    for (const G of gasLayers) {
+      const o = G.o; if (o.far) continue;
+      if (o.zLive != null) o.zLive += dt * SPEED + extra;
+      const z = o.zLive != null ? o.zLive : o.zN != null ? ((o.zN + nebT) % LN + LN) % LN - LN * 0.85 : wrapN(o.z0);
+      // gentle sideways drift so every sheet moves on its own
+      G.mesh.position.set(o.x * 1.6 * Q.xs + Math.sin(tt * 0.02 + o.z0) * 4, o.y * 1.2 * Q.ys + Math.cos(tt * 0.017 + o.z0) * 3, z);
+      const fadeIn = THREE.MathUtils.smoothstep(z, -LN * 0.85, -LN * 0.62);
+      const fadeOut = o.near ? 1 - THREE.MathUtils.smoothstep(z, -70, -20) : 1 - THREE.MathUtils.smoothstep(z, -o.size * 1.15, -o.size * 0.6);
+      // page-specific sheets: the mirrored Orion only on The Mirror; the Pillars never on The Mirror
+      const pk = o.only ? ([].concat(o.only).includes(curPage) ? 1 : 0) : (o.tex === 'pillars' && curPage === 'mirror' ? 0 : 1);
+      G.pk = (G.pk ?? pk) + (pk - (G.pk ?? pk)) * Math.min(1, dt * 1.5);
+      G.mat.uniforms.uOpacity.value = o.opacity * Q.gas * fadeIn * fadeOut * G.pk * gasK;
+      G.mesh.visible = G.mat.uniforms.uOpacity.value > 0.003;
+    }
+    for (const [m, x, y, z] of FAR) { m.position.set(camera.position.x + x, camera.position.y + y, z); m.material.uniforms.uOpacity.value = m === cigar ? 0.9 : (m === wash1 ? 0.22 : 0.14) * Math.max(Q.wash, menuK * 3.5); m.visible = m.material.uniforms.uOpacity.value > 0.003; }
+    const cz = wrapZ(CL.z0);
+    cluster.position.set(CL.x, CL.y, cz);
+    cluster.rotation.y = tt * 0.02; cluster.rotation.x = 0.3;
+    const cf = THREE.MathUtils.smoothstep(cz, -L * 0.85, -L * 0.6) * (1 - THREE.MathUtils.smoothstep(cz, -20, 10));
+    cluster.visible = false; cluster.userData.glow.material.opacity = 0.6 * cf;
+    cluster.children[0].material.uniforms.uFade.value = cf;
+    deep.position.copy(camera.position);
+    renderer.render(scene, camera);
+  }
+  requestAnimationFrame(frame);
+  window.__space = { renderer, scene, camera, Q, setTravel: v => { travel = v % L; nebT = v * 2 % LN; menuK = document.body.classList.contains('space-band') ? 1 : 0; } };
+})();
+</script>
 <script>
 (function () {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const canvas = document.getElementById('stage');
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.setClearColor(0x000000, 1);
+  renderer.setClearColor(0x000000, 0);
 
   const scene = new THREE.Scene();
   scene.fog = new THREE.FogExp2(0x000000, 0.08);
@@ -1610,7 +2150,7 @@
     size: 0.05, map: tex, color: 0x9aa6bb, transparent: true, opacity: 0.6, depthWrite: false,
     blending: THREE.AdditiveBlending
   }));
-  scene.add(dust);
+  scene.add(dust); dust.visible = false;   // space preview: the 3D space replaces these flat stars and dust
   // Depth layers: a far field of fine stars and a few soft, out-of-focus motes drifting close to the viewer
   const PH = innerWidth < 761;
   const layer = (n, fill, mat) => { const pos = new Float32Array(n * 3); for (let i = 0; i < n; i++) fill(pos, i); const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); const m = new THREE.Points(g, new THREE.PointsMaterial(Object.assign({ map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }, mat))); dust.add(m); return m; };
@@ -2451,7 +2991,7 @@
     endMode = 'solid'; endT = 0; endVis = 0; endGroup.visible = true;
     for (let i = 0; i < SN; i++) { const j = (Math.random() * WN) | 0; ePts[i].copy(WP[j]); eVel[i].set(0, 0, 0); }
   }
-  function stopTorus() { endMode = 'off'; endGroup.visible = false; document.body.classList.remove('menu-on'); }
+  function stopTorus() { endMode = 'off'; endGroup.visible = false; document.body.classList.remove('menu-on', 'space-band'); }
   const bandTop = document.getElementById('band-top'), bandBot = document.getElementById('band-bot');
   // the band hugs the three circles: a little over three ring-heights tall, centred on them
   function bandPx() {
@@ -2546,7 +3086,7 @@
       const hw = visW / 2 * 0.96;
       const [topPx, botPx] = bandPx();
       const yTop = (0.5 - topPx / innerHeight) * visH, yBot = (0.5 - botPx / innerHeight) * visH;
-      bandTop.style.top = topPx + 'px'; bandBot.style.top = botPx + 'px';
+      bandTop.style.top = topPx + 'px'; bandBot.style.top = botPx + 'px'; document.body.classList.add('space-band');
       for (let i = 0; i < PFN; i++) {
         const p = ePts[i], v = eVel[i];
         if (mouse.active) {
@@ -2667,16 +3207,16 @@
       // the word sEEnik sits centred in the space left of the form; the dark swirl behind it is free to run off the left edge
       const ar = (lo.naturalHeight / lo.naturalWidth) || .5606, dh = Math.min(r.height, r.width * ar), dw = dh / ar, iy = r.top + (r.height - dh) / 2, ix = r.left + (r.width - dw) / 2;   // where the picture actually sits inside its box
       const ox = ix + dw * .949, oy = iy + dh * .466, wx = ix + dw * .569, lx = ix + dw * .066, c0 = Math.max(0, (document.documentElement.clientWidth - PAGE_MAX) / 2), c = (c0 + goal) / 2;   // centred in the page column, not the whole window
-      const S = Math.min(1.6, (goal - c) / (ox - wx), Math.max(1.45, (c + 40) / (wx - lx))), t = c - (ox + (wx - ox) * S);   // word centred; the right point sits level with the email line
+      const M = Math.max(24, document.documentElement.clientWidth - fm.form.getBoundingClientRect().right), S = Math.min(2.4, 1.4 * (goal - M) / (ox - lx)), t = goal - ox;   // Oct 24: 40% bigger; the right tip stays put, it grows to the left and up and down   // balanced: the whole logo shows, its left tip the same distance from the edge as the form's right side
       lo.style.transformOrigin = (ox - r.left).toFixed(1) + 'px ' + (oy - r.top).toFixed(1) + 'px'; lo.style.scale = S.toFixed(3); lo.style.translate = Math.round(t) + 'px ' + Math.round(em.bottom - .5 - oy) + 'px'; };
     requestAnimationFrame(fit); })();
   (function reelLabels() {   // Digital Media: every video title the same size, small enough that the longest one fits inside its thumbnail
     let key = '';
     const fit = () => { requestAnimationFrame(fit); const labs = [...SV.querySelectorAll('.reel .lab')]; if (!labs.length || !SV.classList.contains('on')) { key = ''; return; }
       const k = innerWidth + 'x' + labs.length; if (k === key) return; key = k;
-      SV.style.removeProperty('--lab-fs'); let worst = 1;
-      labs.forEach(l => { const m = l.parentElement.querySelector('.m'); if (!m || !m.offsetWidth) return; const rg = document.createRange(); rg.selectNodeContents(l); const w = rg.getBoundingClientRect().width; if (w) worst = Math.min(worst, (m.offsetWidth - 24) / w); });
-      const fs = parseFloat(getComputedStyle(labs[0]).fontSize) || 11; SV.style.setProperty('--lab-fs', (fs * worst).toFixed(2) + 'px'); };
+      SV.style.setProperty('--lab-fs', '22px'); let worst = 1;
+      labs.forEach(l => { const m = l.parentElement.querySelector('.m'); if (!m || !m.offsetWidth) return; const rg = document.createRange(); const tn = l.firstChild; if (tn && tn.nodeType === 3) rg.selectNodeContents(tn); else rg.selectNodeContents(l); const w = rg.getBoundingClientRect().width; if (w) worst = Math.min(worst, (m.offsetWidth - 24) / w); });
+      const fs = parseFloat(getComputedStyle(labs[0]).fontSize) || 22; SV.style.setProperty('--lab-fs', Math.min(22, fs * worst).toFixed(2) + 'px'); };
     requestAnimationFrame(fit); })();
   const restRect = el => { const r = el.getBoundingClientRect(), x = el._ox || 0, y = el._oy || 0;   // where it rests: its box minus the float we added (follows the page when it scrolls)
     return { left: r.left - x, top: r.top - y, right: r.right - x, bottom: r.bottom - y, width: r.width, height: r.height }; };
@@ -2718,7 +3258,7 @@
           const f2 = op.getBoundingClientRect(), a = rot * Math.PI / 180, cx = (f2.left + f2.right) / 2, cy = (f2.top + f2.bottom) / 2, w = op.offsetWidth / 2, h = op.offsetHeight / 2;
           const at = fx => [cx + fx * w * Math.cos(a) + h * Math.sin(a), cy + fx * w * Math.sin(a) - h * Math.cos(a)];
           out = '';   // The Studio: no strings (it holds still)   // The Studio: two strings from the title down to the top of the pill
-        } else {   // The Mirror: the frame is held by three equal elastic strings, one up to the title and two down to the picture; no spin, it floats and can be tugged evenly
+        } else if (false) {   // The Mirror: (strings removed — the opening line now floats free above the live eye)
           if (op !== mPill) { mPill = op; op.style.cursor = 'grab'; op.style.touchAction = 'none'; op.style.userSelect = 'none'; op.style.transformOrigin = '';
             op.addEventListener('pointerdown', e => { mr.on = true; mr.sx = e.clientX - mr.x; mr.sy = e.clientY - mr.y; op.setPointerCapture(e.pointerId); op.style.cursor = 'grabbing'; e.stopPropagation(); });
             op.addEventListener('pointermove', e => { if (!mr.on) return; const dx = e.clientX - mr.sx, dy = e.clientY - mr.sy, d = Math.hypot(dx, dy), k = d > 0 ? Math.min(1, 120 / d) ** .5 : 1; mr.tx = dx * k; mr.ty = dy * k; });
@@ -2735,7 +3275,7 @@
           const rest = [Math.hypot(r0.left + r0.width / 2 - C[0], r0.top - C[1]), Math.hypot(r0.left + r0.width * .11 - A1[0], r0.bottom - 6 - A1[1]), Math.hypot(r0.right - r0.width * .11 - A2[0], r0.bottom - 6 - A2[1])];
           const sagOf = (A, B, r) => Math.max(0, r - Math.hypot(B[0] - A[0], B[1] - A[1])) * .7 + 3;
           const oa = +getComputedStyle(op).opacity, sa = +getComputedStyle(st).opacity;   // strings appear with what they hold (during the drop-in)
-          out += `<g opacity="${oa.toFixed(2)}">` + strand(C, topC, 1, sagOf(C, topC, rest[0])) + `</g><g opacity="${Math.min(oa, sa).toFixed(2)}">` + strand(bl, A1, 3, sagOf(bl, A1, rest[1])) + strand(br, A2, 4, sagOf(br, A2, rest[2])) + '</g>';
+          out += `<g opacity="${oa.toFixed(2)}">` + (ti.offsetParent ? strand(C, topC, 1, sagOf(C, topC, rest[0])) : '') + `</g><g opacity="${Math.min(oa, sa).toFixed(2)}">` + strand(bl, A1, 3, sagOf(bl, A1, rest[1])) + strand(br, A2, 4, sagOf(br, A2, rest[2])) + '</g>';
         }
         teth.innerHTML = out; teth.style.setProperty('--teth-top', Math.round(document.querySelector('.top').getBoundingClientRect().bottom + 6) + 'px'); return; }
       if (p !== pic) hook(p);
@@ -2798,7 +3338,7 @@
     const box = el => { if (el.tagName !== 'P') { const r = el.getBoundingClientRect(); return [r.top, r.bottom]; }
       const rg = document.createRange(); rg.selectNodeContents(el); const rs = [...rg.getClientRects()].filter(r => r.height); return rs.length ? [Math.min(...rs.map(r => r.top)), Math.max(...rs.map(r => r.bottom))] : null; };
     const fit = () => { requestAnimationFrame(fit); if (innerWidth <= 760 || !SV.classList.contains('on')) return;
-      const t = SV.querySelector('.sv-t') || SV.querySelector('.sv-title'), op = SV.querySelector('.reel-intro'); if (!t || !op || op.offsetParent === null) return;
+      const t = SV.querySelector('.sv-t') || SV.querySelector('.sv-title'), op = SV.querySelector('.reel-intro'); if (!t || !op || op.offsetParent === null || t.offsetParent === null) return;   /* no title shown: the spacing is set in CSS */
       let nx = op.nextElementSibling; while (nx && (!nx.offsetHeight || nx.classList.contains('art-gap'))) nx = nx.nextElementSibling; if (!nx) return;
       const framed = innerWidth > 760 && (op.classList.contains('st-intro') || op.classList.contains('mir-open') || !!SV.querySelector('.ct-sleek'));
       const rb = e => { const r = e.getBoundingClientRect(); return [r.top, r.bottom]; };
@@ -2840,7 +3380,7 @@
       if (f > start + len * per) { el.textContent = to; clearInterval(flipTimer); done(); }
     }, 16);
   }
-  function openArtist() {
+  function openArtist() { document.body.dataset.spacePage = 'artist';
     phase = 'artist'; phaseT = 0;
     const art = menuRings.find(m => m.btn.dataset.key === 'artist');
     // everything else explodes: the field scatters outward, the other rings burst, the scene fades to black
@@ -2905,7 +3445,7 @@
       mk.animate(inn, { duration: desk ? half : d + 100, easing: 'cubic-bezier(.2,.8,.25,1)', fill: 'forwards' }).onfinish = a => { mk.getAnimations().forEach(x => x.cancel()); };
     };
   }
-  function openPage(key) {   // The Studio / The Mirror: the rings burst, the scene fades, the page comes up
+  function openPage(key) { document.body.dataset.spacePage = key;   // The Studio / The Mirror: the rings burst, the scene fades, the page comes up
     phase = 'artist'; phaseT = 0;
     const ring = menuRings.find(m => m.btn.dataset.key === key);
     eHand.fill(0); mirHand = null;
@@ -2985,7 +3525,7 @@
       mk.getAnimations().forEach(x => x.cancel());
     }, 1400);
   }
-  function setNav(key) { setMark(key === 'artist'); navBtns.forEach((b, i) => { if (b.dataset.go === key) { b.setAttribute('aria-current', 'page'); b.parentElement.style.setProperty('--ix', i); } else b.removeAttribute('aria-current'); }); }
+  function setNav(key) { document.body.dataset.spacePage = key; setMark(key === 'artist'); navBtns.forEach((b, i) => { if (b.dataset.go === key) { b.setAttribute('aria-current', 'page'); b.parentElement.style.setProperty('--ix', i); } else b.removeAttribute('aria-current'); }); }
   // --- placeholders, a different look for each section
   const ph = {
     film(seed, s = 600) {   // cinematic duotone: a lit figure-like shape, grain, vignette
@@ -3185,14 +3725,14 @@
           <label class="sf"><input name="email" type="email" autocomplete="email" placeholder="Email" required><i aria-hidden="true"></i></label>
           <label class="sf"><textarea name="message" rows="2" placeholder="Message" required></textarea><i aria-hidden="true"></i></label>
           <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form><div class="contact-extra"><span class="contact-mail">sandy@seenik.studio</span><div class="socials"><a href="https://www.facebook.com/sandy.heidebrecht" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-8.2h2.8l.4-3.2h-3.2V8.6c0-.9.3-1.6 1.6-1.6h1.7V4.1c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.4H7.3v3.2h2.8V22h3.4z"/></svg></a><a href="https://www.instagram.com/sandybeaches23/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.7.1-1.1.1-1.7.2-2.1.4-.5.2-.9.4-1.3.8-.4.4-.6.8-.8 1.3-.2.4-.3 1-.4 2.1C2.6 9.9 2.6 10.3 2.6 12s0 2.1.1 3.3c.1 1.1.2 1.7.4 2.1.2.5.4.9.8 1.3.4.4.8.6 1.3.8.4.2 1 .3 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1-.1 1.7-.2 2.1-.4.5-.2.9-.4 1.3-.8.4-.4.6-.8.8-1.3.2-.4.3-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1.1-.2-1.7-.4-2.1-.2-.5-.4-.9-.8-1.3-.4-.4-.8-.6-1.3-.8-.4-.2-1-.3-2.1-.4C15.5 4 15.1 4 12 4zm0 3.1a4.9 4.9 0 110 9.8 4.9 4.9 0 010-9.8zm0 8.1a3.2 3.2 0 100-6.4 3.2 3.2 0 000 6.4zm5.1-8.3a1.1 1.1 0 110-2.3 1.1 1.1 0 010 2.3z"/></svg></a><a href="https://www.youtube.com/@innerpeaces1799" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 00-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 002.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 001.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 001.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg></a></div></div></div>` },
-    studio: { title: 'The Studio', back: null, spaced: true, render: () => `<p class="reel-intro clip-intro mir-lines st-intro"><span>Seenik brings a music-driven story arc to the fulldome medium, grounded in</span><span>earth imagery and the geometric patterns that exist all around and inside of us.</span></p>
-        <div class="st-stage"><div class="st-top"><div class="st-lead"><img class="st-logo" alt="Seenik" draggable="false" src="${IMG('logo-black')}?v=2"><p class="st-ph-txt">${evenPh("Seenik brings a music-driven story arc to the fulldome medium, grounded in earth imagery and the geometric patterns that exist all around and inside of us.")}</p></div><div class="st-dform"><form class="cform st-form" data-to="studio" novalidate>
+    studio: { title: 'The Studio', back: null, spaced: true, render: () => `<div class="mir-sing mir-tp st-top-say"><p class="mir-big">Seenik brings a music-driven story arc to the fulldome</p></div>
+        <div class="st-stage"><div class="st-top"><div class="st-lead"><img class="st-logo" alt="Seenik" draggable="false" src="preview/space-img/logo-alpha.png"><p class="st-ph-txt">${evenPh("Seenik brings a music-driven story arc to the fulldome medium, grounded in earth imagery and the geometric patterns that exist all around and inside of us.")}</p></div><div class="st-dform"><form class="cform st-form" data-to="studio" novalidate>
           <h3>Contact</h3>
           <label class="sf"><input name="name" type="text" autocomplete="name" placeholder="Name" required><i aria-hidden="true"></i></label>
           <label class="sf"><input name="email" type="email" autocomplete="email" placeholder="Email" required><i aria-hidden="true"></i></label>
           <label class="sf"><textarea name="message" rows="2" placeholder="Message" required></textarea><i aria-hidden="true"></i></label>
-          <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form></div></div><div class="mir-sing st-say"><p class="mir-big">Our focus is to create seamless,<br class="ph-br"> dreamlike immersive experiences</p></div><figure class="st-photo"><img alt="Mountains dissolving into a leaf" draggable="false" src="${IMG('studio-journey')}"></figure></div>
-        <div class="mir-sing st-say st-based"><p class="mir-big">Seenik is based in North Vancouver,<br class="ph-br"> where the mountains meet the sea</p></div>
+          <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form></div></div><div class="mir-sing st-ground"><p class="mir-big">Seamless, dreamlike immersive experiences</p></div><figure class="st-fern"><img alt="A drop falling into still water, its ripples forming a geometric pattern of light" draggable="false" src="preview/space-img/studio-fern.jpg?v=2"></figure><div class="mir-sing st-say"><p class="mir-big">Grounded in earth imagery<br class="ph-br"> and the geometric patterns of creation</p></div><figure class="st-photo"><img alt="Mountains dissolving into a leaf" draggable="false" src="${IMG('studio-journey')}"></figure></div>
+        <div class="mir-sing st-say st-based"><p class="mir-big">Based in North Vancouver,<br class="ph-br"> where the mountains meet the sea</p></div>
         <figure class="studio-place st-pier"><img alt="North Vancouver at night, from the pier" src="${IMG('studio-pier')}"></figure>
         <div class="st-contact"><form class="cform st-form" data-to="studio" novalidate>
           <h3>Contact</h3>
@@ -3203,10 +3743,11 @@
     mirror: { title: 'The Mirror', back: null, spaced: true, render: () => {
       const one = (n, t, ar, x = '') => `<button type="button" class="fr mir-wide${x}" style="--w:calc(var(--vw, 100vw) - 48px);--ar:${ar}" data-t="${t}" data-s="The Mirror"><img alt="${t}" draggable="false" src="${IMG(n)}"></button>`;
       const say = (...l) => `<p class="reel-intro clip-intro mir-lines">${l.map(x => `<span>${x}</span>`).join('')}</p>`;
+      const wv = t => '<span class="wv">' + t.split(' ').map(w => '<span class="ww">' + [...w].map(c => '<i>' + c + '</i>').join('') + '</span>').join(' ') + '</span>';   // letters that can ride a wave
       const sing = (big, small, x = '', ph = '') => `<div class="mir-sing${x}"><p class="mir-big">${big}</p>${small ? `<p class="mir-small">${small}</p>` : ''}${ph}</div>`;
-      return `<p class="reel-intro clip-intro mir-lines mir-open"><span style="--m:24"><span class="phl" style="--n:21">Not a film you watch,</span> <span class="phl" style="--n:24">but a world you inhabit.</span></span><span style="--m:30"><span class="phl" style="--n:28">Designed to feel like moving</span> <span class="phl" style="--n:30">through a single living thing.</span></span></p><p class="mir-open-ph" style="--m:40">${evenPh("Not a film you watch, but a world you inhabit. Designed to feel like moving through a single living thing.")}</p>`
-        + `<div class="mir-stage"><div class="mir-hero"><div class="mir-par"><img alt="The Mirror" draggable="false" src="${IMG('seenik-00')}"></div></div><canvas class="mir-tri" aria-hidden="true"></canvas></div>`
-        + sing('Every visual decision<br class="ph-br"> flows from the music', 'Through photorealistic worlds —<br class="ph-br"> the cosmos, the deep ocean', ' mir-first', `<p class="mir-one">${evenPh('Every visual decision flows from the music, through photorealistic worlds — the cosmos, the deep ocean.')}</p>`) + one('seenik-02c', 'The Music Tells the Story', '1572 / 523', ' mir-lined')
+      return sing('A world you inhabit', 'A ' + wv('single living thing') + ' you move through', ' mir-top') + `<p class="mir-open-ph" style="--m:40">${evenPh("A world you inhabit. A single living thing you move through.")}</p>`
+        + `<div class="mir-stage"><div class="mir-hero"><div class="mir-title3d" aria-label="The Mirror"><span class="t3"><span class="b" aria-hidden="true">THE MIRROR</span><span class="f">THE MIRROR</span></span><span class="sub">A FULLDOME CINEMATIC 48-min EXPERIENCE</span></div><div class="mir-par"><img alt="The Mirror" draggable="false" src="${IMG('seenik-00')}"></div></div><canvas class="mir-tri" aria-hidden="true"></canvas></div>`
+        + sing('Every visual<br class="ph-br"> flows from the music', 'Through photorealistic worlds —<br class="ph-br"> the cosmos, the deep ocean', ' mir-first', `<p class="mir-one">${evenPh('Every visual flows from the music, through photorealistic worlds — the cosmos, the deep ocean.')}</p>`) + one('seenik-02c', 'The Music Tells the Story', '1572 / 523', ' mir-lined')
         + sing('Experience the power of<br class="ph-br"> the elemental forces', '', ' mir-wind') + one('seenik-03c', 'Effects that Mirror Nature', '1540 / 462')
         + sing('The same patterns that<br class="ph-br"> build a galaxy build us', '', ' mir-close')
         + `<div class="mir-galaxy"><video src="vid/deep-field.mp4" autoplay muted loop playsinline preload="auto" aria-label="A flight through thousands of real galaxies, from James Webb Space Telescope data"></video></div><p class="mir-credit">Visualization: NASA, ESA, CSA, STScI · F. Summers, G. Bacon, J. DePasquale, L. Hustak, J. Olmsted, A. Pagan</p>`; } }
@@ -3241,7 +3782,7 @@
     artBtn.dataset.back = pg.back === 'film' ? 'film' : '';
     navBtns.forEach(b => b.classList.toggle('deep', !!pg.back && b.dataset.go === 'artist')); artBtn.classList.toggle('long', artBtn.textContent.length > 13);
     if (key === 'art') requestAnimationFrame(layoutWall);
-    if (key === 'mirror' && innerWidth > 760 && !reduced && window._mirSnap) window._mirSnap();   // The Mirror opens with its strings stretched, and they snap back into place
+    if (false && window._mirSnap) window._mirSnap();   // The Mirror opens with its strings stretched, and they snap back into place
     remember(key === 'proj' ? 'proj-' + arg : key);
     SV.querySelectorAll('.screen video').forEach(v => { try { const p = v.play(); if (p) p.catch(() => {}); } catch (e) {} });
   }
@@ -3624,7 +4165,7 @@
     const home = (q, t) => {
       if (q.kind === 'orbit') { q.a += q.sp * t; return [W / 2 + Math.cos(q.a) * W * .43 * q.r, HH / 2 + Math.sin(q.a) * HH * .47 * q.r]; }
       q.a += q.sp * t;   // wanderers: up and down the side, from beside the eye to beside the words
-      const top = HH * .55, bot = H - 40, y = (top + bot) / 2 + Math.sin(q.a) * (bot - top) / 2;
+      const T = HH * .55, B = (boxes.length ? Math.min(...boxes.map(b => b[1])) : H) - 30, M = (T + B) / 2, top = q.band ? M + 30 : T, bot = q.band ? B : M - 30, y = (top + bot) / 2 + Math.sin(q.a) * (bot - top) / 2;
       return [W / 2 + q.side * W * (.42 + .03 * Math.sin(q.a * 1.7)), y];
     };
     const fit = (q, x, y) => [Math.max(4 - q.ext[0], Math.min(W - 4 - q.ext[2], x)), Math.max(edge + PT / 2 + 4 - q.ext[1], Math.min(H - 4 - q.ext[3], y))];   // a whole piece stays on the canvas, below the eye's top line
@@ -3657,8 +4198,8 @@
       const F = hand || freshField(), src = F.pts, groups = innerWidth < 760 ? chunkUp(src, 16).filter(g => g.length >= 3).sort((u, v) => u.length - v.length).slice(0, 9) : chunkUp(src, 10), N = groups.length, cr = cv.getBoundingClientRect();
       // the pieces become the page's clusters: some orbit the eye (starting round its upper half, so they land in view), the rest wander the sides
       const nw = N >= 8 ? 4 : N >= 5 ? 2 : 0, no = N - nw, slots = [], spd = innerWidth < 760 ? 3.4 : 1;   // phone: livelier, so the triangles visibly travel round the eye
-      for (let k = 0; k < no; k++) slots.push({ kind: 'orbit', a: Math.PI + (k + .5) * Math.PI / no, sp: spd * (k % 2 ? -1 : 1) * (0.03 + (k % 3) * 0.012), r: .9 + (k % 2) * .08 });
-      for (let k = 0; k < nw; k++) slots.push({ kind: 'wander', side: k % 2 ? 1 : -1, a: -Math.PI / 2 + (k >> 1) * .6, sp: spd * (0.14 + k * 0.025) });
+      for (let k = 0; k < no; k++) slots.push({ kind: 'orbit', a: Math.PI + (k + .5) * 2 * Math.PI / no, sp: spd * 0.035, r: .9 + (k % 2) * .06, ox: 0, oy: 0 });   // one ring: evenly spaced, all turning together, so they keep their distance
+      for (let k = 0; k < nw; k++) slots.push({ kind: 'wander', side: k % 2 ? 1 : -1, band: k >> 1, a: -Math.PI / 2, sp: spd * 0.14, ox: 0, oy: 0 });   // the sides mirror each other, each in its own lane
       const pieces = groups.map(ix => { let x = 0, y = 0; ix.forEach(i => { x += src[i].x; y += src[i].y; }); return { ix, x: x / ix.length, y: y / ix.length }; });
       const pairs = []; pieces.forEach((pc, i) => slots.forEach((s, j) => { const [hx, hy] = home(s, 0); pairs.push([(hx + cr.left - pc.x) ** 2 + (hy + cr.top - pc.y) ** 2, i, j]); }));
       pairs.sort((u, v) => u[0] - v[0]); const slotOf = new Int32Array(N).fill(-1), taken = new Uint8Array(N);
@@ -3690,8 +4231,7 @@
       if (mx < 0 || my < 0 || mx > W || my > H) { if (!drag) { mx = my = -1e4; } }
       if (drag) { const q = cl[drag.k], nx = mx - drag.dx, ny = my - drag.dy; q.vx = (nx - q.x) * 30; q.vy = (ny - q.y) * 30; q.x = nx; q.y = ny; }
       SV.style.cursor = drag ? 'grabbing' : !fly && near(mx, my) ? 'grab' : '';
-      const st = cv.parentElement.querySelector('.mir-par'), b = cv.parentElement.querySelector('.mir-hero').getBoundingClientRect();   // the eye leans a little toward the cursor
-      if (e.clientY < b.bottom && e.clientY > b.top) st.style.transform = `translate(${((e.clientX - b.left) / b.width - .5) * -14}px, ${((e.clientY - b.top) / b.height - .5) * -9}px)`; else st.style.transform = '';
+      // the eye never moves with the cursor: only the clusters respond to it
     });
     SV.addEventListener('pointerdown', e => { if (!cv || !cv.isConnected || fly) return; const [x, y] = rel(e), p = near(x, y, e.pointerType === 'touch' ? 46 : 30); if (!p) return;
       const q = cl[p.k]; drag = { k: p.k, dx: x - q.x, dy: y - q.y }; q.free = 1; e.preventDefault(); SV.style.cursor = 'grabbing'; });
@@ -3716,8 +4256,19 @@
           q.x += q.vx * dt; q.y += q.vy * dt; q.vx *= .94; q.vy *= .94; q.free = Math.max(0, q.free - dt * .22);
           const t = (1 - q.free) * .05; q.x += (ox - q.x) * t; q.y += (oy - q.y) * t;
           if (q.x < 0 || q.x > W) q.vx *= -1; if (q.y < 0 || q.y > H) q.vy *= -1;
-        } else { q.x = ox; q.y = oy; }
+        } else { q.x = ox + q.ox; q.y = oy + q.oy; }
       });
+      if (!fly) {   // pieces give each other room: if two come close they ease apart, then drift back to their places
+        cl.forEach((q, k) => { q.rad = Math.hypot(q.ext[2] - q.ext[0], q.ext[3] - q.ext[1]) * .42; q.ox *= 1 - Math.min(1, dt * .8); q.oy *= 1 - Math.min(1, dt * .8);
+          if (drag && drag.k === k) return; const dx = q.x - mx, dy = q.y - my, d = Math.hypot(dx, dy), R = q.rad + 120;   // the cursor nudges a whole cluster away, and it drifts back when the cursor leaves
+          if (d < R && d > 1) { const f = (1 - d / R) * 220 * dt; q.ox += dx / d * f; q.oy += dy / d * f; if (q.free <= 0) { q.x += dx / d * f; q.y += dy / d * f; } } });
+        for (let i = 0; i < cl.length; i++) for (let j = i + 1; j < cl.length; j++) {
+          const A = cl[i], B = cl[j], dx = B.x - A.x, dy = B.y - A.y, d = Math.hypot(dx, dy) || 1, need = A.rad + B.rad + 24;
+          if (d >= need) continue; const push = (need - d) * Math.min(1, dt * 4), nx = dx / d, ny = dy / d, ha = drag && drag.k === i, hb = drag && drag.k === j;
+          const wa = ha ? 0 : hb ? 1 : .5, wb = hb ? 0 : ha ? 1 : .5;
+          [[A, -wa], [B, wb]].forEach(([q, w]) => { if (!w) return; if (q.free > 0) { q.x += nx * push * w; q.y += ny * push * w; } else { q.ox += nx * push * w; q.oy += ny * push * w; q.x += nx * push * w; q.y += ny * push * w; } });
+        }
+      }
       const calm = Math.max(0, Math.min(1, (now - calmT) / 1500)), cw = calm * calm * (3 - 2 * calm);   // after landing, the gentle drift eases in
       for (const p of pts) {
         const q = cl[p.k];
@@ -3726,7 +4277,7 @@
         const dr = innerWidth < 760 ? 4 : 1, tx = q.x + p.ox + Math.cos(wob * p.sp) * E * .05 * dr * cw, ty = q.y + p.oy + Math.sin(wob * p.sp * 1.3) * E * .04 * dr * cw;   // phone: a wider drift on the smaller field   // a soft drift: the triangles breathe but keep their shape
         p.vx += (tx - p.x) * kk * dt; p.vy += (ty - p.y) * kk * dt;
         if (!held) { const dx = p.x - mx, dy = p.y - my, d = Math.hypot(dx, dy);
-          if (d < 110) { const f = (1 - d / 110) ** 2 * 900 * dt; p.vx += dx / (d + 1e-3) * f; p.vy += dy / (d + 1e-3) * f; } }
+          if (d < 160) { const f = (1 - d / 160) ** 2 * 1800 * dt; p.vx += dx / (d + 1e-3) * f; p.vy += dy / (d + 1e-3) * f; } }
         for (const [x0, y0, x1, y1] of boxes) if (p.x > x0 && p.x < x1 && p.y > y0 && p.y < y1) {   // keep off the writing: slide out the nearest side
           const dl = p.x - x0, dr = x1 - p.x, du = p.y - y0, dd = y1 - p.y, m = Math.min(dl, dr, du, dd);
           if (m === dl) { p.x = x0; p.vx = -Math.abs(p.vx); } else if (m === dr) { p.x = x1; p.vx = Math.abs(p.vx); } else if (m === du) { p.y = y0; p.vy = -Math.abs(p.vy); } else { p.y = y1; p.vy = Math.abs(p.vy); }
@@ -4254,7 +4805,13 @@
     fcGeo.attributes.position.needsUpdate = true;
     fcGeo.computeVertexNormals();
 
-    renderer.render(scene, camera);
+    {   // space preview, the black strip: only the geodesic field and the three discs are drawn; every other particle in the scene is held back
+      const strip = document.body.classList.contains('space-band') && !document.body.classList.contains('artist-on'), held = [];
+      if (strip) scene.children.forEach(c => { if (c.isLight || c === endGroup || menuRings.some(m => m.g === c) || !c.visible) return; c.visible = false; held.push(c); });
+      if (strip) endGroup.children.forEach(c => { if (c.isPoints && c.geometry !== eGeo && c.visible) { c.visible = false; held.push(c); } });
+      renderer.render(scene, camera);
+      held.forEach(c => c.visible = true);
+    }
     renderStars(now);
     requestAnimationFrame(frame);
   }
@@ -4262,4 +4819,420 @@
 })();
 </script>
 
+<script>
+(function () {   // the void: a strip of pure black between the top and bottom lines. Only the geodesic field and the three discs live in it;
+                 // nothing of the main scene floats above or below it, where the 3D space keeps moving. On a selection the black bleeds
+                 // up and down to fill the screen; then the space world slowly comes back up behind the page, dimmed so the text reads.
+  const T = document.getElementById('band-top'), B = document.getElementById('band-bot'), mm = document.getElementById('bm-mid');
+  const clipEls = [document.getElementById('stage'), document.getElementById('stars')], sparkle = document.getElementById('stars');
+  if (location.protocol === 'file:') document.documentElement.classList.add('local-file');   // double-clicked file: the Studio's water and sea effects cannot read the pictures, so show the plain pictures
+  if (location.protocol === 'file:') {   // double-clicked file: give the Studio's cloud and water effects copies of their pictures they are allowed to read
+    const sc = document.createElement('script'); sc.src = 'preview/space-img/studio-local.js'; document.head.appendChild(sc);
+    const swap = () => { if (!window.STUDIO_LOCAL) return; document.querySelectorAll('img').forEach(im => { for (const k in STUDIO_LOCAL) if (im.src.indexOf(k + '.jpg') > -1 && im.src.indexOf('data:') !== 0) im.src = STUDIO_LOCAL[k]; }); };
+    new MutationObserver(swap).observe(document.body, { childList: true, subtree: true }); sc.onload = swap;
+  }
+  // The Mirror's wave: the version with its black made see-through, so the top blends into the space
+  // The Mirror's wave: Sandy's animated version, slowed and stretched; its black drops out (screen blend) and the edges fade into space
+  new MutationObserver(() => document.querySelectorAll('img[src*="seenik-02c"]').forEach(im => {
+    const v = document.createElement('video'); v.src = 'preview/space-img/wave-pingpong.mp4'; v.muted = true;   // plays forward, then backward: no jump back to the start
+     v.loop = true; v.autoplay = true; v.playsInline = true; v.setAttribute('playsinline', '');
+    v.className = 'wave-live'; im.replaceWith(v); v.play().catch(() => {});
+  })).observe(document.body, { childList: true, subtree: true });
+  const body = document.body; mm.style.transition = 'none';
+  // the explosion: the strip breaks into black triangular shards that fly outward, spin and fade, revealing the space behind
+  function explode(top, bot) {
+    const W = innerWidth, H = bot - top, cols = innerWidth <= 760 ? 7 : 16, rows = 3, cw = W / cols, rh = H / rows, cx = W / 2, cy = (top + bot) / 2;
+    const box = document.createElement('div'); box.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden;';
+    mm.after(box);
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) for (let h = 0; h < 2; h++) {
+      const x = c * cw, y = top + r * rh, el = document.createElement('i');
+      el.style.cssText = `position:absolute;left:${x - 1}px;top:${y - 1}px;width:${cw + 2}px;height:${rh + 2}px;background:#000;will-change:transform,opacity;` +
+        `clip-path:polygon(${h ? '0 0,100% 0,0 100%' : '100% 0,100% 100%,0 100%'});`;
+      box.appendChild(el);
+      const mx = x + cw / 2 - cx, my = y + rh / 2 - cy, d = Math.hypot(mx, my) + 40, sp = 0.9 + Math.random() * 0.9;
+      const tx = mx / d * (380 + Math.random() * 520) * sp, ty = my / d * (260 + Math.random() * 380) * sp + (Math.random() - .5) * 120;
+      el.animate([{ transform: 'none', opacity: 1 }, { transform: `translate(${tx}px, ${ty}px) rotate(${(Math.random() - .5) * 220}deg) scale(${0.35 + Math.random() * 0.4})`, opacity: 0 }],
+        { duration: 1100 + Math.random() * 500, delay: d * 0.25, easing: 'cubic-bezier(.15,.7,.3,1)', fill: 'forwards' });
+    }
+    setTimeout(() => box.remove(), 2600);
+  }
+  const PAGE_DIM = innerWidth <= 760 ? 0.34 : 0.2;   // how much black stays over the space behind a page
+  let vis = 0, k = 0, last = performance.now(), clipped = false, bledAt = 0, lastPg = '', dipFrom = 1, dipStart = 0;
+  (function f(now) { requestAnimationFrame(f);
+    now = now || performance.now(); const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    const band = body.classList.contains('space-band'), away = body.classList.contains('artist-on');
+    if (!away) body.classList.remove('space-bled');
+    if (away && !body.classList.contains('space-bled')) {   // a disc was chosen: the black strip explodes into shards and you are left in open space
+      if (band && vis > 0.5) explode(parseFloat(T.style.top) || innerHeight / 2, parseFloat(B.style.top) || innerHeight / 2);
+      body.classList.add('space-bled'); bledAt = now; k = 1; vis = 0;
+    }
+    const bled = body.classList.contains('space-bled');
+    // one continuous move: the black fills the screen and, without stopping, slowly gives way to the space behind the page
+    const kT = ((band && away) || bled) ? 1 : 0;
+    // moving between pages: a short dip into black, then the same slow fade into the new place in space
+    const pgNow = body.dataset.spacePage + '|' + (document.querySelector('#section-view .ct-sleek') ? 'c' : '');
+    // moving between pages: no black dip; the space stays in view and you fly through it to the next place
+    lastPg = bled ? pgNow : '';
+    if (bled && now < bledAt) { const p = Math.min(1, (now - dipStart) / 650); vis = dipFrom + (1 - dipFrom) * p * p * (3 - 2 * p); }
+    else if (bled) { const p = Math.min(1, (now - bledAt) / 1200), ease = p * p * (3 - 2 * p); vis = PAGE_DIM * ease; }
+    else vis += (((band || bled) ? 1 : 0) - vis) * Math.min(1, dt * 2.5);
+    k += (kT - k) * Math.min(1, dt * 3.4); if (Math.abs(kT - k) < 0.002) k = kT;
+    const e = k * k * (3 - 2 * k), H = innerHeight;
+    const t = parseFloat(T.style.top) || H / 2, b = parseFloat(B.style.top) || H / 2;
+    const top = bled ? 0 : t, bot = bled ? H : b;
+    mm.style.top = top + 'px'; mm.style.height = Math.max(0, bot - top) + 'px'; mm.style.opacity = vis;
+    // inside the strip: only the field and the discs (no cursor sparkle)
+    sparkle.style.visibility = band && !away ? 'hidden' : '';
+    if (band && !away && !bled) { const c = 'inset(' + top.toFixed(1) + 'px 0 ' + (H - bot).toFixed(1) + 'px 0)'; clipEls.forEach(el => el.style.clipPath = c); clipped = true; }
+    else if (clipped) { clipEls.forEach(el => el.style.clipPath = ''); clipped = false; }
+  })();
+})();
+</script>
+<script src="preview/space-img/eye-data.js"></script>
+<script>
+// ===== The Mirror: the eye in 3D (space preview) =====
+// Sandy's eye picture is taken apart into layers that sit at different depths and is put back together live:
+//   far     the nebula above the horizon: its brighter wisps sit nearer than the dark gas, and it swirls very slowly
+//   middle  the iris below: a bowl, the pupil deepest, the fibres rising toward the rim, catching light as you move
+//   glass   a glass sphere over the centre: it bends what is behind it, carries a soft reflection of light and a cool rim
+//   near    the fine traced rings, lifted off the picture, float in front and turn slowly round the eye
+//   dust    a few hundred motes of star dust drift through the space in front of and behind the eye
+// With no mouse the whole thing sways on its own, so it always reads as 3D. Outside the outer ring the black melts into space.
+(function () {
+  const ED = window.EYE_DATA; if (!ED || !window.THREE || !ED.base || !ED.lines) return;
+  const PHONE = innerWidth <= 760;
+  let R = null, host = null, imgs = null, U = null, scene, cam, cv, dust;
+  const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+  addEventListener('pointermove', e => { mouse.tx = e.clientX / innerWidth * 2 - 1; mouse.ty = e.clientY / innerHeight * 2 - 1; }, { passive: true });
+  addEventListener('deviceorientation', e => { if (e.gamma == null) return; mouse.tx = Math.max(-1, Math.min(1, e.gamma / 30)); mouse.ty = Math.max(-1, Math.min(1, (e.beta - 45) / 30)); }, { passive: true });
+  const load = src => new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = src; });
+  Promise.all([load(ED.img), load(ED.mask), load(ED.base), load(ED.lines)]).then(a => { imgs = a; });
+
+  const VERT = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }`;
+  const FRAG = `
+    precision highp float;
+    uniform sampler2D tex, msk, base, lines; uniform float uTime, uB; uniform vec2 uM;
+    varying vec2 vUv;
+    const vec2 PX = vec2(2400.0, 1950.0);
+    const vec2 C = vec2(1200.0, 975.0);          // centre of the rings
+    const float HZ = 966.0;                       // the horizon line
+    const float R_DOME = 588.0, R_IRIS = 455.0, R_OUT = 772.0;
+    vec2 toUv(vec2 p){ return p / PX; }           // picture pixels (y down) -> texture coords
+    vec3 S(sampler2D t, vec2 p, float b){ return texture2D(t, toUv(p), b).rgb; }
+    float h21(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+    float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+      return mix(mix(h21(i), h21(i + vec2(1, 0)), f.x), mix(h21(i + vec2(0, 1)), h21(i + vec2(1, 1)), f.x), f.y); }
+    float sq(float x){ return x * x; }
+    vec2 rot(vec2 p, float a){ float c = cos(a), s = sin(a); return vec2(c * p.x - s * p.y, s * p.x + c * p.y); }
+    void main(){
+      vec2 p = vec2(vUv.x, 1.0 - vUv.y) * PX;     // this pixel, in picture coordinates
+      p = C + (p - C) / (1.0 + 0.018 * uB);          // the whole eye drifts gently toward you and back
+      vec2 d = p - C; float r = length(d);
+      vec2 m = uM;                                 // where we are looking from (mouse + gentle sway), -1..1
+      vec2 par = vec2(m.x, m.y) * 70.0;            // how far, in picture pixels, the nearest layer slides
+      float above = 1.0 - smoothstep(HZ - 3.0, HZ + 3.0, p.y);
+
+      // --- glass sphere: bends the light passing through it, a little more toward its rim
+      float q = clamp(r / R_DOME, 0.0, 1.0), inDome = 1.0 - smoothstep(0.985, 1.0, r / R_DOME);
+      float bulge = sqrt(max(0.0, 1.0 - q * q));
+      vec2 refr = inDome * (-d * 0.045 * (1.0 - bulge) - par * 0.25 * bulge);
+
+      // --- far: the nebula, sliding opposite to the near layers; brighter wisps sit nearer; a slow swirl
+      float t = uTime;
+      // the gas flows: a slow vortex (two crossfading turns so it never smears) plus curling drift
+      float T1 = fract(t * 0.035), T2 = fract(t * 0.035 + 0.5), wv = 1.0 - abs(T1 * 2.0 - 1.0);
+      float vf = exp(-r / 520.0);
+      vec2 f1 = rot(d, -(T1 - 0.5) * 0.55 * vf), f2 = rot(d, -(T2 - 0.5) * 0.55 * vf);
+      vec2 curl = vec2(vn(p / 160.0 + vec2(t * 0.06, 0.0)), vn(p / 160.0 + vec2(0.0, t * 0.05) + 7.3)) - 0.5;
+      vec2 zf = -d * 0.03 * uB;                       // the far nebula moves less than the eye as you drift in: depth
+      vec2 pn = C + f1 + curl * 38.0 + refr - par * 0.55 + zf;
+      vec2 pn2 = C + f2 + curl * 38.0 + refr - par * 0.55 + zf;
+      float lumN = dot(S(base, pn, 1.5), vec3(0.33));
+      pn += par * 0.35 * lumN; pn2 += par * 0.35 * lumN;   // wisps lift toward the viewer
+      vec3 neb = mix(S(base, pn2, 0.0), S(base, pn, 0.0), wv);
+      neb *= 1.0 + 0.35 * (vn(p / 90.0 + vec2(t * 0.12, -t * 0.08)) - 0.5);   // light breathing through the gas
+
+      // --- middle: the iris, a bowl (pupil deepest), fibres catching light as the view moves
+      float qi = clamp(r / R_IRIS, 0.0, 1.0);
+      float bowl = mix(-0.5, 0.25, smoothstep(0.15, 1.0, qi));
+      vec2 pi = p + refr + par * bowl * (1.0 - smoothstep(0.95, 1.25, qi));
+      float breathe = 1.0 + 0.06 * sin(t * 0.55) * (1.0 - smoothstep(0.2, 0.45, qi));
+      pi = C + (pi - C) / breathe;
+      vec3 iris = S(base, pi, 0.0);
+      float ang = atan(d.y, d.x);
+      float fib = vn(vec2(ang * 40.0 + t * 0.4, qi * 6.0 - t * 0.3));
+      float lit = dot(normalize(vec2(cos(ang), sin(ang))), normalize(vec2(-m.x, m.y) + 1e-4));
+      iris *= 1.0 + (0.3 * lit * smoothstep(0.3, 0.9, qi) + 0.22 * (fib - 0.5)) * (1.0 - above) * (1.0 - smoothstep(1.0, 1.15, qi));
+
+      vec3 col = mix(iris, neb, above);
+      // the space just outside the iris and dome (halo, rainbow, black) sits on the far layer too
+      float outer = smoothstep(R_DOME * 0.98, R_DOME * 1.05, r);
+      col = mix(col, S(base, p - par * 0.35, 0.0), outer * (1.0 - above));
+
+      // --- glass: soft reflection of a window of light that slides as you move, and a cool rim
+      vec2 hl = vec2(-0.32 - m.x * 0.22, -0.38 - m.y * 0.18) * R_DOME;
+      float spec = exp(-dot((d - hl) / vec2(150.0, 95.0), (d - hl) / vec2(150.0, 95.0)));
+      float sk = (length(d - vec2(40.0, 30.0) + par * 2.0) - R_DOME * 0.86) / 7.0; float streak = exp(-sk * sk) * smoothstep(0.15, -0.6, (d.x + d.y) / r);
+      float rim = smoothstep(0.86, 0.995, q) * inDome;
+      col += inDome * (vec3(0.92, 0.95, 1.0) * spec * 0.22 + vec3(0.8, 0.88, 1.0) * streak * 0.0) + vec3(0.55, 0.65, 1.0) * rim * 0.14;
+
+      // --- a breath of bloom: bright parts glow softly
+      col += S(base, p, 4.0) * 0.16;
+
+      // --- the schematic: the geometry the eye and the nebula are built from, drawn in light ON the picture (locked to it, never sliding)
+      // all of it sits at the depth of the glass dome, so it moves only as the eye itself moves
+      vec2 ds = d + par * 0.25 * bulge;  float rs = length(ds);  float as = atan(ds.y, ds.x);
+      const float TAU6 = 6.2831853;
+      float scl = 1.8;                                   // picture pixels per screen pixel, roughly: keeps lines hairline-fine
+      float sch = 0.0, hot = 0.0;
+      // 1) the traced rings of the picture: light runs round them like comets, each ring at its own pace and direction.
+      //    a bright white-gold head, a long cool-blue tail, and a soft bloom of light around the head
+      float la = texture2D(lines, toUv(C + ds)).r;
+      float laSoft = texture2D(lines, toUv(C + ds), 3.5).r;
+      float rk = floor(rs / 14.0);
+      float dir = mod(rk, 2.0) * 2.0 - 1.0, spd = 0.11 + 0.05 * mod(rk, 3.0);
+      float ph = fract((as / TAU6) * dir - t * spd + rk * 0.37);
+      float ph2 = fract(ph + 0.5);
+      float head = exp(-ph * 60.0) + exp(-ph2 * 60.0) * 0.7;
+      float tail = exp(-ph * 4.5) + exp(-ph2 * 4.5) * 0.7;
+      float quiet = 1.0 - 0.6 * (1.0 - smoothstep(60.0, 140.0, abs(p.y - (HZ + 40.0))));   // softer behind the words
+      sch += la * (0.42 + 0.12 * sin(t * 0.6 + rk)) * quiet;
+      vec3 cometCol = la * tail * vec3(0.55, 0.75, 1.0) * 0.9 + (la + laSoft * 2.5) * head * vec3(1.0, 0.93, 0.78) * 1.6;
+      // 4) the measure: fine degree marks round the outer ring, a longer mark every 30 deg; they light up as a sweep passes
+      float deg = as / TAU6 * 360.0, fm = abs(fract(deg / 5.0 + 0.5) - 0.5) * 5.0, major = step(abs(fract(deg / 30.0 + 0.5) - 0.5) * 30.0, 0.4);
+      float tickLen = mix(10.0, 24.0, major), inTick = step(R_OUT - 6.0 - tickLen, rs) * step(rs, R_OUT - 6.0);
+      float tick = exp(-sq(fm * 0.0175 * rs / (0.9 * scl))) * inTick;
+      float sweep = exp(-fract((as / TAU6) - t * 0.05) * 6.0);
+      sch += tick * (0.35 + 0.65 * sweep);  hot += tick * sweep * 0.8;
+      float ring = clamp(sch, 0.0, 1.0);
+      col = col * (1.0 - ring * 0.25) + vec3(0.80, 0.88, 1.0) * ring * 0.85 + vec3(1.0, 0.95, 0.85) * clamp(hot, 0.0, 2.0) * 0.5 + cometCol * quiet;
+
+      float still = 0.0;   // the words are no longer in the picture: they are live type above it
+
+      // --- black melts into space outside the outer ring; inside, the picture stays (its darkest parts let space shimmer through)
+      float lum = max(col.r, max(col.g, col.b));
+      float a = smoothstep(0.03, 0.2, lum);
+      float rr = r / R_OUT;
+      a *= 1.0 - smoothstep(1.02, 1.2, rr);
+      a = max(a, (1.0 - smoothstep(0.985, 1.03, rr)) * mix(0.62, 1.0, smoothstep(0.02, 0.18, lum)));
+      a = max(a, max(still, ring));
+      gl_FragColor = vec4(col * a, a);
+    }`;
+
+  function makeDust() {
+    const N = PHONE ? 500 : 1400, pos = new Float32Array(N * 3), sz = new Float32Array(N), ph = new Float32Array(N);
+    for (let i = 0; i < N; i++) { pos[i * 3] = (Math.random() * 2 - 1) * 1.9; pos[i * 3 + 1] = (Math.random() * 2 - 1) * 1.5; pos[i * 3 + 2] = Math.random() * 2.6 - 1.6; sz[i] = 0.4 + Math.pow(Math.random(), 3) * 2.2; ph[i] = Math.random(); }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('size', new THREE.BufferAttribute(sz, 1)); g.setAttribute('phase', new THREE.BufferAttribute(ph, 1));
+    dust = new THREE.Points(g, new THREE.ShaderMaterial({ uniforms: { uTime: U.uTime, uPx: { value: 1 } },
+      vertexShader: `attribute float size; attribute float phase; uniform float uTime, uPx; varying float vA;
+        void main(){ vec3 p = position; p.z = mod(position.z + uTime * 0.12 * (0.6 + phase) + 1.6, 3.0) - 1.6; p.x += sin(uTime * 0.05 + phase * 20.0) * 0.06;
+          vec4 mv = modelViewMatrix * vec4(p, 1.0); gl_Position = projectionMatrix * mv; float dist = -mv.z;
+          gl_PointSize = size * uPx / dist; vec2 sp = gl_Position.xy / gl_Position.w;
+          vA = (0.55 + 0.4 * sin(uTime * 0.9 + phase * 30.0)) * (1.0 - smoothstep(0.55, 0.95, length(sp))) * smoothstep(0.8, 1.6, dist); }`,
+      fragmentShader: `varying float vA; void main(){ vec2 d = gl_PointCoord - 0.5; float a = exp(-dot(d, d) * 18.0) * vA; if (a < 0.01) discard; gl_FragColor = vec4(vec3(0.85, 0.9, 1.0) * a, a); }`,
+      transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending }));
+    dust.frustumCulled = false; dust.renderOrder = 2; scene.add(dust);
+  }
+
+  let ok = false, checked = 0;
+  function setup(h) {
+    host = h;
+    if (!R) {
+      cv = document.createElement('canvas'); cv.className = 'eye-live';
+      cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;';
+      R = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: false, premultipliedAlpha: true, preserveDrawingBuffer: true });
+      R.setPixelRatio(Math.min(devicePixelRatio, PHONE ? 1.5 : 2)); R.setClearColor(0x000000, 0);
+      const T = (im, mip) => { const t = new THREE.Texture(im); t.needsUpdate = true; t.flipY = false; t.magFilter = THREE.LinearFilter;
+        t.minFilter = mip ? THREE.LinearMipmapLinearFilter : THREE.LinearFilter; t.generateMipmaps = !!mip; return t; };
+      U = { tex: { value: T(imgs[0]) }, msk: { value: T(imgs[1]) }, base: { value: T(imgs[2], true) }, lines: { value: T(imgs[3], true) }, uTime: { value: 0 }, uM: { value: new THREE.Vector2() }, uB: { value: 0 } };
+      scene = new THREE.Scene(); cam = new THREE.PerspectiveCamera(40, 1600 / 1300, 0.01, 50); cam.position.set(0, 0, 3.2);
+      const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), new THREE.ShaderMaterial({ uniforms: U, vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthTest: false, depthWrite: false }));
+      quad.frustumCulled = false; quad.renderOrder = -1; scene.add(quad);
+      makeDust();
+    }
+    h.appendChild(cv); ok = false; checked = 0;
+    h.querySelector('img').style.opacity = '';   // the picture stays visible until the live eye is proven to draw
+  }
+  let t0 = performance.now(), last = t0;
+  (function tick(now) {
+    requestAnimationFrame(tick);
+    const h = document.querySelector('#section-view.on .mir-hero .mir-par');
+    if (!h) { if (host && !document.body.contains(host)) host = null; return; }
+    if (!imgs) return;
+    if (h !== host) setup(h);
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    const w = host.clientWidth, hh = host.clientHeight; if (!w || !hh) return;
+    const pr = R.getPixelRatio();
+    if (cv.width !== Math.round(w * pr) || cv.height !== Math.round(hh * pr)) { R.setSize(w, hh, false); cam.aspect = w / hh; cam.updateProjectionMatrix(); dust.material.uniforms.uPx.value = hh * pr * 0.0045; }
+    mouse.x += (mouse.tx - mouse.x) * Math.min(1, dt * 1.6); mouse.y += (mouse.ty - mouse.y) * Math.min(1, dt * 1.6);
+    const t = (now - t0) / 1000;
+    const mx = 0.0, my = 0.0;   // nothing slides sideways: depth comes only from the slow drift toward you and back   // no side-to-side sway on its own: only the mouse leans it, a little
+    U.uTime.value = t; U.uM.value.set(mx, my); window.__eyeView = [mx, my];
+    cam.position.set(mx * 0.08, -my * 0.06, 3.2); cam.lookAt(0, 0, 0); U.uB.value = Math.sin(t * 0.25);
+    R.render(scene, cam);
+    // safety: only hide the still picture once the live eye really shows something; if it never does, keep the picture
+    if (!ok && checked < 40) { checked++; const gl = R.getContext(), px = new Uint8Array(4);
+      gl.readPixels(Math.floor(cv.width / 2), Math.floor(cv.height * 0.35), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      if (px[3] > 20) { ok = true; host.querySelector('img').style.opacity = '0'; }
+      else if (checked === 40) { cv.style.display = 'none'; console.warn('eye: live layers did not draw, showing the picture'); } }
+  })(performance.now());
+})();
+</script>
+<script>
+(function () {   // the glass cards tilt toward the pointer and the highlight follows it
+  addEventListener('pointermove', e => document.querySelectorAll('#section-view .reel-intro.st-intro, #section-view .reel-intro.mir-open').forEach(cd => {
+    const r = cd.getBoundingClientRect(); if (!r.width) return; const x = Math.max(-1, Math.min(1, (e.clientX - r.left) / r.width - .5)), y = Math.max(-1, Math.min(1, (e.clientY - r.top) / r.height - .5));
+    cd.style.setProperty('--ry', (x * 6).toFixed(2) + 'deg'); cd.style.setProperty('--rx', (-y * 5).toFixed(2) + 'deg'); cd.style.setProperty('--hx', (x + .5) * 100 + '%'); cd.style.setProperty('--hy', (y + .5) * 100 + '%'); }), { passive: true });
+})();
+</script>
+<script>
+(function elementalNames() {   // The Mirror, desktop: the four names over the elementals are live, sharp white type (the picture's own faded names are painted out)
+  let btn = null, names = null;
+  const N = [['Murmurations', 12.4], ['Cymatics', 37.3], ['Fractals', 62.2], ['Kaleidoscopes', 86.7]];
+  (function f() { requestAnimationFrame(f);
+    const SV = document.querySelector('#section-view.on'), b = innerWidth > 760 && SV ? [...SV.querySelectorAll('.fr.mir-wide:not(.mir-lined)')].find(x => x.querySelector('img[src*="seenik-03c"], img[src*="elementals-clean"]')) : null;
+    if (b !== btn) { if (names) names.remove(); names = null; btn = b; if (!b) return;
+      const im = b.querySelector('img'); if (im && /seenik-03c/.test(im.src)) im.src = 'preview/space-img/elementals-clean.jpg';
+      names = document.createElement('div'); names.className = 'el-names'; names.setAttribute('aria-hidden', 'true');
+      names.innerHTML = N.map(([t, x]) => `<span style="left:${x}%">${t}</span>`).join(''); b.parentElement.appendChild(names); }
+    if (!btn || !names) return;
+    const op = names.offsetParent || document.body, r = btn.getBoundingClientRect(), pr = op.getBoundingClientRect();
+    names.style.left = (r.left - pr.left + op.scrollLeft - op.clientLeft) + 'px'; names.style.top = (r.top - pr.top + op.scrollTop - op.clientTop + r.height * (37 / 462)) + 'px'; names.style.width = r.width + 'px';
+  })();
+})();
+(function mirTitleZoom() {   // The Mirror, desktop: when the title comes into view it grows from where it is until it spans the eye's outer circle, and stays that size;
+  // as it grows, the line underneath comes in from wide, soft, spread-out letters to sharp
+  let el = null, t0 = 0;
+  const ease = x => (x = Math.max(0, Math.min(1, x)), x < .5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
+  (function f(now) { requestAnimationFrame(f);
+    const SV = document.querySelector('#section-view.on'), cur = innerWidth > 760 && SV && !SV.classList.contains('arriving') ? SV.querySelector('.mir-title3d') : null;
+    if (cur !== el) { el = cur; t0 = 0; if (el) { el.querySelector('.t3').style.scale = '1'; el.querySelector('.sub').classList.add('pre'); } }
+    if (!el) return;
+    const t3 = el.querySelector('.t3'), sub = el.querySelector('.sub'), pic = el.parentElement.querySelector('.mir-par img, .mir-par canvas, .mir-par');
+    if (!t0) { const r = t3.getBoundingClientRect(); if (r.top < innerHeight * .8 && r.bottom > 0) t0 = now; else return; }
+    const w = t3.offsetWidth, ring = pic.getBoundingClientRect().width * (1544 / 2400) * .96, S = w ? Math.max(1, ring / w) : 1, u = ease(((now - t0) / 1000 - .4) / 2.4);
+    t3.style.transformOrigin = '50% 100%'; t3.style.scale = (1 + (S - 1) * u).toFixed(4);
+    if ((now - t0) / 1000 > 1.0 && sub.classList.contains('pre')) { sub.classList.remove('pre'); sub.classList.add('enter'); }
+  })(performance.now());
+})();
+(function tilt() { requestAnimationFrame(tilt); const v = window.__eyeView, el = document.querySelector('#section-view.on .mir-title3d .t3'); if (!v || !el) return;
+  el.style.setProperty('--try', (v[0] * 14).toFixed(2) + 'deg'); el.style.setProperty('--trx', (-v[1] * 10).toFixed(2) + 'deg'); })();
+</script>
+<script>
+(function fitStatements() {   // desktop: on The Mirror every statement is one line across, sized to fill the page width, and it keeps filling it as the window grows or shrinks.
+  // The Studio uses exactly The Mirror's sizes (the size of "Not a film you watch…" for its big lines, of "Designed to feel like…" for the lines under them); longer statements break onto two lines instead of shrinking
+  let key = '', probe = null;
+  const prep = el => { el.style.setProperty('padding-left', '.16em', 'important'); el.style.setProperty('white-space', 'nowrap', 'important'); el.style.setProperty('max-width', 'none', 'important'); el.style.setProperty('width', 'max-content', 'important'); el.style.setProperty('letter-spacing', '.16em', 'important'); };
+  const fitTo = (el, room) => { el.style.setProperty('font-size', '20px', 'important'); const w = el.getBoundingClientRect().width; return w > 0 ? Math.max(14, Math.min(52, 20 * room / w)) : 20; };
+  (function f() { requestAnimationFrame(f);
+    const SV = document.querySelector('#section-view.on'); if (!SV || innerWidth <= 760) { key = ''; return; }
+    const els = [...SV.querySelectorAll('.mir-sing .mir-big, .mir-sing .mir-small')].filter(e => e.offsetParent);
+    const k = innerWidth + 'x' + els.length + (SV.querySelector('.sv-t') || {}).textContent; if (!els.length || k === key) return; key = k;
+    const studio = false;   // Oct 24: The Studio uses The Mirror's setup exactly: every statement one line across, sized to fill the width
+    let BIG = 0, SMALL = 0;
+    if (studio) {   // measure The Mirror's opening lines, off screen, the way The Mirror sizes them
+      if (!probe) { probe = document.createElement('div'); probe.className = 'mir-sing'; probe.setAttribute('aria-hidden', 'true'); probe.style.cssText = 'position:absolute;left:-99999px;top:0;visibility:hidden';
+        probe.innerHTML = '<p class="mir-big">Not a film you watch, but a world you inhabit</p><p class="mir-small">Designed to feel like moving through a single living thing</p>'; }
+      const host = SV.querySelector('.mir-top') ? SV.querySelector('.mir-top').parentElement : SV; host.appendChild(probe);
+      const [pb, ps] = probe.children; prep(pb); prep(ps); const room = Math.min(innerWidth - 96, 1500, 1240) * 0.95;
+      BIG = fitTo(pb, room); SMALL = fitTo(ps, room); probe.remove();
+    }
+    let stmt = 0;   // The Mirror's statement size at this window width
+    els.forEach(el => {
+      const room = Math.min(innerWidth - 96, 1500, el.parentElement.clientWidth) * 0.95;
+      el.querySelectorAll('br').forEach(b => b.style.setProperty('display', studio ? 'inline' : 'none', 'important'));
+      prep(el);
+      if (!studio && SV.querySelector('.st-stage')) {   // The Studio: its sentences are longer, so they may run wider than The Mirror's (up to nearly the full window) with slightly tighter spacing, to stay close to The Mirror's size
+        el.style.setProperty('letter-spacing', '.1em', 'important'); el.style.setProperty('padding-left', '.1em', 'important'); el.style.removeProperty('margin-left'); el.style.removeProperty('justify-self');
+        // Oct 24: The Studio follows The Mirror exactly: The Mirror's spacing, and every line stops at the same width as The Mirror's lines, leaving the same black margins left and right
+        el.style.setProperty('letter-spacing', '.16em', 'important'); el.style.setProperty('padding-left', '.16em', 'important');
+        const grow = el.closest('.st-top-say') ? 1.26 : el.closest('.st-say:not(.st-based)') ? 1.25 : el.closest('.st-based') ? 1.21 : 1;   // Oct 24: halfway back toward the earlier, bigger sizes (Seamless, dreamlike… stays as it is)
+        const fs = Math.min(fitTo(el, Math.min(innerWidth - 96, 1500, 1238) * 0.95) * grow, fitTo(el, innerWidth - 80)); el.style.setProperty('font-size', fs.toFixed(2) + 'px', 'important');   // Oct 24: scaled back 3%;   // as big as The Mirror's (52px, and 43px for the line under it) whenever the window is wide enough; the line under: 13 inches to the first line's 15   // the line under the opening: 13 inches to the first line's 15
+        el.style.translate = ''; const er = el.getBoundingClientRect(), pr = el.parentElement.getBoundingClientRect();
+        el.style.translate = ((pr.left + pr.right) / 2 - (er.left + er.right) / 2).toFixed(1) + 'px 0';   // wider than its column or not: its centre sits on the page's centre
+        return; }
+      if (!studio) { const fs = fitTo(el, room); el.style.setProperty('font-size', fs.toFixed(2) + 'px', 'important');
+        if (el.closest('.mir-top')) { const m = window.__mirSizes && window.__mirSizes.w === innerWidth ? window.__mirSizes : (window.__mirSizes = { w: innerWidth }); m[el.classList.contains('mir-small') ? 'small' : 'big'] = fs; } return; }
+      let fs = el.classList.contains('mir-small') ? SMALL : BIG; el.style.setProperty('font-size', fs.toFixed(2) + 'px', 'important');
+      const w = el.getBoundingClientRect().width; if (w > room) el.style.setProperty('font-size', (fs * room / w).toFixed(2) + 'px', 'important');
+      el.style.setProperty('text-align', 'center', 'important'); el.style.setProperty('margin-inline', 'auto', 'important');
+    });
+  })();
+})();
+</script>
+<script>
+(function laser() {   // A4 laser scan reveal, desktop: a bar of light sweeps down each block of text and writes it, one block after another, as it comes into view.
+  // Once written, text stays written (scrolling back up changes nothing) until the page is opened again.
+  const SV = document.getElementById('section-view'); if (!SV) return;
+  const bar = document.createElement('div'); bar.id = 'lz-bar'; document.body.appendChild(bar);
+  const PICK = '.mir-top, .sv-t, .reel-intro, .mir-sing > *, h1, h2, h3, h4, p, li, figcaption, blockquote, label, .lab';
+  const SKIP = 'a, button, input, textarea, select, form *, nav, .site-nav, .mir-title3d, .mir-keep, .mir-open-ph, .mir-one, .ph-only, [aria-hidden="true"]';
+  let items = [], busy = null, op = null, wave = null, scr = null, ret = null, seen = new WeakSet();
+  const ease = x => (x = Math.max(0, Math.min(1, x)), x * x * (3 - 2 * x));
+  const hide = el => { el.style.setProperty('clip-path', 'inset(0 0 100% 0)', 'important'); };
+  const collect = () => {
+    if (innerWidth <= 760 || !SV.querySelector('.mir-stage, .st-stage')) return;   // only The Studio and The Mirror; the artist's pages stay as they are
+    const found = [...SV.querySelectorAll(PICK)].filter(el => !seen.has(el) && !el.closest(SKIP) && !el.querySelector('img, video, canvas, iframe, button, input, .reel, .pano') && el.textContent.trim() && el.getClientRects().length);
+    const fresh = found.filter(el => !found.some(o => o !== el && o.contains(el)) && !items.some(it => it.el.contains(el)));
+    fresh.forEach(el => { seen.add(el); el.classList.add('lz');
+      if (el.classList.contains('mir-top')) el.querySelectorAll('.mir-big, .mir-small:not(.mir-keep)').forEach(c => c.style.setProperty('clip-path', 'inset(0 0 100% 0)', 'important'));
+      else if (el.classList.contains('mir-open')) { el.classList.add('scan'); [...el.children].forEach(c => c.style.clipPath = 'inset(0 0 100% 0)'); } else hide(el); items.push({ el, done: 0 }); });
+    if (fresh.length) items.sort((u, v) => u.el.compareDocumentPosition(v.el) & 4 ? -1 : 1);
+  };
+  new MutationObserver(collect).observe(SV, { childList: true, subtree: true });
+  const sweepBar = (r, y, o) => { bar.style.left = (r.left - r.width * .04) + 'px'; bar.style.width = (r.width * 1.08) + 'px'; bar.style.top = (y - 1) + 'px'; bar.style.opacity = o; };
+  (function f(now) { requestAnimationFrame(f);
+    items = items.filter(it => it.el.isConnected);
+    if (busy && !busy.el.isConnected) busy = null;
+    if (!SV.classList.contains('on') || SV.classList.contains('arriving')) { bar.style.opacity = 0; return; }
+    items.forEach(it => { if (!it.done && it !== busy && it.el.getBoundingClientRect().bottom < 0) { it.done = 1; it.el.style.setProperty('clip-path', 'none', 'important'); [...it.el.children].forEach((c, i) => c.style.clipPath = it.el.classList.contains('mir-open') && i === 0 ? 'inset(0 0 100% 0)' : ''); if (it.el.classList.contains('mir-top')) { it.el.querySelector('.mir-big').style.setProperty('clip-path', 'inset(0 0 100% 0)', 'important'); it.el.querySelector('.mir-small:not(.mir-keep)').style.setProperty('clip-path', 'none', 'important'); } } });   // scrolled past before its turn: simply shown
+    if (op && op.el.isConnected) {   // The Mirror's opening, on its own track: line one is written, the light goes back up, and line two is written in its place
+      const el = op.el, t = (now - op.t0) / 1000, sp = [...el.children].filter(c => c.tagName === 'SPAN'), ln = el.querySelector('.scanline'), er = el.getBoundingClientRect(), r = sp[0].getBoundingClientRect();
+      const D = 1.1, H = 2.4, U = .9, P = .4, E = D + H + U + P;
+      let a0 = 0, a1 = 0, y, o = 1;
+      if (t < D) { a0 = ease(t / D); y = r.height * a0; }
+      else if (t < D + H) { a0 = 1; y = r.height; o = Math.max(0, 1 - (t - D) / .5); }
+      else if (t < D + H + U) { a0 = 1 - ease((t - D - H) / U); y = r.height * a0; }
+      else if (t < E) { y = 0; o = 0; }
+      else { a1 = Math.min(1, ease((t - E) / D)); y = r.height * a1; o = t < E + D ? 1 : Math.max(0, 1 - (t - E - D) / .5); }
+      sp.forEach((s, i) => s.style.clipPath = `inset(-30% -6% ${((1 - (i ? a1 : a0)) * 130 - 30).toFixed(2)}% -6%)`);
+      if (ln) { ln.style.top = (r.top - er.top + y - 1).toFixed(1) + 'px'; ln.style.opacity = o.toFixed(3); }
+      if (t > E + D + .6) op = null;
+    }
+    if (wave && wave.el.isConnected) {   // "moving through a single living thing": the letters ride a wave as they appear, then settle
+      const tw = (now - wave.t0) / 1000, env = tw < wave.D ? 1 : Math.max(0, 1 - (tw - wave.D) / 2.4), ls = wave.el.querySelectorAll('.wv i');
+      const amp = ls.length ? parseFloat(getComputedStyle(ls[0]).fontSize) * .08 : 0;
+      ls.forEach((c, i) => c.style.transform = env > 0 ? `translateY(${(Math.sin(i * .35 - tw * 3.6) * amp * env * env).toFixed(2)}px)` : '');
+      if (env <= 0) wave = null;
+    } else wave = null;
+    if (!busy) { const nx = items.find(it => { if (it.done) return false; const r = it.el.getBoundingClientRect(); return r.top < innerHeight * .88 && r.bottom > 0; }); if (!nx) { if (!ret) bar.style.opacity = 0; return; } busy = nx; busy.t0 = now; }
+    const el = busy.el, t = (now - busy.t0) / 1000;
+    if (el.classList.contains('mir-top')) {   // the opening, the same on The Mirror and The Studio: a laser exactly as wide as the first line scans down and writes it,
+      // carries on past it while it stretches to the width of the second line, then rises and writes the second line from the bottom up. Both lines stay.
+      const big = el.querySelector('.mir-big'), sm = el.querySelector('.mir-small'); if (!big || !sm) { busy.done = 1; busy = null; return; }
+      const tw = e => { const rg = document.createRange(); rg.selectNodeContents(e); return rg.getBoundingClientRect(); };   // the words themselves, not the box
+      const bb = big.getBoundingClientRect(), bs = sm.getBoundingClientRect(), wb = tw(big), wsm = tw(sm);
+      const DN = 1.3, GO = .9, UP = 1.5, F = .5, T1 = DN, T2 = T1 + GO, T3 = T2 + UP;
+      const top = bb.top - 10, mid = bb.bottom + 4, bot = bs.bottom + 18;
+      const flat = (y, cx, w, h, o) => { bar.style.cssText = `left:${cx - w / 2}px;top:${y - h / 2}px;width:${w}px;height:${h}px;opacity:${o};box-shadow:0 0 ${10 + h * 4}px ${1 + h}px rgba(170,200,255,.75),0 0 ${30 + h * 10}px ${4 + h * 2}px rgba(120,160,255,.35)`; };
+      const clip = (e, v) => e.style.setProperty('clip-path', v, 'important');
+      const c1 = (wb.left + wb.right) / 2, c2 = (wsm.left + wsm.right) / 2;
+      if (t < T1) { const y = top + (mid - top) * ease(t / DN); flat(y, c1, wb.width, 2, 1); clip(big, `inset(-40% -10% ${Math.max(0, bb.bottom - y).toFixed(1)}px -10%)`); clip(sm, 'inset(0 0 100% 0)'); return; }
+      clip(big, 'none');
+      if (t < T2) { const u = ease((t - T1) / GO), y = mid + (bot - mid) * u; flat(y, c1 + (c2 - c1) * u, wb.width + (wsm.width - wb.width) * u, 2 + 2 * u, 1); clip(sm, 'inset(0 0 100% 0)'); return; }   // past the first line, growing to the second line's width
+      if (!wave || wave.el !== el) wave = { el, t0: now, D: UP };
+      if (t < T3) { const y = bot - (bot - bs.top + 6) * ease((t - T2) / UP); flat(y, c2, wsm.width, 4, 1); clip(sm, `inset(${Math.max(0, y - bs.top).toFixed(1)}px -10% -60% -10%)`); return; }   // rising: the second line appears from the bottom up
+      clip(sm, 'none'); const u = Math.min(1, (t - T3) / F); flat(bs.top - 6, c2, wsm.width, 4 * (1 - u) + 1, 1 - u);
+      if (u >= 1) { bar.style.cssText = 'opacity:0'; busy.done = 1; busy = null; }
+      return;
+    }
+    if (el.classList.contains('mir-open')) { if (!el.querySelector('.scanline')) { const i = document.createElement('i'); i.className = 'scanline'; el.appendChild(i); } op = { el, t0: now }; busy.done = 1; busy = null; return; }
+    const r = el.getBoundingClientRect(), D = Math.min(1.5, .8 + r.height / 300), u = ease(Math.min(1, t / D));
+    el.style.setProperty('clip-path', `inset(-30% -6% ${((1 - u) * 130 - 30).toFixed(2)}% -6%)`, 'important');
+    sweepBar(r, r.top + r.height * u, t < D ? 1 : Math.max(0, 1 - (t - D) / .25));
+    if (t >= D + .25) { el.style.setProperty('clip-path', 'none', 'important'); busy.done = 1; busy = null; }
+  })(performance.now());
+})();
+</script>
 </html>

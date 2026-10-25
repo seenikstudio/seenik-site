@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Type Options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400&family=Inter:wght@300;400;500&family=Inter+Tight:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&family=Geist+Mono:wght@400&family=Space+Grotesk:wght@300;400;500&family=Ubuntu:wght@300;400&family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root { --fg: #f2f4f7; --muted: rgba(242,244,247,.55); }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #02030a; color: var(--fg); }
+  body { background: radial-gradient(ellipse 60% 40% at 20% 10%, rgba(120,80,140,.22), transparent 70%), radial-gradient(ellipse 50% 40% at 85% 60%, rgba(70,90,160,.18), transparent 70%), #02030a; }
+  canvas#sky { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .bar { position: sticky; top: 0; z-index: 5; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: center; padding: 12px 16px; background: rgba(2,3,10,.82); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,.08); font: 400 12px/1.4 'IBM Plex Mono', monospace; letter-spacing: .12em; text-transform: uppercase; }
+  .bar button { font: inherit; letter-spacing: inherit; color: var(--fg); background: transparent; border: 1px solid rgba(255,255,255,.25); border-radius: 999px; padding: 8px 14px; cursor: pointer; }
+  .bar button.on { background: #f2f4f7; color: #02030a; }
+  .bar .hint { color: var(--muted); text-transform: none; letter-spacing: .02em; }
+  main { position: relative; }
+  section { padding: clamp(60px, 9vw, 160px) 0 clamp(50px, 7vw, 120px); border-bottom: 1px solid rgba(255,255,255,.07); display: grid; justify-items: center; gap: clamp(26px, 3.4vw, 64px); }
+  .tag { font: 400 11px/1.4 'IBM Plex Mono', monospace; letter-spacing: .3em; text-transform: uppercase; color: #9fb8ff; text-align: center; padding: 0 16px; }
+  .tag em { display: block; font-style: normal; color: var(--muted); letter-spacing: .06em; text-transform: none; margin-top: 8px; font-size: 12px; }
+  /* every size below grows and shrinks with the window, so nothing gets small on a big screen */
+  .title { font-size: clamp(30px, 6vw, 140px); line-height: 1; text-align: center; padding: 0 16px; }
+  .line { width: calc(100vw - 2 * clamp(16px, 4vw, 80px)); text-align: center; white-space: nowrap; overflow: hidden; }
+  .para { width: min(62ch, calc(100vw - 32px)); font-size: clamp(16px, .55vw + 11px, 26px); line-height: 1.7; text-align: center; margin: 0; }
+  .small { font-size: clamp(11px, .35vw + 8px, 16px); letter-spacing: .3em; text-transform: uppercase; color: var(--muted); }
+  [data-copy="short"] .long, [data-copy="long"] .short { display: none; }
+
+  .A .title, .A .line { font-family: 'IBM Plex Mono', monospace; font-weight: 300; letter-spacing: .25em; text-transform: uppercase; }
+  .A .para, .A .small { font-family: 'IBM Plex Mono', monospace; }
+  .B .title { font-family: 'Inter Tight', sans-serif; font-weight: 300; letter-spacing: -.02em; }
+  .B .line { font-family: 'Inter Tight', sans-serif; font-weight: 400; letter-spacing: .02em; }
+  .B .para { font-family: 'Inter', sans-serif; font-weight: 300; }
+  .B .small { font-family: 'Inter', sans-serif; }
+  .C .title { font-family: 'Instrument Serif', serif; font-weight: 400; letter-spacing: -.01em; }
+  .C .line { font-family: 'Instrument Serif', serif; font-style: italic; letter-spacing: .01em; }
+  .C .para { font-family: 'Inter', sans-serif; font-weight: 300; }
+  .C .small { font-family: 'Geist Mono', monospace; }
+  .D .title { font-family: 'Geist', sans-serif; font-weight: 300; letter-spacing: -.01em; }
+  .D .line { font-family: 'Geist', sans-serif; font-weight: 300; letter-spacing: .04em; }
+  .D .para { font-family: 'Geist', sans-serif; font-weight: 300; }
+  .D .small { font-family: 'Geist Mono', monospace; }
+  .E .title { font-family: 'Ubuntu', sans-serif; font-weight: 300; letter-spacing: .01em; }
+  .E .line { font-family: 'Ubuntu', sans-serif; font-weight: 300; letter-spacing: .06em; text-transform: uppercase; }
+  .E .para { font-family: 'Inter', sans-serif; font-weight: 300; }
+  .E .small { font-family: 'Inter', sans-serif; }
+  .F .title { font-family: 'Space Grotesk', sans-serif; font-weight: 300; letter-spacing: -.01em; }
+  .F .line { font-family: 'Space Grotesk', sans-serif; font-weight: 300; letter-spacing: .03em; }
+  .F .para { font-family: 'Inter', sans-serif; font-weight: 300; }
+  .F .small { font-family: 'Space Grotesk', sans-serif; }
+  .G .title { font-family: 'Cormorant Garamond', serif; font-weight: 300; letter-spacing: .02em; }
+  .G .line { font-family: 'Cormorant Garamond', serif; font-weight: 300; letter-spacing: .04em; }
+  .G .para { font-family: 'Inter', sans-serif; font-weight: 300; }
+  .G .small { font-family: 'IBM Plex Mono', monospace; }
+</style>
+</head>
+<body data-copy="long">
+<canvas id="sky"></canvas>
+<div class="bar">
+  <button type="button" data-set="long" class="on">Your current words</button>
+  <button type="button" data-set="short">Shorter version (suggestion)</button>
+  <span class="hint">Stretch and shrink the window: every size here grows with it.</span>
+</div>
+<main id="opts"></main>
+<template id="tpl">
+  <div class="small">The Studio</div>
+  <div class="title"><span class="long">Seenik</span><span class="short">Seenik</span></div>
+  <p class="para"><span class="long">Seenik brings a music-driven story arc to the fulldome medium, grounded in earth imagery and the geometric patterns that exist all around and inside of us.</span><span class="short">Music-driven stories for the dome, grounded in the earth and the geometry inside all of us.</span></p>
+  <div class="line fit"><span class="long">Our focus is to create seamless, dreamlike immersive experiences</span><span class="short">Seamless. Dreamlike. Immersive.</span></div>
+  <div class="line fit"><span class="long">Seenik is based in North Vancouver, where the mountains meet the sea</span><span class="short">North Vancouver, where the mountains meet the sea</span></div>
+  <div class="small" style="margin-top:2vw">The Mirror</div>
+  <div class="title">The Mirror</div>
+  <p class="para"><span class="long">Not a film you watch, but a world you inhabit. Designed to feel like moving through a single living thing.</span><span class="short">Not a film you watch. A world you inhabit.</span></p>
+  <div class="line fit"><span class="long">Every visual decision flows from the music, through photorealistic worlds — the cosmos, the deep ocean</span><span class="short">Every image flows from the music</span></div>
+</template>
+<script>
+  const OPTS = [
+    ['A', 'Now: IBM Plex Mono', 'The typewriter look the site uses today, for comparison.'],
+    ['B', 'Inter Tight + Inter', 'Clean, modern, quiet. The most common choice on studio and product sites right now; disappears so the images lead.'],
+    ['C', 'Instrument Serif + Inter', 'Cinematic and editorial: an elegant serif for titles and lines, a clean sans for reading. Film-festival feel.'],
+    ['D', 'Geist + Geist Mono', 'Precise and technical, with a small mono for labels. Feels engineered, like a schematic.'],
+    ['E', 'Ubuntu + Inter', 'Matches THE MIRROR title (Ubuntu): rounded and soft, with Inter for reading.'],
+    ['F', 'Space Grotesk + Inter', 'Geometric with a little character; a bit sci-fi without being a costume.'],
+    ['G', 'Cormorant Garamond + Inter', 'Classical and dreamy; the serif the site already has for statements, at a large size.'],
+  ];
+  const main = document.getElementById('opts'), tpl = document.getElementById('tpl').innerHTML;
+  main.innerHTML = OPTS.map(([k, n, d]) => `<section class="${k}"><div class="tag">${k} · ${n}<em>${d}</em></div>${tpl}</section>`).join('');
+  // the one-line statements always fill the line exactly, at any window width
+  const fit = () => document.querySelectorAll('.fit').forEach(el => { el.style.fontSize = '20px'; const sp = [...el.children].find(c => c.offsetParent); if (!sp) return;
+    const w = sp.getBoundingClientRect().width; if (w) el.style.fontSize = Math.min(120, 20 * el.clientWidth * 0.98 / w) + 'px'; });
+  addEventListener('resize', fit); document.fonts.ready.then(fit); setTimeout(fit, 600);
+  document.querySelectorAll('.bar button').forEach(b => b.onclick = () => { document.body.dataset.copy = b.dataset.set; document.querySelectorAll('.bar button').forEach(x => x.classList.toggle('on', x === b)); fit(); });
+  // slow drifting stars
+  const c = document.getElementById('sky'), g = c.getContext('2d'); let W, H, S = [];
+  function size() { W = c.width = innerWidth * devicePixelRatio; H = c.height = innerHeight * devicePixelRatio; S = Array.from({ length: 260 }, () => ({ x: Math.random() * W, y: Math.random() * H, z: Math.random(), p: Math.random() * 6.3 })); }
+  addEventListener('resize', size); size();
+  (function f(t) { requestAnimationFrame(f); g.clearRect(0, 0, W, H);
+    for (const s of S) { s.y -= (0.02 + s.z * 0.1) * devicePixelRatio; if (s.y < 0) s.y += H; g.fillStyle = `rgba(235,240,255,${(0.25 + 0.6 * s.z) * (0.8 + 0.2 * Math.sin(t / 900 + s.p))})`; g.beginPath(); g.arc(s.x, s.y, (0.4 + s.z) * devicePixelRatio, 0, 6.29); g.fill(); } })(0);
+</script>
+</body>
+</html>

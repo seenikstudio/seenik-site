@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Text Mount Options</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root { --fg: #f2f4f7; --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace; }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: var(--fg); font: 400 13px/1.8 var(--mono); background: #000 url('space-img/orion.jpg') center / cover fixed; }
+  body::before { content: ""; position: fixed; inset: 0; background: radial-gradient(ellipse at 50% 40%, rgba(0,0,0,.55), rgba(0,0,0,.85)); pointer-events: none; }
+  main { position: relative; max-width: 1100px; margin: 0 auto; padding: 40px 16px 80px; display: grid; gap: 70px; }
+  .opt { display: grid; justify-items: center; gap: 26px; }
+  .tag { font-size: 10px; letter-spacing: .3em; text-transform: uppercase; color: rgba(242,244,247,.55); }
+  .t { font-size: 22px; letter-spacing: .3em; text-transform: uppercase; padding: 14px 30px; position: relative; }
+  .s { text-align: center; padding: 22px 46px; position: relative; max-width: 760px; }
+
+  /* 1 Halo: no frame, a soft dark halo of shadow and light */
+  .o1 .t, .o1 .s { text-shadow: 0 0 18px rgba(170,200,255,.55); }
+  .o1 .t::before, .o1 .s::before { content: ""; position: absolute; inset: -30px -60px; background: radial-gradient(ellipse at center, rgba(0,0,0,.7), rgba(0,0,0,0) 70%); z-index: -1; }
+
+  /* 2 Hairlines: one fine glowing line above and below, fading at both ends */
+  .o2 .t::before, .o2 .t::after, .o2 .s::before, .o2 .s::after { content: ""; position: absolute; left: -10%; right: -10%; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.85) 30%, rgba(255,255,255,.85) 70%, transparent); box-shadow: 0 0 8px rgba(170,200,255,.6); }
+  .o2 .t::before, .o2 .s::before { top: 0; } .o2 .t::after, .o2 .s::after { bottom: 0; }
+
+  /* 3 Corner brackets: a viewfinder, only the four corners drawn */
+  .o3 .t, .o3 .s { --c: 14px; background:
+    linear-gradient(#fff,#fff) 0 0 / var(--c) 1px no-repeat, linear-gradient(#fff,#fff) 0 0 / 1px var(--c) no-repeat,
+    linear-gradient(#fff,#fff) 100% 0 / var(--c) 1px no-repeat, linear-gradient(#fff,#fff) 100% 0 / 1px var(--c) no-repeat,
+    linear-gradient(#fff,#fff) 0 100% / var(--c) 1px no-repeat, linear-gradient(#fff,#fff) 0 100% / 1px var(--c) no-repeat,
+    linear-gradient(#fff,#fff) 100% 100% / var(--c) 1px no-repeat, linear-gradient(#fff,#fff) 100% 100% / 1px var(--c) no-repeat; filter: drop-shadow(0 0 4px rgba(170,200,255,.6)); }
+
+  /* 4 Dome arc: the words sit under a thin glowing arc with node points, like the dome */
+  .o4 .t svg, .o4 .s svg { position: absolute; left: -6%; width: 112%; top: -22px; height: 40px; overflow: visible; }
+
+  /* 5 Light bar: a single glowing line under the words with a spark travelling along it */
+  .o5 .t::after, .o5 .s::after { content: ""; position: absolute; left: 10%; right: 10%; bottom: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.7), transparent); }
+  .o5 .t::before, .o5 .s::before { content: ""; position: absolute; bottom: -2px; width: 60px; height: 5px; border-radius: 50%; background: radial-gradient(ellipse, #fff, rgba(170,200,255,.6) 40%, transparent 70%); animation: spark 4s ease-in-out infinite; }
+  @keyframes spark { 0% { left: 10%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { left: calc(90% - 60px); opacity: 0; } }
+
+  /* 6 Geodesic frame: a fine polygon of lines with node points, like the floating shapes */
+  .o6 .t svg, .o6 .s svg { position: absolute; inset: -10px -18px; width: calc(100% + 36px); height: calc(100% + 20px); overflow: visible; }
+
+  /* 7 Frosted band: a strip of frosted glass the width of the screen, no rounded ends, fading at the sides */
+  .o7 { width: 100vw; margin-left: calc(50% - 50vw); }
+  .o7 .band { width: 100%; display: grid; justify-items: center; gap: 10px; padding: 26px 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.07) 25%, rgba(255,255,255,.07) 75%, transparent);
+    -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,.12); border-bottom: 1px solid rgba(255,255,255,.12);
+    -webkit-mask: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent); mask: linear-gradient(90deg, transparent, #000 20%, #000 80%, transparent); }
+  .opt .t, .opt .s { animation: breathe 5s ease-in-out infinite; }
+  @keyframes breathe { 0%, 100% { filter: drop-shadow(0 0 3px rgba(170,200,255,.35)); } 50% { filter: drop-shadow(0 0 10px rgba(170,200,255,.85)); } }
+  .o3 .t, .o3 .s { animation: breathe3 5s ease-in-out infinite; }
+  @keyframes breathe3 { 0%, 100% { filter: drop-shadow(0 0 3px rgba(170,200,255,.5)); } 50% { filter: drop-shadow(0 0 12px rgba(190,215,255,1)); } }
+  .o6 svg g:first-child { stroke-dasharray: 4 2; animation: march 12s linear infinite; }
+  @keyframes march { to { stroke-dashoffset: -60; } }
+  .o4 svg path { animation: arcglow 4s ease-in-out infinite; }
+  @keyframes arcglow { 50% { stroke: #fff; } }
+</style>
+</head>
+<body>
+<main>
+  <section class="opt o1"><span class="tag">1 · Halo, no frame</span><div class="t">The Studio</div><div class="s">Seenik brings a music-driven story arc to the fulldome medium,<br>grounded in earth imagery and the geometric patterns all around us.</div></section>
+  <section class="opt o2"><span class="tag">2 · Hairlines above and below</span><div class="t">The Studio</div><div class="s">Seenik brings a music-driven story arc to the fulldome medium,<br>grounded in earth imagery and the geometric patterns all around us.</div></section>
+  <section class="opt o3"><span class="tag">3 · Corner brackets (viewfinder)</span><div class="t">The Studio</div><div class="s">Seenik brings a music-driven story arc to the fulldome medium,<br>grounded in earth imagery and the geometric patterns all around us.</div></section>
+  <section class="opt o4"><span class="tag">4 · Dome arc with nodes</span><div class="t">The Studio<svg viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M2 19 Q50 -6 98 19" fill="none" stroke="rgba(255,255,255,.8)" stroke-width=".5" vector-effect="non-scaling-stroke" style="filter:drop-shadow(0 0 3px rgba(170,200,255,.8))"/><circle cx="2" cy="19" r="1" fill="#fff"/><circle cx="50" cy="6.5" r="1" fill="#fff"/><circle cx="98" cy="19" r="1" fill="#fff"/></svg></div><div class="s">Seenik brings a music-driven story arc to the fulldome medium,<br>grounded in earth imagery and the geometric patterns all around us.<svg viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M2 19 Q50 -2 98 19" fill="none" stroke="rgba(255,255,255,.7)" stroke-width=".5" vector-effect="non-scaling-stroke"/><circle cx="2" cy="19" r=".8" fill="#fff"/><circle cx="26" cy="9.6" r=".8" fill="#fff"/><circle cx="50" cy="8.5" r=".8" fill="#fff"/><circle cx="74" cy="9.6" r=".8" fill="#fff"/><circle cx="98" cy="19" r=".8" fill="#fff"/></svg></div></section>
+  <section class="opt o5"><span class="tag">5 · Light line with a travelling spark</span><div class="t">The Studio</div><div class="s">Seenik brings a music-driven story arc to the fulldome medium,<br>grounded in earth imagery and the geometric patterns all around us.</div></section>
+  <section class="opt o6"><span class="tag">6 · Geodesic frame</span><div class="t">The Studio<svg viewBox="0 0 100 40" preserveAspectRatio="none"><g fill="none" stroke="rgba(229,239,255,.7)" stroke-width=".6" vector-effect="non-scaling-stroke"><path d="M8 2 L92 2 L100 20 L92 38 L8 38 L0 20 Z"/><path d="M0 20 L8 2 M100 20 L92 38" opacity=".5"/></g><g fill="#fff"><circle cx="8" cy="2" r=".9"/><circle cx="92" cy="2" r=".9"/><circle cx="100" cy="20" r=".9"/><circle cx="92" cy="38" r=".9"/><circle cx="8" cy="38" r=".9"/><circle cx="0" cy="20" r=".9"/></g></svg></div><div class="s">Seenik brings a music-driven story arc to the fulldome medium,<br>grounded in earth imagery and the geometric patterns all around us.<svg viewBox="0 0 100 40" preserveAspectRatio="none"><g fill="none" stroke="rgba(229,239,255,.55)" stroke-width=".6" vector-effect="non-scaling-stroke"><path d="M4 0 L96 0 L100 20 L96 40 L4 40 L0 20 Z"/></g><g fill="#fff"><circle cx="4" cy="0" r=".7"/><circle cx="96" cy="0" r=".7"/><circle cx="100" cy="20" r=".7"/><circle cx="96" cy="40" r=".7"/><circle cx="4" cy="40" r=".7"/><circle cx="0" cy="20" r=".7"/></g></svg></div></section>
+  <section class="opt o7"><div class="band"><span class="tag">7 · Frosted band, full width</span><div class="t">The Studio</div><div class="s" style="padding-top:4px">Seenik brings a music-driven story arc to the fulldome medium,<br>grounded in earth imagery and the geometric patterns all around us.</div></div></section>
+</main>
+</body>
+</html>
