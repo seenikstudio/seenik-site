@@ -1728,6 +1728,9 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
   html body #section-view .mir-sing.mir-top > *, html body #section-view .mir-sing.mir-top.in > *, html body #section-view .mir-sing.mir-top span.ev-ph {
     animation: none !important; opacity: 1 !important; transition: none !important; }
 }
+
+/* Oct 25 PHONE: the water-drop picture cropped in at the sides (Sandy's request), so the ripple fills the phone */
+@media (max-width: 760px) { html body #section-view .st-stage .st-fern img { aspect-ratio: 1080 / 494 !important; height: auto !important; object-fit: cover !important; object-position: 50% 55% !important; } }
 </style>
 
 
@@ -3981,7 +3984,7 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
           SV.querySelectorAll('.st-top-say .evcap span.ev-ph, .st-ground .evcap span.ev-ph, .st-top-say-none').forEach(x => { if (!x.offsetParent) return; const f = parseFloat(x.style.fontSize) || parseFloat(getComputedStyle(x).fontSize), w = mw(x); if (w) x.style.setProperty('font-size', (f * Wg / w).toFixed(2) + 'px', 'important'); });
           // the opening's first line spans the same width as "Grounded…"; "to the fulldome" underneath is bigger, a little bigger (15%)
           const a = SV.querySelector('.st-top-desk .mir-big span.ev-ph'), b2 = SV.querySelector('.st-top-desk .mir-small span.ev-ph');
-          if (a && b2 && a.offsetParent) { a.style.setProperty('font-size', '16px', 'important'); const wa = mw(a), f2 = parseFloat(b2.style.fontSize) || 16, wb = mw(b2); b2.style.setProperty('font-size', '28.4px', 'important'); } } }   // Sandy: 28.4px, the same as "A world you inhabit"   // Sandy: first line 16px; "to the fulldome" sized to the same width   // Sandy: "to the fulldome" 20px
+          if (a && b2 && a.offsetParent) { a.style.setProperty('font-size', '16px', 'important'); { const w0 = mw(a), room = SV.clientWidth - 32; if (w0 > room) a.style.setProperty('font-size', (16 * room / w0).toFixed(2) + 'px', 'important'); }   /* 16px, or smaller on a narrower phone so it never runs off the edges */ const wa = mw(a), f2 = parseFloat(b2.style.fontSize) || 16, wb = mw(b2); b2.style.setProperty('font-size', '28.4px', 'important'); } } }   // Sandy: 28.4px, the same as "A world you inhabit"   // Sandy: first line 16px; "to the fulldome" sized to the same width   // Sandy: "to the fulldome" 20px
       // 1c. even line spacing (the Capsize / text-box-trim method): each line's box is trimmed to exactly its capitals, then every gap between lines is the same
       SV.querySelectorAll('.mir-sing').forEach(b => { const sps = [...b.querySelectorAll('.evcap span.ev-ph')].filter(s => s.offsetParent); if (!sps.length) return;
         const g = Math.round(Math.min(...sps.map(s => parseFloat(s.style.fontSize) || 16)) * 1.0);
