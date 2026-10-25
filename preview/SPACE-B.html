@@ -1550,7 +1550,7 @@
 .mir-sing.mir-top .wv i { display: inline-block; font-style: normal; will-change: transform; }
 .mir-sing.mir-top, .mir-sing.mir-tp { padding-top: clamp(18px, 4vh, 48px) !important; padding-bottom: clamp(10px, 2vh, 24px) !important; }
 @media (min-width: 761px) { .mir-sing.mir-top { display: grid !important; justify-items: center; row-gap: clamp(14px, 2vh, 26px); } .mir-sing.mir-top > p { margin: 0 !important; } }   /* the two opening lines, one under the other */   /* both lines share one place: one becomes the other */
-@media (max-width: 760px) { .mir-sing.mir-top, .mir-sing.mir-tp { display: none !important; } }
+/* (phone: the opening lines now show on the phone too, as caps statements — see the Oct 25 phone block at the end) */
 html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase !important; }   /* A SINGLE LIVING THING YOU MOVE THROUGH: all caps */
 /* Oct 24: The Mirror, desktop: the elementals' names as live type */
 .el-names { display: none; }
@@ -1565,6 +1565,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
 }
 /* Oct 24: The Studio, desktop: "Grounded in earth imagery…" after the logo and contact, then the fern picture edge to edge, its top and bottom fading into space */
 .st-ground, .st-fern { display: none; }
+@media (max-width: 760px) { #section-view .st-stage .mir-sing.st-ground { display: grid; } #section-view .st-stage .st-fern { display: block; } }
 @media (min-width: 761px) {
   html body #section-view .st-stage .mir-sing.st-ground { display: grid; justify-items: center; padding-top: clamp(50px, 8vh, 120px) !important; padding-bottom: clamp(30px, 5vh, 70px) !important; margin: 0 !important; }
   html body #section-view .st-stage .st-fern { display: block; margin: 0 0 0 calc(50% - 50vw) !important; width: 100vw !important; justify-self: start !important;
@@ -1660,6 +1661,39 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
   #section-view .mir-hero .mir-par img { mix-blend-mode: screen; }
 
 }
+
+/* ===== Oct 25: PHONE gets the desktop's words, type and pictures, in the same layout =====
+   every statement is a caps statement in Ubuntu with the 3D edge (same sizes and places as the phone's caps statements);
+   The Studio opens with "Seenik brings a music-driven story arc to the fulldome"; The Mirror with "A world you inhabit / A single living thing you move through";
+   the water-drop picture with "Seamless, dreamlike immersive experiences" sits after the logo, as on the desktop */
+@media (max-width: 760px) {
+  html body #section-view .mir-sing.mir-top, html body #section-view .mir-sing.mir-tp { display: grid !important; gap: 10px !important; padding: 26px 0 18px !important; margin: 0 !important; }
+  html body #section-view .st-ph-txt, html body #section-view .mir-open-ph, html body #section-view .mir-first .mir-one { display: none !important; }
+  html body #section-view .mir-first .mir-big, html body #section-view .mir-first .mir-small { display: grid !important; }
+  html body #section-view .mir-big.evcap span.ev-ph, html body #section-view .mir-small.evcap span.ev-ph {
+    font-family: 'Ubuntu', system-ui, sans-serif !important; font-weight: 400 !important; text-transform: uppercase !important; color: #f4f6fb !important;
+    text-shadow: 0 1px 0 #a7afc6, 0 2px 0 #707892, 0 3px 0 #40465c, 0 6px 12px rgba(0,0,0,.7) !important; }
+  html body #section-view .mir-small.evcap { container-type: inline-size; display: grid !important; width: 100% !important; max-width: none !important; justify-items: center !important; text-align: center !important; padding: 0 16px !important; box-sizing: border-box; margin: 0 !important; }
+  html body #section-view .mir-small.evcap > .dk { display: none !important; }
+  html body #section-view .st-stage .mir-sing.st-ground { padding: 40px 0 18px !important; margin: 0 !important; }
+  html body #section-view .st-stage .st-fern { margin: 0 0 0 calc(50% - 50vw) !important; width: 100vw !important; justify-self: start !important;
+    -webkit-mask: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%); mask: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%); }
+  html body #section-view .st-stage .st-fern img { display: block; width: 100%; height: auto; max-width: none; }
+}
+
+@media (max-width: 760px) {
+  #section-view .mir-title3d .sub.pre { opacity: 0; }
+  #section-view .mir-title3d .sub.enter { animation: subIn 2s cubic-bezier(.2,.7,.2,1) both; }
+}
+/* ===== Oct 25: PHONE — the eye is a true circle (same proportions as the desktop picture), bigger, fading into space top and bottom ===== */
+@media (max-width: 760px) {
+  html body #section-view .mir-stage { border: 0 !important; box-shadow: none !important; overflow: visible !important; }
+  html body #section-view .mir-stage::before, html body #section-view .mir-stage::after, html body #section-view .mir-hero::after, html body #section-view .mir-hero::before { display: none !important; }
+  html body #section-view .mir-stage > .mir-hero, html body #section-view .mir-stage .mir-hero, html body #section-view .mir-hero {
+    aspect-ratio: 1600 / 1300 !important; height: auto !important; --hw: calc(100vw + 150px); width: var(--hw) !important; max-width: none !important;
+    margin-left: calc((100% - var(--hw)) / 2) !important; margin-right: 0 !important; justify-self: start !important; background: transparent !important; border: 0 !important;
+    -webkit-mask: radial-gradient(closest-side, #000 82%, transparent 100%); mask: radial-gradient(closest-side, #000 82%, transparent 100%); }
+}
 </style>
 
 
@@ -1721,7 +1755,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   // Desktop and phone have their own settings: phone changes never touch the desktop look
   const Q = PHONE ? {
-    dpr: 1, stars: 3200, cluster: 2200, haze: 0, tex: '-m', octaves: 3, starScale: 1.0, xs: 0.42, ys: 1.5, wash: 0, gas: 0.8, cl: [-14, -62]
+    dpr: 1, stars: 6500, cluster: 2200, haze: 0, tex: '-m', octaves: 3, starScale: 1.25, xs: 0.24, ys: 1.15, wash: 0, gas: 1.35, cl: [-14, -62]   // Oct 25: phone space richer: twice the stars, brighter gas, the nebulae drawn in toward the middle of the narrow screen
   } : {
     dpr: Math.min(devicePixelRatio, 1.5), stars: 9000, cluster: 5000, haze: 0, tex: '', octaves: 4, starScale: 1.0, xs: 1, ys: 1, wash: 0, gas: 0.8, cl: [-64, -26]
   };
@@ -1785,7 +1819,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
     }`;
   const gasLayers = [];
   function gas(o) {
-    if (PHONE && o.desk) return null;   // phone: fewer sheets, lighter work
+    // Oct 25: the phone gets every sheet too, so its space is as full as the desktop's
     const mat = new THREE.ShaderMaterial({
       uniforms: { map: { value: TEX[o.tex] }, uTime: U.uTime, uRes: U.uRes, uOpacity: { value: 0 }, uBias: { value: o.bias || 0 },
         uLo: { value: o.lo ?? 0.04 }, uHi: { value: o.hi ?? 0.5 }, uWisp: { value: o.wisp || 0 }, uFlow: { value: o.flow ?? 0.06 },
@@ -3811,7 +3845,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
   }
   setTimeout(() => {
     let k = (location.hash || '').slice(1), y = 0;
-    if (!k) { try { const v = JSON.parse(localStorage.getItem('seenik-last') || 'null'); if (v && Date.now() - v.t < 15 * 60 * 1000) { k = v.k; y = v.y || 0; } } catch (e) {} }
+    // Oct 25: opening the site always starts at the intro (it no longer jumps back to the last page visited); a direct link like #contact still opens that page
     if (k && (k === 'artist' || PAGES[k] || /^proj-\d+$/.test(k))) jumpTo(k, y);
   }, 300);
   SV.addEventListener('pointerdown', e => e.stopPropagation());
@@ -3826,13 +3860,13 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
     const quads = () => SV.querySelectorAll('.fr.mir-wide:not(.mir-lined)').forEach(f => { if (f.querySelector('.el4')) return; const src = f.querySelector('img').src;   // the four elementals: one picture, shown as two rows of two
       const X = [25, 1179, 409, 792];   // top: murmurations, kaleidoscope; bottom: cymatics, fractals — the pictures tell it, no names   // each picture's square inside the 1540 x 462 image (333 px), without the label strip
       f.insertAdjacentHTML('beforeend', `<span class="el4">${X.map((x, k) => `<i style="background-image:url('${src}');background-position:${(x / (1540 - 333) * 100).toFixed(3)}% ${(89 / (462 - 333) * 100).toFixed(3)}%"></i>`).join('')}</span>`); });
-    const caps = () => SV.querySelectorAll('.st-say .mir-big, .st-based .mir-big, .mir-wind .mir-big, .mir-close .mir-big').forEach(el => { if (el.classList.contains('evcap')) return;
+    const caps = () => SV.querySelectorAll('.st-say .mir-big, .st-based .mir-big, .mir-wind .mir-big, .mir-close .mir-big, .mir-top .mir-big, .mir-top .mir-small, .st-ground .mir-big, .mir-first .mir-big, .mir-first .mir-small').forEach(el => { if (el.classList.contains('evcap')) return;
       const t = el.textContent.replace(/\s+/g, ' ').trim(); el.innerHTML = `<span class="dk">${el.innerHTML}</span>` + (t.length <= 30 ? `<span class="ev-ph one">${t}</span>` : (() => { const w = t.split(' '); let best = null; for (let i = 1; i < w.length; i++) { const a = w.slice(0, i).join(' '), b = w.slice(i).join(' '), d = Math.abs(a.length - b.length); if (!best || d < best[0]) best = [d, a, b]; } return `<span class="ev-ph">${best[1]}</span><span class="ev-ph">${best[2]}</span>`; })()); el.classList.add('evcap'); });
     const fit = () => { if (innerWidth > 760) return; caps(); dots(); folds(); quads(); SV.querySelectorAll('span.ev-ph.one').forEach(sp => { if (!sp.offsetParent) return;   // one line: the size that exactly fills the width
         const box = sp.parentElement, cs = getComputedStyle(box), W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), f0 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pfs')) || 13.5;
         sp.style.setProperty('letter-spacing', '0px', 'important'); sp.style.setProperty('font-size', f0 + 'px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = '';
         sp.style.setProperty('font-size', (f0 * W / w * .999).toFixed(2) + 'px', 'important'); });
-      { const blocks = [...SV.querySelectorAll('.mir-big.evcap')].filter(b => b.offsetParent); let k = 1e9; const meas = [];   // every caps statement on the page: the same size, the same spacing
+      { const blocks = [...SV.querySelectorAll('.mir-big.evcap, .mir-small.evcap')].filter(b => b.offsetParent); let k = 1e9; const meas = [];   // every caps statement on the page: the same size, the same spacing
         blocks.forEach(b => { const cs = getComputedStyle(b), W = b.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
           b.querySelectorAll('span.ev-ph').forEach(sp => { sp.style.setProperty('letter-spacing', '.1em', 'important'); sp.style.setProperty('font-size', '13.5px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = ''; meas.push(sp); k = Math.min(k, W / w); }); });
         const fs = (Math.min(innerWidth, 760) - 32) / 24.52;   // one size for every caps statement on every page: the size at which the Studio's longest line meets the edges
@@ -3844,8 +3878,10 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
       { const lo = SV.querySelector('.st-lead .st-logo'), say = SV.querySelector('.st-say:not(.st-based)'), based = SV.querySelector('.st-based'), ph = SV.querySelector('.st-photo'), pier = SV.querySelector('.st-pier');   // The Studio: each statement sits in the middle of its space
         const text = el => { const r = document.createRange(); r.selectNodeContents(el.querySelector('.mir-big')); return r.getBoundingClientRect(); };
         const mid = (el, top, bot) => { const t = text(el), m = parseFloat(el.style.marginTop) || 0, shift = ((t.top - top) - (bot - t.bottom)) / 2; if (Math.abs(shift) > .5) el.style.setProperty('margin-top', (m - shift).toFixed(1) + 'px', 'important'); };
-        if (lo && say && ph) { const r = lo.getBoundingClientRect(), mt = new DOMMatrix(getComputedStyle(lo).transform), h = r.height / mt.a, cy = r.top + r.height / 2 - mt.f;
-          mid(say, cy - h / 2 + h * .858, ph.getBoundingClientRect().top); }   // where the logo visibly ends (its faint glow included), measured from screenshots
+        const gr = SV.querySelector('.st-ground'), fern = SV.querySelector('.st-fern');
+        if (lo && say && ph) { const r = lo.getBoundingClientRect(), mt = new DOMMatrix(getComputedStyle(lo).transform), h = r.height / mt.a, cy = r.top + r.height / 2 - mt.f, end = cy - h / 2 + h * .858;
+          if (gr && fern && fern.offsetParent) { mid(gr, end, fern.getBoundingClientRect().top); mid(say, fern.getBoundingClientRect().bottom, ph.getBoundingClientRect().top); }   // Oct 25: with the water-drop picture in between
+          else mid(say, end, ph.getBoundingClientRect().top); }   // where the logo visibly ends (its faint glow included), measured from screenshots
         if (based && ph && pier) mid(based, ph.getBoundingClientRect().bottom, pier.getBoundingClientRect().top); }
       SV.querySelectorAll('.mir-sing.mir-wind, .mir-sing.mir-close').forEach(el => {   // The Mirror: each statement sits in the middle of the space between the pictures above and below it
         const prv = el.previousElementSibling, nxt = el.nextElementSibling; if (!prv || !nxt) return;
@@ -5105,7 +5141,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
   let el = null, t0 = 0;
   const ease = x => (x = Math.max(0, Math.min(1, x)), x < .5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
   (function f(now) { requestAnimationFrame(f);
-    const SV = document.querySelector('#section-view.on'), cur = innerWidth > 760 && SV && !SV.classList.contains('arriving') ? SV.querySelector('.mir-title3d') : null;
+    const SV = document.querySelector('#section-view.on'), cur = SV && !SV.classList.contains('arriving') ? SV.querySelector('.mir-title3d') : null;   // Oct 25: on the phone too
     if (cur !== el) { el = cur; t0 = 0; if (el) { el.querySelector('.t3').style.scale = '1'; el.querySelector('.sub').classList.add('pre'); } }
     if (!el) return;
     const t3 = el.querySelector('.t3'), sub = el.querySelector('.sub'), pic = el.parentElement.querySelector('.mir-par img, .mir-par canvas, .mir-par');
@@ -5166,7 +5202,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
   const SV = document.getElementById('section-view'); if (!SV) return;
   const bar = document.createElement('div'); bar.id = 'lz-bar'; document.body.appendChild(bar);
   const PICK = '.mir-top, .sv-t, .reel-intro, .mir-sing > *, h1, h2, h3, h4, p, li, figcaption, blockquote, label, .lab';
-  const SKIP = 'a, button, input, textarea, select, form *, nav, .site-nav, .mir-title3d, .mir-keep, .mir-open-ph, .mir-one, .ph-only, [aria-hidden="true"]';
+  const SKIP = 'a, button, input, textarea, select, form *, nav, .site-nav, .mir-title3d, .mir-keep, .mir-credit, .mir-open-ph, .mir-one, .ph-only, [aria-hidden="true"]';
   let items = [], busy = null, op = null, wave = null, scr = null, ret = null, seen = new WeakSet();
   const ease = x => (x = Math.max(0, Math.min(1, x)), x * x * (3 - 2 * x));
   const hide = el => { el.style.setProperty('clip-path', 'inset(0 0 100% 0)', 'important'); };
