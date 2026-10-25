@@ -1735,6 +1735,25 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
 /* Oct 25: the opening titles — the light always sits in front of the words */
 html body #section-view .mir-sing.mir-top > p { position: relative; z-index: 1; }
 html body #section-view .mir-sing.mir-top > #lz-bar { z-index: 50 !important; mix-blend-mode: normal; pointer-events: none; }
+
+/* Oct 25 PHONE: the galaxy video edge to edge like the other pictures, top and bottom fading into space */
+@media (max-width: 760px) {
+  html body #section-view .mir-galaxy { width: 100vw !important; max-width: none !important; margin-left: calc(50% - 50vw) !important; margin-right: 0 !important; justify-self: start !important; padding: 0 !important; border: 0 !important; -webkit-mask: none !important; mask: none !important; }
+  html body #section-view .mir-galaxy video { display: block; width: 100% !important; max-width: none !important; height: auto !important;
+    -webkit-mask: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%) !important; mask: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%) !important; }
+}
+
+/* Oct 25: no blue tap box on phones; the intro takes the finger so you can drag and play */
+* { -webkit-tap-highlight-color: transparent; }
+body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#stars { touch-action: none; }
+
+/* Oct 25 desktop: the new, taller water-drop picture; the phone keeps its own */
+.st-fern .desk-drop { display: none; }
+@media (max-width: 760px) { html body #section-view .st-stage .st-fern img.desk-drop { display: none !important; } }   /* phone: only its own picture */
+@media (min-width: 761px) { html body #section-view .st-stage .st-fern img:not(.desk-drop) { display: none !important; } html body #section-view .st-stage .st-fern .desk-drop { display: block !important; width: 100%; height: auto; } }
+
+/* Oct 25 desktop: less black above "Grounded in earth imagery…" (under the water drop) */
+@media (min-width: 761px) { html body #section-view .st-stage .mir-sing.st-say:not(.st-based) { padding-top: 0 !important; margin-top: -60px !important; } }
 </style>
 
 
@@ -1889,7 +1908,7 @@ html body #section-view .mir-sing.mir-top > #lz-bar { z-index: 50 !important; mi
   gas({ tex: 'orion', size: 270, x: -82, y: 28, z0: L * 0.5 + 45, only: ['mirror', ''], arr: -395, bias: 1.6, lo: 0.12, hi: 0.8, wisp: 0.9, opacity: 0.4, flow: 0.09, order: 2, soft: 1, uvOff: [0.15, 0.2], uvScale: [0.6, 0.6], desk: true });
   gas({ tex: 'orion', size: 270, x: 82, y: 28, z0: L * 0.5 + 45, only: ['mirror', ''], arr: -395, bias: 1.6, lo: 0.12, hi: 0.8, wisp: 0.9, opacity: 0.4, flow: 0.09, order: 2, soft: 1, uvOff: [0.85, 0.2], uvScale: [-0.6, 0.6], desk: true });
   const CA2 = (window.CONTACT_DATA && CONTACT_DATA.asp) || 1;
-  gas({ tex: 'contact', size: 400, asp: CA2, x: 0, y: 6, z0: 0, zN: 646 - 330 - 60, bias: 0.3, lo: 0.0, hi: 0.05, opacity: 1, gain: 2.6, flow: 0.03, calm: 0.9, order: 1, near: true, only: ['contact'], arr: true });
+  gas({ tex: 'contact', size: PHONE ? 230 : 400, asp: CA2, x: 0, y: 6, z0: 0, zN: 646 - 330 - 60, bias: 0.3, lo: 0.0, hi: 0.05, opacity: 1, gain: PHONE ? 1.7 : 2.6,   /* Oct 25: phone zoomed out and less white */ flow: 0.03, calm: 0.9, order: 1, near: true, only: ['contact'], arr: true });
   gas({ tex: 'contact', size: 360, asp: CA2, x: 0, y: 6, z0: 0, zN: 646 - 260 - 60, bias: 1.5, lo: 0.08, hi: 0.5, wisp: 0.9, opacity: 0.35, gain: 2, flow: 0.09, calm: 0.9, order: 2, near: true, only: ['contact'], desk: true, arr: true });
   // drifting haze close by: crops of the real gas, misty and faint, that you pass through
   const crops = [[0.15, 0.2], [0.45, 0.35], [0.3, 0.55], [0.55, 0.1], [0.1, 0.5], [0.5, 0.55], [0.25, 0.05], [0.6, 0.6], [0.05, 0.3], [0.4, 0.15]];
@@ -2266,9 +2285,14 @@ html body #section-view .mir-sing.mir-top > #lz-bar { z-index: 50 !important; mi
       ray.setFromCamera(ndc, camera);
       const o = ray.ray.origin, d = ray.ray.direction, tz = (RING_Z - o.z) / d.z;
       const atCentre = Math.hypot(o.x + d.x * tz, o.y + d.y * tz) < CENTRE_R;
+      if (e.pointerType === 'touch') {   // Oct 25 phone: first touch shows Click under your thumb; drag to play with the logo; tap Click again to go on
+        if (onRing && budState !== 'hidden') { document.getElementById('skip-intro').click(); return; }
+        if (budState === 'hidden') showRing(tmp.set(o.x + d.x * tz, o.y + d.y * tz, RING_Z), 'Click');
+        return;
+      }
       if (onRing || atCentre) { if (budState === 'hidden') showRing(tmp.set(o.x + d.x * tz, o.y + d.y * tz, RING_Z), 'Click'); document.getElementById('skip-intro').click(); return; }   // one click at the centre always works
     }
-    if (phase === 'idle') burst();
+    if (phase === 'idle' && !(e.pointerType === 'touch' && mode === 'shape')) burst();
   });
   document.addEventListener('pointerleave', () => { mouse.active = false; document.body.classList.remove('cursor-hidden'); });
   addEventListener('blur', () => { mouse.active = false; });
@@ -3540,8 +3564,8 @@ html body #section-view .mir-sing.mir-top > #lz-bar { z-index: 50 !important; mi
     const f2 = document.createElement('div'); f2.className = 'fly'; f2.textContent = label.toUpperCase();
     f2.style.left = ((ring && ring.sx) || innerWidth / 2) + 'px'; f2.style.top = ((ring && ring.sy) || innerHeight / 2) + 'px';
     f2.style.fontSize = (ring ? parseFloat(ring.btn.style.fontSize) || 12 : 12) + 'px'; f2.style.letterSpacing = '0.24em';
-    document.body.appendChild(f2); if (ring) ring.btn.style.visibility = 'hidden';
-    if (key === 'mirror') { AV.classList.add('away'); AV.style.transition = 'none'; requestAnimationFrame(() => requestAnimationFrame(() => AV.style.transition = '')); }   // the artist view never shows through on the way to The Mirror
+    f2.style.visibility = 'hidden'; document.body.appendChild(f2); menuRings.forEach(m => m.btn.style.visibility = 'hidden');   // Oct 25: no label flying to the corner, and no ghost of the three circles left behind
+    { AV.classList.add('away'); AV.style.transition = 'none'; requestAnimationFrame(() => requestAnimationFrame(() => AV.style.transition = '')); }   // the artist view never shows through on the way to The Mirror
     AV.classList.add('on', 'ready', 'named'); avName.classList.remove('waiting'); avFit();
     SV.classList.add('arriving'); showSection(key);
     if (key === 'mirror') {   // The Mirror: the letters lift off the circle and fly home into the title, one by one; the page itself comes in as before
@@ -3805,7 +3829,7 @@ html body #section-view .mir-sing.mir-top > #lz-bar { z-index: 50 !important; mi
           <label class="sf"><input name="name" type="text" autocomplete="name" placeholder="Name" required><i aria-hidden="true"></i></label>
           <label class="sf"><input name="email" type="email" autocomplete="email" placeholder="Email" required><i aria-hidden="true"></i></label>
           <label class="sf"><textarea name="message" rows="2" placeholder="Message" required></textarea><i aria-hidden="true"></i></label>
-          <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form></div></div><div class="mir-sing st-ground"><p class="mir-big">Seamless, dreamlike immersion</p></div><figure class="st-fern"><img alt="A drop falling into still water, its ripples forming a geometric pattern of light" draggable="false" src="space-img/studio-fern.jpg?v=2"></figure><div class="mir-sing st-say"><p class="mir-big">Grounded in earth imagery<br class="ph-br"> and the geometric patterns of creation</p></div><figure class="st-photo"><img alt="Mountains dissolving into a leaf" draggable="false" src="${IMG('studio-journey')}"></figure></div>
+          <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form></div></div><div class="mir-sing st-ground"><p class="mir-big">Seamless, dreamlike immersion</p></div><figure class="st-fern"><img alt="A drop falling into still water, its ripples forming a geometric pattern of light" draggable="false" src="space-img/studio-fern.jpg?v=2"><img class="desk-drop" alt="" draggable="false" src="space-img/studio-drop-desk.jpg?v=4"></figure><div class="mir-sing st-say"><p class="mir-big">Grounded in earth imagery<br class="ph-br"> and the geometric patterns of creation</p></div><figure class="st-photo"><img alt="Mountains dissolving into a leaf" draggable="false" src="${IMG('studio-journey')}"></figure></div>
         <div class="mir-sing st-say st-based"><p class="mir-big">Based in North Vancouver,<br class="ph-br"> where the mountains meet the sea</p></div>
         <figure class="studio-place st-pier"><img alt="North Vancouver at night, from the pier" src="${IMG('studio-pier')}"></figure>
         <div class="st-contact"><form class="cform st-form" data-to="studio" novalidate>
@@ -4336,7 +4360,7 @@ html body #section-view .mir-sing.mir-top > #lz-bar { z-index: 50 !important; mi
       cv = c; g = c.getContext('2d'); measure(); scale();
       fly = null; if (ov) { ov.remove(); ov = null; }
       const hand = innerWidth >= 760 && mirHand && performance.now() - mirHand.t0 < 1500 && mirHand.pts.length ? mirHand : null; mirHand = null;
-      const F = hand || freshField(), src = F.pts, groups = innerWidth < 760 ? chunkUp(src, 16).filter(g => g.length >= 3).sort((u, v) => u.length - v.length).slice(0, 9) : chunkUp(src, 10), N = groups.length, cr = cv.getBoundingClientRect();
+      const F = hand || freshField(), src = F.pts, groups = innerWidth < 760 ? chunkUp(src, 18).filter(g => g.length >= 3).sort((u, v) => u.length - v.length).slice(0, 11)   /* Oct 25: two more clusters on the phone */ : chunkUp(src, 10), N = groups.length, cr = cv.getBoundingClientRect();
       // the pieces become the page's clusters: some orbit the eye (starting round its upper half, so they land in view), the rest wander the sides
       const nw = N >= 8 ? 4 : N >= 5 ? 2 : 0, no = N - nw, slots = [], spd = innerWidth < 760 ? 3.4 : 1;   // phone: livelier, so the triangles visibly travel round the eye
       for (let k = 0; k < no; k++) slots.push({ kind: 'orbit', a: Math.PI + (k + .5) * 2 * Math.PI / no, sp: spd * 0.035, r: .9 + (k % 2) * .06, ox: 0, oy: 0 });   // one ring: evenly spaced, all turning together, so they keep their distance
