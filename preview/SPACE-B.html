@@ -1713,6 +1713,10 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
   html body #section-view .mir-sing.mir-top, html body #section-view .mir-sing.mir-tp { gap: 0 !important; row-gap: 0 !important; padding: 0 !important; }
   html body #section-view .mir-sing.mir-top .mir-small.evcap span.ev-ph:first-child { margin-top: var(--tg, 14px) !important; }
 }
+
+/* Oct 25: below the two top titles, statements fold in softly as they come into view (no laser) */
+html body #section-view .lz.lz-fold { opacity: 0 !important; transform: perspective(700px) rotateX(-24deg) translateY(6px) !important; transform-origin: 50% 0 !important; clip-path: none !important; }
+html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: none !important; transition: opacity 1.3s ease, transform 1.5s cubic-bezier(.2,.7,.2,1) !important; }
 </style>
 
 
@@ -3923,19 +3927,20 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
         sps.forEach((sp, i) => { sp.style.setProperty('font-size', (f0 * k).toFixed(2) + 'px', 'important'); sp.style.setProperty('letter-spacing', Math.max(0, (W - ws[i] * k) / sp.textContent.length).toFixed(3) + 'px', 'important'); }); }); };
     // Oct 25, PHONE: the two opening titles fill the width, and every statement has the same space above and below it, measured to what you actually see of the pictures
     const G = 60;   // the breath above and below every statement (Oct 25: a little more air)
+    const L = el => { let y = 0, e = el; while (e) { y += e.offsetTop; e = e.offsetParent; } const h = el.offsetHeight; return { top: y, bottom: y + h, height: h }; };   // layout position, ignoring any animation transform: nothing jumps while words animate
     const vis = el => {   // the visible top and bottom of a block: pictures fade at their edges, so their visible edge sits a little inside the box
-      const r = el.getBoundingClientRect();
-      if (el.matches('.mir-stage')) { const h = el.querySelector('.mir-hero').getBoundingClientRect(); return [h.top + h.height * .11, h.bottom - h.height * .11]; }
-      if (el.matches('.st-top')) { const lo = el.querySelector('.st-logo'); if (lo) { const b = lo.getBoundingClientRect(); return [b.top + b.height * .095, b.bottom - b.height * .123]; } }
-      if (el.matches('.st-fern')) { const r2 = el.getBoundingClientRect(); return [r2.top + r2.height * .17, r2.bottom - r2.height * .1]; }   // the water drop: its dark top fades away, the light starts at the gold horizon
-      if (el.matches('.mir-lined')) { const r2 = el.getBoundingClientRect(); return [r2.top + r2.height * .2, r2.bottom - r2.height * .16]; }   // the sound wave: its black dissolves, the wave itself starts a fifth of the way in
+      const r = L(el);
+      if (el.matches('.mir-stage')) { const h = L(el.querySelector('.mir-hero')); return [h.top + h.height * .11, h.bottom - h.height * .11]; }
+      if (el.matches('.st-top')) { const lo = el.querySelector('.st-logo'); if (lo) { const b = L(lo); return [b.top + b.height * .095, b.bottom - b.height * .123]; } }
+      if (el.matches('.st-fern')) { const r2 = L(el); return [r2.top + r2.height * .17, r2.bottom - r2.height * .1]; }   // the water drop: its dark top fades away, the light starts at the gold horizon
+      if (el.matches('.mir-lined')) { const r2 = L(el); return [r2.top + r2.height * .2, r2.bottom - r2.height * .16]; }   // the sound wave: its black dissolves, the wave itself starts a fifth of the way in
       if (el.matches('.st-photo, .st-pier, .fr.mir-wide, .mir-galaxy')) {   // only pictures that fade at the edges get their visible edge moved inside
         const m = [el, ...el.querySelectorAll('img, video')].some(x => { const cs = getComputedStyle(x); return (cs.maskImage && cs.maskImage !== 'none') || (cs.webkitMaskImage && cs.webkitMaskImage !== 'none'); });
-        const f = m ? .08 : 0; const r2 = (el.querySelector('.el4') || el).getBoundingClientRect(); return [r2.top + r2.height * f, r2.bottom - r2.height * f]; }
-      if (el.matches('.st-contact')) { const h = el.querySelector('h3') || el; return [h.getBoundingClientRect().top, r.bottom]; }
+        const f = m ? .08 : 0; const r2 = L(el.querySelector('.el4') || el); return [r2.top + r2.height * f, r2.bottom - r2.height * f]; }
+      if (el.matches('.st-contact')) { const h = el.querySelector('h3') || el; return [L(h).top, r.bottom]; }
       return [r.top, r.bottom];
     };
-    const words = el => { const rs = [...el.querySelectorAll('span.ev-ph')].filter(s => s.offsetParent).map(s => s.getBoundingClientRect()); if (!rs.length) { const r = el.getBoundingClientRect(); return [r.top, r.bottom]; } return [Math.min(...rs.map(r => r.top)), Math.max(...rs.map(r => r.bottom))]; };
+    const words = el => { const rs = [...el.querySelectorAll('span.ev-ph')].filter(s => s.offsetParent).map(s => L(s)); if (!rs.length) { const r = L(el); return [r.top, r.bottom]; } return [Math.min(...rs.map(r => r.top)), Math.max(...rs.map(r => r.bottom))]; };
     const setMT = (el, d) => { if (Math.abs(d) < .5) return; const m = parseFloat(el.dataset.bmt || '0') + d; el.dataset.bmt = m.toFixed(1); el.style.setProperty('margin-top', m.toFixed(1) + 'px', 'important'); };
     const phoneOrder = () => {   // PHONE, The Mirror: Every visual flows from the music · the sound wave · Through photorealistic worlds… · the four elementals · Experience the power… · the galaxy · The same patterns…
       const body = SV.querySelector('.sv-body'), first = SV.querySelector('.mir-first'); if (!body || !first || body.dataset.phoneOrder) return; body.dataset.phoneOrder = '1';
@@ -3957,8 +3962,11 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
         const fs = parseFloat(sps[0].style.fontSize) || parseFloat(getComputedStyle(sps[0]).fontSize), ws = sps.map(s => { s.style.width = 'max-content'; const w = s.offsetWidth; s.style.width = ''; return w; }), mx = Math.max(...ws);
         sps.forEach((s, i) => s.style.setProperty('font-size', (fs * Math.min(1.4, mx / ws[i])).toFixed(2) + 'px', 'important')); });
       // Sandy's set sizes (Oct 25): the Studio's opening title 18px, "Seamless, dreamlike immersion" 17px
-      SV.querySelectorAll('.st-top-say .evcap span.ev-ph').forEach(x => x.style.setProperty('font-size', '18px', 'important'));
-      SV.querySelectorAll('.st-ground .evcap span.ev-ph').forEach(x => x.style.setProperty('font-size', '17px', 'important'));
+      { // The Studio: every line of the opening title and of "Seamless, dreamlike immersion" is exactly as wide as the "Grounded in earth imagery…" block, so all share the same margins left and right
+        const mw = x => { x.style.width = 'max-content'; const w = x.offsetWidth; x.style.width = ''; return w; };
+        const ref = [...SV.querySelectorAll('.st-say:not(.st-based) .evcap span.ev-ph')].filter(x => x.offsetParent);
+        if (ref.length) { const Wg = Math.min(Math.max(...ref.map(mw)), SV.clientWidth - 40);
+          SV.querySelectorAll('.st-top-say .evcap span.ev-ph, .st-ground .evcap span.ev-ph').forEach(x => { if (!x.offsetParent) return; const f = parseFloat(x.style.fontSize) || parseFloat(getComputedStyle(x).fontSize), w = mw(x); if (w) x.style.setProperty('font-size', (f * Wg / w).toFixed(2) + 'px', 'important'); }); } }
       // 1c. even line spacing (the Capsize / text-box-trim method): each line's box is trimmed to exactly its capitals, then every gap between lines is the same
       SV.querySelectorAll('.mir-sing').forEach(b => { const sps = [...b.querySelectorAll('.evcap span.ev-ph')].filter(s => s.offsetParent); if (!sps.length) return;
         const g = Math.round(Math.min(...sps.map(s => parseFloat(s.style.fontSize) || 16)) * 1.0);
@@ -3967,7 +3975,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
       const studio = !!SV.querySelector('.st-stage');
       const flow = studio ? [top, ...SV.querySelector('.st-stage').children] : [...SV.querySelector('.sv-body').children].filter(e => !e.matches('.mir-open, .mir-open-ph, .el-names, script'));
       const seq = flow.filter(e => e.offsetParent && e.getBoundingClientRect().height > 2);
-      const nav = (document.querySelector('.site-nav') || SV).getBoundingClientRect().bottom - SV.scrollTop;   // the menu is fixed: measure it where the page's top is, so scrolling never adds space
+      const nav = (document.querySelector('.site-nav') || SV).getBoundingClientRect().bottom - SV.getBoundingClientRect().top + L(SV).top;   // the menu is fixed: measure it where the page's top is, so scrolling never adds space
       seq.forEach((el, i) => {
         if (!el.matches('.mir-sing')) return;
         const prev = seq[i - 1], next = seq[i + 1], above = prev ? vis(prev)[1] : nav;
@@ -5234,11 +5242,12 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
   // The Studio uses exactly The Mirror's sizes (the size of "Not a film you watch…" for its big lines, of "Designed to feel like…" for the lines under them); longer statements break onto two lines instead of shrinking
   let key = '', probe = null;
   const prep = el => { el.style.setProperty('padding-left', '.16em', 'important'); el.style.setProperty('white-space', 'nowrap', 'important'); el.style.setProperty('max-width', 'none', 'important'); el.style.setProperty('width', 'max-content', 'important'); el.style.setProperty('letter-spacing', '.16em', 'important'); };
-  const fitTo = (el, room) => { el.style.setProperty('font-size', '20px', 'important'); const w = el.getBoundingClientRect().width; return w > 0 ? Math.max(14, Math.min(52, 20 * room / w)) : 20; };
+  const fitTo = (el, room) => { el.style.setProperty('font-size', '20px', 'important'); const w = el.offsetWidth;   // layout width: never fooled by an animation in progress
+    return w > 0 ? Math.max(14, Math.min(52, 20 * room / w)) : 20; };
   (function f() { requestAnimationFrame(f);
     const SV = document.querySelector('#section-view.on'); if (!SV || innerWidth <= 760) { key = ''; return; }
     const els = [...SV.querySelectorAll('.mir-sing .mir-big, .mir-sing .mir-small')].filter(e => e.offsetParent);
-    const k = innerWidth + 'x' + els.length + (SV.querySelector('.sv-t') || {}).textContent; if (!els.length || k === key) return; key = k;
+    const k = innerWidth + 'x' + els.length + (SV.querySelector('.sv-t') || {}).textContent + (document.fonts ? document.fonts.status : ''); if (!els.length || k === key) return; key = k;   // refit once the real fonts have loaded
     const studio = false;   // Oct 24: The Studio uses The Mirror's setup exactly: every statement one line across, sized to fill the width
     let BIG = 0, SMALL = 0;
     if (studio) {   // measure The Mirror's opening lines, off screen, the way The Mirror sizes them
@@ -5287,6 +5296,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
     const fresh = found.filter(el => !found.some(o => o !== el && o.contains(el)) && !items.some(it => it.el.contains(el)));
     fresh.forEach(el => { seen.add(el); el.classList.add('lz');
       if (el.classList.contains('mir-top')) el.querySelectorAll('.mir-big, .mir-small:not(.mir-keep)').forEach(c => c.style.setProperty('clip-path', 'inset(0 0 100% 0)', 'important'));
+      else if (!el.classList.contains('mir-open')) { el.classList.add('lz-fold'); return items.push({ el, done: 0, fold: 1 }); }   // Oct 25: only the two top titles get the laser; everything lower folds in softly
       else if (el.classList.contains('mir-open')) { el.classList.add('scan'); [...el.children].forEach(c => c.style.clipPath = 'inset(0 0 100% 0)'); } else hide(el); items.push({ el, done: 0 }); });
     if (fresh.length) items.sort((u, v) => u.el.compareDocumentPosition(v.el) & 4 ? -1 : 1);
   };
@@ -5296,7 +5306,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
     items = items.filter(it => it.el.isConnected);
     if (busy && !busy.el.isConnected) busy = null;
     if (!SV.classList.contains('on') || SV.classList.contains('arriving')) { bar.style.opacity = 0; return; }
-    items.forEach(it => { if (!it.done && it !== busy && it.el.getBoundingClientRect().bottom < 0) { it.done = 1; it.el.style.setProperty('clip-path', 'none', 'important'); [...it.el.children].forEach((c, i) => c.style.clipPath = it.el.classList.contains('mir-open') && i === 0 ? 'inset(0 0 100% 0)' : ''); if (it.el.classList.contains('mir-top')) { it.el.querySelector('.mir-big').style.setProperty('clip-path', 'inset(0 0 100% 0)', 'important'); it.el.querySelector('.mir-small:not(.mir-keep)').style.setProperty('clip-path', 'none', 'important'); } } });   // scrolled past before its turn: simply shown
+    items.forEach(it => { if (!it.done && it !== busy && it.el.getBoundingClientRect().bottom < 0) { it.done = 1; it.el.classList.add('lz-in'); it.el.style.setProperty('clip-path', 'none', 'important'); [...it.el.children].forEach((c, i) => c.style.clipPath = it.el.classList.contains('mir-open') && i === 0 ? 'inset(0 0 100% 0)' : ''); if (it.el.classList.contains('mir-top')) { it.el.querySelector('.mir-big').style.setProperty('clip-path', 'inset(0 0 100% 0)', 'important'); it.el.querySelector('.mir-small:not(.mir-keep)').style.setProperty('clip-path', 'none', 'important'); } } });   // scrolled past before its turn: simply shown
     if (op && op.el.isConnected) {   // The Mirror's opening, on its own track: line one is written, the light goes back up, and line two is written in its place
       const el = op.el, t = (now - op.t0) / 1000, sp = [...el.children].filter(c => c.tagName === 'SPAN'), ln = el.querySelector('.scanline'), er = el.getBoundingClientRect(), r = sp[0].getBoundingClientRect();
       const D = 1.1, H = 2.4, U = .9, P = .4, E = D + H + U + P;
@@ -5317,6 +5327,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
       if (env <= 0) wave = null;
     } else wave = null;
     if (!busy) { const nx = items.find(it => { if (it.done) return false; const r = it.el.getBoundingClientRect(); return r.top < innerHeight * .88 && r.bottom > 0; }); if (!nx) { if (!ret) bar.style.opacity = 0; return; } busy = nx; busy.t0 = now; }
+    if (busy.fold) { busy.el.classList.add('lz-in'); busy.done = 1; busy = null; return; }
     const el = busy.el, t = (now - busy.t0) / 1000;
     if (el.classList.contains('mir-top')) {   // the opening, the same on The Mirror and The Studio: a laser exactly as wide as the first line scans down and writes it,
       // carries on past it while it stretches to the width of the second line, then rises and writes the second line from the bottom up. Both lines stay.
