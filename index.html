@@ -1711,11 +1711,22 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
   html body #section-view .mir-sing { height: auto !important; min-height: 0 !important; }
   html body #section-view .mir-sing.mir-top, html body #section-view .mir-sing.mir-tp { gap: 0 !important; row-gap: 0 !important; padding: 0 !important; }
   html body #section-view .mir-sing.mir-top .mir-small.evcap span.ev-ph:first-child { margin-top: var(--tg, 14px) !important; }
+  html body #section-view .mir-sing.mir-top:not(.st-top-say) > .mir-small.evcap { margin-top: 16px !important; }   /* The Mirror: room for the light to pass between the two lines */
 }
 
 /* Oct 25: below the two top titles, statements fold in softly as they come into view (no laser) */
 html body #section-view .lz.lz-fold { opacity: 0 !important; transform: perspective(700px) rotateX(-24deg) translateY(6px) !important; transform-origin: 50% 0 !important; clip-path: none !important; }
 html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: none !important; transition: opacity 1.3s ease, transform 1.5s cubic-bezier(.2,.7,.2,1) !important; }
+
+/* Oct 25: the Studio's opening — desktop shows the two-line version, the phone keeps its own */
+@media (min-width: 761px) { html body #section-view .mir-sing.mir-top.st-top-say { display: none !important; } }
+@media (max-width: 760px) { html body #section-view .mir-sing.mir-top.st-top-say { display: none !important; } }   /* Oct 25: the phone uses the two-line opening too */
+
+/* Oct 25 PHONE: the two opening titles are revealed only by the laser, exactly as it passes; no separate fade running on its own clock */
+@media (max-width: 760px) {
+  html body #section-view .mir-sing.mir-top > *, html body #section-view .mir-sing.mir-top.in > *, html body #section-view .mir-sing.mir-top span.ev-ph {
+    animation: none !important; opacity: 1 !important; transition: none !important; }
+}
 </style>
 
 
@@ -3780,7 +3791,7 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
           <label class="sf"><input name="email" type="email" autocomplete="email" placeholder="Email" required><i aria-hidden="true"></i></label>
           <label class="sf"><textarea name="message" rows="2" placeholder="Message" required></textarea><i aria-hidden="true"></i></label>
           <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form><div class="contact-extra"><span class="contact-mail">sandy@seenik.studio</span><div class="socials"><a href="https://www.facebook.com/sandy.heidebrecht" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-8.2h2.8l.4-3.2h-3.2V8.6c0-.9.3-1.6 1.6-1.6h1.7V4.1c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.4H7.3v3.2h2.8V22h3.4z"/></svg></a><a href="https://www.instagram.com/sandybeaches23/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.7.1-1.1.1-1.7.2-2.1.4-.5.2-.9.4-1.3.8-.4.4-.6.8-.8 1.3-.2.4-.3 1-.4 2.1C2.6 9.9 2.6 10.3 2.6 12s0 2.1.1 3.3c.1 1.1.2 1.7.4 2.1.2.5.4.9.8 1.3.4.4.8.6 1.3.8.4.2 1 .3 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1-.1 1.7-.2 2.1-.4.5-.2.9-.4 1.3-.8.4-.4.6-.8.8-1.3.2-.4.3-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1.1-.2-1.7-.4-2.1-.2-.5-.4-.9-.8-1.3-.4-.4-.8-.6-1.3-.8-.4-.2-1-.3-2.1-.4C15.5 4 15.1 4 12 4zm0 3.1a4.9 4.9 0 110 9.8 4.9 4.9 0 010-9.8zm0 8.1a3.2 3.2 0 100-6.4 3.2 3.2 0 000 6.4zm5.1-8.3a1.1 1.1 0 110-2.3 1.1 1.1 0 010 2.3z"/></svg></a><a href="https://www.youtube.com/@innerpeaces1799" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 00-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 002.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 001.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 001.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg></a></div></div></div>` },
-    studio: { title: 'The Studio', back: null, spaced: true, render: () => `<div class="mir-sing mir-top st-top-say"><p class="mir-big">Seenik brings a music-driven story arc to the fulldome</p></div>
+    studio: { title: 'The Studio', back: null, spaced: true, render: () => `<div class="mir-sing mir-top st-top-say"><p class="mir-big">Seenik brings a music-driven story arc to the fulldome</p></div><div class="mir-sing mir-top st-top-desk"><p class="mir-big">Seenik brings a music-driven story arc</p><p class="mir-small">to the fulldome</p></div>
         <div class="st-stage"><div class="st-top"><div class="st-lead"><img class="st-logo" alt="Seenik" draggable="false" src="preview/space-img/logo-alpha.png"><p class="st-ph-txt">${evenPh("Seenik brings a music-driven story arc to the fulldome medium, grounded in earth imagery and the geometric patterns that exist all around and inside of us.")}</p></div><div class="st-dform"><form class="cform st-form" data-to="studio" novalidate>
           <h3>Contact</h3>
           <label class="sf"><input name="name" type="text" autocomplete="name" placeholder="Name" required><i aria-hidden="true"></i></label>
@@ -3940,7 +3951,8 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
       return [r.top, r.bottom];
     };
     const words = el => { const rs = [...el.querySelectorAll('span.ev-ph')].filter(s => s.offsetParent).map(s => L(s)); if (!rs.length) { const r = L(el); return [r.top, r.bottom]; } return [Math.min(...rs.map(r => r.top)), Math.max(...rs.map(r => r.bottom))]; };
-    const setMT = (el, d) => { if (Math.abs(d) < .5) return; const m = parseFloat(el.dataset.bmt || '0') + d; el.dataset.bmt = m.toFixed(1); el.style.setProperty('margin-top', m.toFixed(1) + 'px', 'important'); };
+    const setMT = (el, d) => { if (Math.abs(d) < 1.5) return;   // small re-measures never nudge the page (no jitter)
+    const m = parseFloat(el.dataset.bmt || '0') + d; el.dataset.bmt = m.toFixed(1); el.style.setProperty('margin-top', m.toFixed(1) + 'px', 'important'); };
     const phoneOrder = () => {   // PHONE, The Mirror: Every visual flows from the music · the sound wave · Through photorealistic worlds… · the four elementals · Experience the power… · the galaxy · The same patterns…
       const body = SV.querySelector('.sv-body'), first = SV.querySelector('.mir-first'); if (!body || !first || body.dataset.phoneOrder) return; body.dataset.phoneOrder = '1';
       const lined = SV.querySelector('.mir-lined'), elem = SV.querySelector('.fr.mir-wide:not(.mir-lined)'), wind = SV.querySelector('.mir-wind'), close = SV.querySelector('.mir-close'), gal = SV.querySelector('.mir-galaxy'), sm = first.querySelector('.mir-small');
@@ -3950,7 +3962,7 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
     };
     const phoneBalance = () => {
       phoneOrder();
-      const top = SV.querySelector('.mir-top'); if (!top) return;
+      const top = [...SV.querySelectorAll('.mir-top')].find(e => e.offsetParent); if (!top) return;
       // 1. the opening titles: each line as big as the width allows (the first line of The Mirror on one line, the rest in even lines)
       const W = top.clientWidth - 32;
       { const sps = [...top.querySelectorAll('.evcap span.ev-ph')].filter(s => s.offsetParent);   // BigText: every line of the opening exactly the same width, the full width of the screen
@@ -3965,7 +3977,10 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
         const mw = x => { x.style.width = 'max-content'; const w = x.offsetWidth; x.style.width = ''; return w; };
         const ref = [...SV.querySelectorAll('.st-say:not(.st-based) .evcap span.ev-ph')].filter(x => x.offsetParent);
         if (ref.length) { const Wg = Math.min(Math.max(...ref.map(mw)), SV.clientWidth - 40);
-          SV.querySelectorAll('.st-top-say .evcap span.ev-ph, .st-ground .evcap span.ev-ph').forEach(x => { if (!x.offsetParent) return; const f = parseFloat(x.style.fontSize) || parseFloat(getComputedStyle(x).fontSize), w = mw(x); if (w) x.style.setProperty('font-size', (f * Wg / w).toFixed(2) + 'px', 'important'); }); } }
+          SV.querySelectorAll('.st-top-say .evcap span.ev-ph, .st-ground .evcap span.ev-ph, .st-top-say-none').forEach(x => { if (!x.offsetParent) return; const f = parseFloat(x.style.fontSize) || parseFloat(getComputedStyle(x).fontSize), w = mw(x); if (w) x.style.setProperty('font-size', (f * Wg / w).toFixed(2) + 'px', 'important'); });
+          // the opening's first line spans the same width as "Grounded…"; "to the fulldome" underneath is bigger, a little bigger (15%)
+          const a = SV.querySelector('.st-top-desk .mir-big span.ev-ph'), b2 = SV.querySelector('.st-top-desk .mir-small span.ev-ph');
+          if (a && b2 && a.offsetParent) { a.style.setProperty('font-size', '16px', 'important'); const wa = mw(a), f2 = parseFloat(b2.style.fontSize) || 16, wb = mw(b2); b2.style.setProperty('font-size', '28.4px', 'important'); } } }   // Sandy: 28.4px, the same as "A world you inhabit"   // Sandy: first line 16px; "to the fulldome" sized to the same width   // Sandy: "to the fulldome" 20px
       // 1c. even line spacing (the Capsize / text-box-trim method): each line's box is trimmed to exactly its capitals, then every gap between lines is the same
       SV.querySelectorAll('.mir-sing').forEach(b => { const sps = [...b.querySelectorAll('.evcap span.ev-ph')].filter(s => s.offsetParent); if (!sps.length) return;
         const g = Math.round(Math.min(...sps.map(s => parseFloat(s.style.fontSize) || 16)) * 1.0);
@@ -3983,14 +3998,15 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
         if (next && !next.matches('.mir-sing')) setMT(next, words(el)[1] + G - vis(next)[0]);
       });
     };
-    const fit = () => { fit0(); if (innerWidth <= 760) phoneBalance(); };
+    const phoneWords = () => { const b = SV.querySelector('.st-top-desk .mir-big'); if (b && !b.classList.contains('evcap') && !b.dataset.ph) { b.dataset.ph = '1'; b.textContent = 'Bringing a music-driven story arc'; } };   // Oct 25 PHONE: the Studio's first line without "Seenik"
+    const fit = () => { if (innerWidth <= 760) phoneWords(); fit0(); if (innerWidth <= 760) phoneBalance(); };
     let q = 0; const soon = () => { cancelAnimationFrame(q); q = requestAnimationFrame(fit); };
     new MutationObserver(soon).observe(SV, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
     addEventListener('resize', soon); if (document.fonts) document.fonts.ready.then(soon); SV.addEventListener('click', () => setTimeout(soon, 30));
     SV.addEventListener('load', soon, true);
     const growIO = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('grow'); growIO.unobserve(e.target); } }), { threshold: .9 });
     new MutationObserver(() => SV.querySelectorAll('.mir-wind .mir-big.evcap:not(.grow), .mir-close .mir-big.evcap:not(.grow)').forEach(el => growIO.observe(el))).observe(SV, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });   // pictures arriving change the spaces we balance
-    SV.addEventListener('animationend', soon, true); setInterval(() => { if (innerWidth <= 760 && SV.querySelector('.st-say, .mir-wind')) soon(); }, 1500);
+    SV.addEventListener('animationend', soon, true); let lastH = 0; setInterval(() => { if (innerWidth <= 760 && SV.querySelector('.st-say, .mir-wind') && SV.scrollHeight !== lastH) { lastH = SV.scrollHeight; soon(); } }, 1500);   // re-measure only when something actually changed size, so letters never twitch
   })();
   function svClick(e) {
     const cv = e.target.closest('[data-vid]');
@@ -5265,12 +5281,16 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
         el.style.setProperty('letter-spacing', '.1em', 'important'); el.style.setProperty('padding-left', '.1em', 'important'); el.style.removeProperty('margin-left'); el.style.removeProperty('justify-self');
         // Oct 24: The Studio follows The Mirror exactly: The Mirror's spacing, and every line stops at the same width as The Mirror's lines, leaving the same black margins left and right
         el.style.setProperty('letter-spacing', '.16em', 'important'); el.style.setProperty('padding-left', '.16em', 'important');
+        if (el.closest('.st-top-desk')) {   // Oct 25 desktop: the Studio's opening in two lines; the second, shorter line is the bigger one (Mirror's 52px), the first a little smaller and free to run longer
+          const two = el.classList.contains('mir-small'), fs = two ? 52 : Math.min(40, fitTo(el, Math.min(innerWidth - 160, 1400)));
+          el.style.setProperty('font-size', fs.toFixed(2) + 'px', 'important'); el.style.translate = ''; return; }
         const grow = el.closest('.st-top-say') ? 1.14 : el.closest('.st-say:not(.st-based)') ? 1.25 : el.closest('.st-based') ? 1.21 : 1;   // Oct 24: halfway back toward the earlier, bigger sizes (Seamless, dreamlike… stays as it is)
         const fs = Math.min(fitTo(el, Math.min(innerWidth - 96, 1500, 1238) * 0.95) * grow, fitTo(el, el.closest('.st-top-say') ? Math.min(innerWidth - 280, 1420) : innerWidth - 80)); el.style.setProperty('font-size', (el.closest('.st-ground') ? Math.min(fs, 38) : fs).toFixed(2) + 'px', 'important');   // Oct 24: scaled back 3%;   // as big as The Mirror's (52px, and 43px for the line under it) whenever the window is wide enough; the line under: 13 inches to the first line's 15   // the line under the opening: 13 inches to the first line's 15   // the first line keeps clear black space at both sides
         el.style.translate = ''; const er = el.getBoundingClientRect(), pr = el.parentElement.getBoundingClientRect();
         el.style.translate = ((pr.left + pr.right) / 2 - (er.left + er.right) / 2).toFixed(1) + 'px 0';   // wider than its column or not: its centre sits on the page's centre
         return; }
-      if (!studio) { const fs = fitTo(el, room); el.style.setProperty('font-size', fs.toFixed(2) + 'px', 'important');
+      if (!studio) { const fs = fitTo(el, room) * (el.matches('.mir-top .mir-small') ? .9 : 1);   // Oct 25: "A single living thing…" a little smaller
+        el.style.setProperty('font-size', fs.toFixed(2) + 'px', 'important');
         if (el.closest('.mir-top')) { const m = window.__mirSizes && window.__mirSizes.w === innerWidth ? window.__mirSizes : (window.__mirSizes = { w: innerWidth }); m[el.classList.contains('mir-small') ? 'small' : 'big'] = fs; } return; }
       let fs = el.classList.contains('mir-small') ? SMALL : BIG; el.style.setProperty('font-size', fs.toFixed(2) + 'px', 'important');
       const w = el.getBoundingClientRect().width; if (w > room) el.style.setProperty('font-size', (fs * room / w).toFixed(2) + 'px', 'important');
@@ -5322,7 +5342,7 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
     if (wave && wave.el.isConnected) {   // "moving through a single living thing": the letters ride a wave as they appear, then settle
       const tw = (now - wave.t0) / 1000, env = tw < wave.D ? 1 : Math.max(0, 1 - (tw - wave.D) / 2.4), ls = wave.el.querySelectorAll('.wv i');
       const amp = ls.length ? parseFloat(getComputedStyle(ls[0]).fontSize) * .08 : 0;
-      ls.forEach((c, i) => c.style.transform = env > 0 ? `translateY(${(Math.sin(i * .35 - tw * 3.6) * amp * env * env).toFixed(2)}px)` : '');
+      ls.forEach((c, i) => c.style.transform = env > 0 ? `translate3d(0, ${(Math.sin(i * .35 - tw * 3.6) * amp * env * env).toFixed(3)}px, 0)` : '');   // GPU, sub-pixel: smooth
       if (env <= 0) wave = null;
     } else wave = null;
     if (!busy) { const nx = items.find(it => { if (it.done) return false; const r = it.el.getBoundingClientRect(); return r.top < innerHeight * .88 && r.bottom > 0; }); if (!nx) { if (!ret) bar.style.opacity = 0; return; } busy = nx; busy.t0 = now; }
@@ -5338,7 +5358,8 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
         big.style.setProperty('clip-path', t < DN ? `inset(-40% -10% ${Math.max(0, bb.bottom - y).toFixed(1)}px -10%)` : 'none', 'important');
         if (t > DN + F) { bar.style.cssText = 'opacity:0'; busy.done = 1; busy = null; } return; }
       const tw = e => { const rg = document.createRange(); rg.selectNodeContents(e); return rg.getBoundingClientRect(); };   // the words themselves, not the box
-      const bb = big.getBoundingClientRect(), bs = sm.getBoundingClientRect(), wb = tw(big), wsm = tw(sm);
+      const vr = e => { const sp = [...e.querySelectorAll('span.ev-ph')].find(x => x.offsetParent); return (sp || e).getBoundingClientRect(); };   // the letters themselves (on the phone the line box is taller than the letters)
+      const bb = vr(big), bs = vr(sm), wb = tw(big), wsm = tw(sm);
       const DN = 1.3, GO = .9, UP = 1.5, F = .5, T1 = DN, T2 = T1 + GO, T3 = T2 + UP;
       const top = bb.top - 10, mid = bb.bottom + 4, bot = bs.bottom + 18;
       const flat = (y, cx, w, h, o) => { bar.style.cssText = `left:${cx - w / 2}px;top:${y - h / 2}px;width:${w}px;height:${h}px;opacity:${o};box-shadow:0 0 ${10 + h * 4}px ${1 + h}px rgba(170,200,255,.75),0 0 ${30 + h * 10}px ${4 + h * 2}px rgba(120,160,255,.35)`; };
@@ -5348,8 +5369,9 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
       clip(big, 'none');
       if (t < T2) { const u = ease((t - T1) / GO), y = mid + (bot - mid) * u; flat(y, c1 + (c2 - c1) * u, wb.width + (wsm.width - wb.width) * u, 2 + 2 * u, 1); clip(sm, 'inset(0 0 100% 0)'); return; }   // past the first line, growing to the second line's width
       if (!wave || wave.el !== el) wave = { el, t0: now, D: UP };
-      if (t < T3) { const y = bot - (bot - bs.top + 6) * ease((t - T2) / UP); flat(y, c2, wsm.width, 4, 1); clip(sm, `inset(${Math.max(0, y - bs.top).toFixed(1)}px -10% -60% -10%)`); return; }   // rising: the second line appears from the bottom up
-      clip(sm, 'none'); const u = Math.min(1, (t - T3) / F); flat(bs.top - 6, c2, wsm.width, 4 * (1 - u) + 1, 1 - u);
+      const stop = innerWidth <= 760 ? (bb.bottom + bs.top) / 2 : bs.top - 6;   // phone: the light comes to rest exactly between the two lines
+      if (t < T3) { const y = bot - (bot - stop) * ease((t - T2) / UP); flat(y, c2, wsm.width, 4, 1); clip(sm, `inset(${Math.max(0, y - bs.top).toFixed(1)}px -10% -60% -10%)`); return; }   // rising: the second line appears from the bottom up
+      clip(sm, 'none'); const u = Math.min(1, (t - T3) / F); flat(stop, c2, wsm.width, 4 * (1 - u) + 1, 1 - u);
       if (u >= 1) { bar.style.cssText = 'opacity:0'; busy.done = 1; busy = null; }
       return;
     }

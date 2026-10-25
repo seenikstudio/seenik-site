@@ -1722,6 +1722,12 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
 /* Oct 25: the Studio's opening — desktop shows the two-line version, the phone keeps its own */
 @media (min-width: 761px) { html body #section-view .mir-sing.mir-top.st-top-say { display: none !important; } }
 @media (max-width: 760px) { html body #section-view .mir-sing.mir-top.st-top-say { display: none !important; } }   /* Oct 25: the phone uses the two-line opening too */
+
+/* Oct 25 PHONE: the two opening titles are revealed only by the laser, exactly as it passes; no separate fade running on its own clock */
+@media (max-width: 760px) {
+  html body #section-view .mir-sing.mir-top > *, html body #section-view .mir-sing.mir-top.in > *, html body #section-view .mir-sing.mir-top span.ev-ph {
+    animation: none !important; opacity: 1 !important; transition: none !important; }
+}
 </style>
 
 
@@ -3972,10 +3978,10 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
         const mw = x => { x.style.width = 'max-content'; const w = x.offsetWidth; x.style.width = ''; return w; };
         const ref = [...SV.querySelectorAll('.st-say:not(.st-based) .evcap span.ev-ph')].filter(x => x.offsetParent);
         if (ref.length) { const Wg = Math.min(Math.max(...ref.map(mw)), SV.clientWidth - 40);
-          SV.querySelectorAll('.st-top-say .evcap span.ev-ph, .st-ground .evcap span.ev-ph, .st-top-desk .mir-big .evcap, .st-top-desk .mir-big span.ev-ph').forEach(x => { if (!x.offsetParent) return; const f = parseFloat(x.style.fontSize) || parseFloat(getComputedStyle(x).fontSize), w = mw(x); if (w) x.style.setProperty('font-size', (f * Wg / w).toFixed(2) + 'px', 'important'); });
+          SV.querySelectorAll('.st-top-say .evcap span.ev-ph, .st-ground .evcap span.ev-ph, .st-top-say-none').forEach(x => { if (!x.offsetParent) return; const f = parseFloat(x.style.fontSize) || parseFloat(getComputedStyle(x).fontSize), w = mw(x); if (w) x.style.setProperty('font-size', (f * Wg / w).toFixed(2) + 'px', 'important'); });
           // the opening's first line spans the same width as "Grounded…"; "to the fulldome" underneath is bigger, a little bigger (15%)
           const a = SV.querySelector('.st-top-desk .mir-big span.ev-ph'), b2 = SV.querySelector('.st-top-desk .mir-small span.ev-ph');
-          if (a && b2 && a.offsetParent) b2.style.setProperty('font-size', '20px', 'important'); } }   // Sandy: "to the fulldome" 20px
+          if (a && b2 && a.offsetParent) { a.style.setProperty('font-size', '16px', 'important'); const wa = mw(a), f2 = parseFloat(b2.style.fontSize) || 16, wb = mw(b2); b2.style.setProperty('font-size', '28.4px', 'important'); } } }   // Sandy: 28.4px, the same as "A world you inhabit"   // Sandy: first line 16px; "to the fulldome" sized to the same width   // Sandy: "to the fulldome" 20px
       // 1c. even line spacing (the Capsize / text-box-trim method): each line's box is trimmed to exactly its capitals, then every gap between lines is the same
       SV.querySelectorAll('.mir-sing').forEach(b => { const sps = [...b.querySelectorAll('.evcap span.ev-ph')].filter(s => s.offsetParent); if (!sps.length) return;
         const g = Math.round(Math.min(...sps.map(s => parseFloat(s.style.fontSize) || 16)) * 1.0);
@@ -3993,7 +3999,8 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
         if (next && !next.matches('.mir-sing')) setMT(next, words(el)[1] + G - vis(next)[0]);
       });
     };
-    const fit = () => { fit0(); if (innerWidth <= 760) phoneBalance(); };
+    const phoneWords = () => { const b = SV.querySelector('.st-top-desk .mir-big'); if (b && !b.classList.contains('evcap') && !b.dataset.ph) { b.dataset.ph = '1'; b.textContent = 'Bringing a music-driven story arc'; } };   // Oct 25 PHONE: the Studio's first line without "Seenik"
+    const fit = () => { if (innerWidth <= 760) phoneWords(); fit0(); if (innerWidth <= 760) phoneBalance(); };
     let q = 0; const soon = () => { cancelAnimationFrame(q); q = requestAnimationFrame(fit); };
     new MutationObserver(soon).observe(SV, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
     addEventListener('resize', soon); if (document.fonts) document.fonts.ready.then(soon); SV.addEventListener('click', () => setTimeout(soon, 30));
