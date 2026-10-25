@@ -1536,8 +1536,8 @@
     font-family: 'Ubuntu', system-ui, sans-serif !important; font-weight: 400 !important; color: #f4f6fb !important;
     text-shadow: 0 1px 0 #a7afc6, 0 2px 0 #8b93ac, 0 3px 0 #707892, 0 4px 0 #575e77, 0 5px 0 #40465c, 0 6px 0 #2d3244, 0 12px 24px rgba(0,0,0,.7) !important; }
 }
-/* Oct 24: A4 laser scan reveal (desktop). Every block of page text is written by a bar of light as it comes into view, then holds. */
-@media (min-width: 761px) {
+/* Oct 24: A4 laser scan reveal. Every block of page text is written by a bar of light as it comes into view, then holds. Oct 25: on the phone too */
+@media all {
   html body #section-view .lz { opacity: 1 !important; animation: none !important; transition: none !important; }
   html body #section-view .lz.lz-wait { visibility: hidden; }
   #lz-bar { position: fixed; left: 0; top: 0; height: 2px; pointer-events: none; z-index: 8; opacity: 0;
@@ -1693,6 +1693,25 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
     aspect-ratio: 1600 / 1300 !important; height: auto !important; --hw: calc(100vw + 150px); width: var(--hw) !important; max-width: none !important;
     margin-left: calc((100% - var(--hw)) / 2) !important; margin-right: 0 !important; justify-self: start !important; background: transparent !important; border: 0 !important;
     -webkit-mask: radial-gradient(closest-side, #000 82%, transparent 100%); mask: radial-gradient(closest-side, #000 82%, transparent 100%); }
+}
+
+/* ===== Oct 25: PHONE pictures as on the desktop: edge to edge, no hairlines, top and bottom fading into space; the sound wave with no line, its black dissolving into space ===== */
+@media (max-width: 760px) {
+  html body #section-view .st-photo, html body #section-view .st-pier { border: 0 !important; padding: 0 !important; width: 100vw !important; margin-left: calc(50% - 50vw) !important;
+    -webkit-mask: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%) !important; mask: linear-gradient(to bottom, transparent 0, #000 16%, #000 84%, transparent 100%) !important; }
+  html body #section-view .st-photo .st-water { top: 0 !important; height: 100% !important; }
+  html body #section-view .mir-lined { background: transparent !important; border: 0 !important; outline: 0 !important; box-shadow: none !important; }
+  html body #section-view .mir-lined::after, html body #section-view .mir-lined::before { display: none !important; content: none !important; }
+  html body #section-view .mir-sing { padding-top: 0 !important; padding-bottom: 0 !important; margin-bottom: 0 !important; }
+}
+
+/* Oct 25 PHONE: every statement line is one trimmed block (text-box-trim: the box is exactly the capitals), so spacing is measured, not guessed */
+@media (max-width: 760px) {
+  html body #section-view .mir-sing .evcap span.ev-ph { display: block !important; line-height: 1 !important; text-box: trim-both cap alphabetic; }
+  html body #section-view .mir-sing .evcap { gap: 0 !important; row-gap: 0 !important; line-height: 1 !important; display: block !important; height: auto !important; min-height: 0 !important; text-align: center !important; }
+  html body #section-view .mir-sing { height: auto !important; min-height: 0 !important; }
+  html body #section-view .mir-sing.mir-top, html body #section-view .mir-sing.mir-tp { gap: 0 !important; row-gap: 0 !important; padding: 0 !important; }
+  html body #section-view .mir-sing.mir-top .mir-small.evcap span.ev-ph:first-child { margin-top: var(--tg, 14px) !important; }
 }
 </style>
 
@@ -3764,7 +3783,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
           <label class="sf"><input name="name" type="text" autocomplete="name" placeholder="Name" required><i aria-hidden="true"></i></label>
           <label class="sf"><input name="email" type="email" autocomplete="email" placeholder="Email" required><i aria-hidden="true"></i></label>
           <label class="sf"><textarea name="message" rows="2" placeholder="Message" required></textarea><i aria-hidden="true"></i></label>
-          <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form></div></div><div class="mir-sing st-ground"><p class="mir-big">Seamless, dreamlike immersive experiences</p></div><figure class="st-fern"><img alt="A drop falling into still water, its ripples forming a geometric pattern of light" draggable="false" src="space-img/studio-fern.jpg?v=2"></figure><div class="mir-sing st-say"><p class="mir-big">Grounded in earth imagery<br class="ph-br"> and the geometric patterns of creation</p></div><figure class="st-photo"><img alt="Mountains dissolving into a leaf" draggable="false" src="${IMG('studio-journey')}"></figure></div>
+          <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form></div></div><div class="mir-sing st-ground"><p class="mir-big">Seamless, dreamlike immersion</p></div><figure class="st-fern"><img alt="A drop falling into still water, its ripples forming a geometric pattern of light" draggable="false" src="space-img/studio-fern.jpg?v=2"></figure><div class="mir-sing st-say"><p class="mir-big">Grounded in earth imagery<br class="ph-br"> and the geometric patterns of creation</p></div><figure class="st-photo"><img alt="Mountains dissolving into a leaf" draggable="false" src="${IMG('studio-journey')}"></figure></div>
         <div class="mir-sing st-say st-based"><p class="mir-big">Based in North Vancouver,<br class="ph-br"> where the mountains meet the sea</p></div>
         <figure class="studio-place st-pier"><img alt="North Vancouver at night, from the pier" src="${IMG('studio-pier')}"></figure>
         <div class="st-contact"><form class="cform st-form" data-to="studio" novalidate>
@@ -3860,9 +3879,9 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
     const quads = () => SV.querySelectorAll('.fr.mir-wide:not(.mir-lined)').forEach(f => { if (f.querySelector('.el4')) return; const src = f.querySelector('img').src;   // the four elementals: one picture, shown as two rows of two
       const X = [25, 1179, 409, 792];   // top: murmurations, kaleidoscope; bottom: cymatics, fractals — the pictures tell it, no names   // each picture's square inside the 1540 x 462 image (333 px), without the label strip
       f.insertAdjacentHTML('beforeend', `<span class="el4">${X.map((x, k) => `<i style="background-image:url('${src}');background-position:${(x / (1540 - 333) * 100).toFixed(3)}% ${(89 / (462 - 333) * 100).toFixed(3)}%"></i>`).join('')}</span>`); });
-    const caps = () => SV.querySelectorAll('.st-say .mir-big, .st-based .mir-big, .mir-wind .mir-big, .mir-close .mir-big, .mir-top .mir-big, .mir-top .mir-small, .st-ground .mir-big, .mir-first .mir-big, .mir-first .mir-small').forEach(el => { if (el.classList.contains('evcap')) return;
-      const t = el.textContent.replace(/\s+/g, ' ').trim(); el.innerHTML = `<span class="dk">${el.innerHTML}</span>` + (t.length <= 30 ? `<span class="ev-ph one">${t}</span>` : (() => { const w = t.split(' '); let best = null; for (let i = 1; i < w.length; i++) { const a = w.slice(0, i).join(' '), b = w.slice(i).join(' '), d = Math.abs(a.length - b.length); if (!best || d < best[0]) best = [d, a, b]; } return `<span class="ev-ph">${best[1]}</span><span class="ev-ph">${best[2]}</span>`; })()); el.classList.add('evcap'); });
-    const fit = () => { if (innerWidth > 760) return; caps(); dots(); folds(); quads(); SV.querySelectorAll('span.ev-ph.one').forEach(sp => { if (!sp.offsetParent) return;   // one line: the size that exactly fills the width
+    const caps = () => SV.querySelectorAll('.mir-thru .mir-small, .st-say .mir-big, .st-based .mir-big, .mir-wind .mir-big, .mir-close .mir-big, .mir-top .mir-big, .mir-top .mir-small, .st-ground .mir-big, .mir-first .mir-big, .mir-first .mir-small').forEach(el => { if (el.classList.contains('evcap')) return;
+      const t = el.textContent.replace(/\s+/g, ' ').trim(); el.innerHTML = `<span class="dk">${el.innerHTML}</span>` + (t.length <= 30 || el.closest('.mir-top:not(.st-top-say)') || el.matches('.mir-first .mir-big') ? `<span class="ev-ph one">${t}</span>` : (() => { const w = t.split(' '); let best = null; for (let i = 1; i < w.length; i++) { const a = w.slice(0, i).join(' '), b = w.slice(i).join(' '), d = Math.abs(a.length - b.length); if (!best || d < best[0]) best = [d, a, b]; } return `<span class="ev-ph">${best[1]}</span><span class="ev-ph">${best[2]}</span>`; })()); el.classList.add('evcap'); });
+    const fit0 = () => { if (innerWidth > 760) return; caps(); dots(); folds(); quads(); SV.querySelectorAll('span.ev-ph.one').forEach(sp => { if (!sp.offsetParent) return;   // one line: the size that exactly fills the width
         const box = sp.parentElement, cs = getComputedStyle(box), W = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), f0 = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pfs')) || 13.5;
         sp.style.setProperty('letter-spacing', '0px', 'important'); sp.style.setProperty('font-size', f0 + 'px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = '';
         sp.style.setProperty('font-size', (f0 * W / w * .999).toFixed(2) + 'px', 'important'); });
@@ -3875,7 +3894,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
         if (hs.length) { const h = hs[0], cs = getComputedStyle(h.parentElement), W = h.parentElement.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - parseFloat(getComputedStyle(h).paddingLeft) - parseFloat(getComputedStyle(h).paddingRight);
           const pr = h.cloneNode(); pr.textContent = "Nikhil's Private Command Centre"; pr.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;width:auto;font-size:14px'; h.parentElement.appendChild(pr); const w = pr.getBoundingClientRect().width; pr.remove();
           const fs = Math.min(16, 14 * W / w * .99); hs.forEach(x => { x.style.setProperty('font-size', fs.toFixed(2) + 'px', 'important'); x.style.setProperty('white-space', 'nowrap', 'important'); }); } }
-      { const lo = SV.querySelector('.st-lead .st-logo'), say = SV.querySelector('.st-say:not(.st-based)'), based = SV.querySelector('.st-based'), ph = SV.querySelector('.st-photo'), pier = SV.querySelector('.st-pier');   // The Studio: each statement sits in the middle of its space
+      if (false) { const lo = SV.querySelector('.st-lead .st-logo'), say = SV.querySelector('.st-say:not(.st-based)'), based = SV.querySelector('.st-based'), ph = SV.querySelector('.st-photo'), pier = SV.querySelector('.st-pier');   // The Studio: each statement sits in the middle of its space
         const text = el => { const r = document.createRange(); r.selectNodeContents(el.querySelector('.mir-big')); return r.getBoundingClientRect(); };
         const mid = (el, top, bot) => { const t = text(el), m = parseFloat(el.style.marginTop) || 0, shift = ((t.top - top) - (bot - t.bottom)) / 2; if (Math.abs(shift) > .5) el.style.setProperty('margin-top', (m - shift).toFixed(1) + 'px', 'important'); };
         const gr = SV.querySelector('.st-ground'), fern = SV.querySelector('.st-fern');
@@ -3883,7 +3902,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
           if (gr && fern && fern.offsetParent) { mid(gr, end, fern.getBoundingClientRect().top); mid(say, fern.getBoundingClientRect().bottom, ph.getBoundingClientRect().top); }   // Oct 25: with the water-drop picture in between
           else mid(say, end, ph.getBoundingClientRect().top); }   // where the logo visibly ends (its faint glow included), measured from screenshots
         if (based && ph && pier) mid(based, ph.getBoundingClientRect().bottom, pier.getBoundingClientRect().top); }
-      SV.querySelectorAll('.mir-sing.mir-wind, .mir-sing.mir-close').forEach(el => {   // The Mirror: each statement sits in the middle of the space between the pictures above and below it
+      if (false) SV.querySelectorAll('.mir-sing.mir-wind, .mir-sing.mir-close').forEach(el => {   // The Mirror: each statement sits in the middle of the space between the pictures above and below it
         const prv = el.previousElementSibling, nxt = el.nextElementSibling; if (!prv || !nxt) return;
         const r = el.getBoundingClientRect(), m = parseFloat(el.style.marginTop) || 0, t = (() => { const g = document.createRange(); g.selectNodeContents(el.querySelector('.mir-big')); return g.getBoundingClientRect(); })();
         const pr = prv.getBoundingClientRect(), top = pr.bottom - (prv.classList.contains('mir-lined') ? pr.height * .09 : 0), bot = ([...nxt.querySelectorAll('.el4, img, video')].find(x => x.getBoundingClientRect().height) || nxt).getBoundingClientRect().top, shift = ((t.top - top) - (bot - t.bottom)) / 2;
@@ -3902,6 +3921,62 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
         const sps = [...box.querySelectorAll(':scope > span.ev-ph:not(.one)')], ws = sps.map(sp => { sp.style.setProperty('letter-spacing', '0px', 'important'); sp.style.setProperty('font-size', f0 + 'px', 'important'); sp.style.width = 'max-content'; const w = sp.offsetWidth; sp.style.width = ''; return w; });   // layout widths: unaffected by the flip-in animations
         const k = Math.min(1.3, W / Math.max(...ws));   // the block grows (up to 30 %) until its longest line meets the edges, so short blocks fill with natural spacing; a narrow column steps down instead
         sps.forEach((sp, i) => { sp.style.setProperty('font-size', (f0 * k).toFixed(2) + 'px', 'important'); sp.style.setProperty('letter-spacing', Math.max(0, (W - ws[i] * k) / sp.textContent.length).toFixed(3) + 'px', 'important'); }); }); };
+    // Oct 25, PHONE: the two opening titles fill the width, and every statement has the same space above and below it, measured to what you actually see of the pictures
+    const G = 60;   // the breath above and below every statement (Oct 25: a little more air)
+    const vis = el => {   // the visible top and bottom of a block: pictures fade at their edges, so their visible edge sits a little inside the box
+      const r = el.getBoundingClientRect();
+      if (el.matches('.mir-stage')) { const h = el.querySelector('.mir-hero').getBoundingClientRect(); return [h.top + h.height * .11, h.bottom - h.height * .11]; }
+      if (el.matches('.st-top')) { const lo = el.querySelector('.st-logo'); if (lo) { const b = lo.getBoundingClientRect(); return [b.top + b.height * .095, b.bottom - b.height * .123]; } }
+      if (el.matches('.st-fern')) { const r2 = el.getBoundingClientRect(); return [r2.top + r2.height * .17, r2.bottom - r2.height * .1]; }   // the water drop: its dark top fades away, the light starts at the gold horizon
+      if (el.matches('.mir-lined')) { const r2 = el.getBoundingClientRect(); return [r2.top + r2.height * .2, r2.bottom - r2.height * .16]; }   // the sound wave: its black dissolves, the wave itself starts a fifth of the way in
+      if (el.matches('.st-photo, .st-pier, .fr.mir-wide, .mir-galaxy')) {   // only pictures that fade at the edges get their visible edge moved inside
+        const m = [el, ...el.querySelectorAll('img, video')].some(x => { const cs = getComputedStyle(x); return (cs.maskImage && cs.maskImage !== 'none') || (cs.webkitMaskImage && cs.webkitMaskImage !== 'none'); });
+        const f = m ? .08 : 0; const r2 = (el.querySelector('.el4') || el).getBoundingClientRect(); return [r2.top + r2.height * f, r2.bottom - r2.height * f]; }
+      if (el.matches('.st-contact')) { const h = el.querySelector('h3') || el; return [h.getBoundingClientRect().top, r.bottom]; }
+      return [r.top, r.bottom];
+    };
+    const words = el => { const rs = [...el.querySelectorAll('span.ev-ph')].filter(s => s.offsetParent).map(s => s.getBoundingClientRect()); if (!rs.length) { const r = el.getBoundingClientRect(); return [r.top, r.bottom]; } return [Math.min(...rs.map(r => r.top)), Math.max(...rs.map(r => r.bottom))]; };
+    const setMT = (el, d) => { if (Math.abs(d) < .5) return; const m = parseFloat(el.dataset.bmt || '0') + d; el.dataset.bmt = m.toFixed(1); el.style.setProperty('margin-top', m.toFixed(1) + 'px', 'important'); };
+    const phoneOrder = () => {   // PHONE, The Mirror: Every visual flows from the music · the sound wave · Through photorealistic worlds… · the four elementals · Experience the power… · the galaxy · The same patterns…
+      const body = SV.querySelector('.sv-body'), first = SV.querySelector('.mir-first'); if (!body || !first || body.dataset.phoneOrder) return; body.dataset.phoneOrder = '1';
+      const lined = SV.querySelector('.mir-lined'), elem = SV.querySelector('.fr.mir-wide:not(.mir-lined)'), wind = SV.querySelector('.mir-wind'), close = SV.querySelector('.mir-close'), gal = SV.querySelector('.mir-galaxy'), sm = first.querySelector('.mir-small');
+      if (sm && lined) { const d = document.createElement('div'); d.className = 'mir-sing mir-thru'; d.appendChild(sm); lined.after(d); }
+      if (wind && elem) elem.after(wind);
+      if (close && gal) gal.after(close);
+    };
+    const phoneBalance = () => {
+      phoneOrder();
+      const top = SV.querySelector('.mir-top'); if (!top) return;
+      // 1. the opening titles: each line as big as the width allows (the first line of The Mirror on one line, the rest in even lines)
+      const W = top.clientWidth - 32;
+      { const sps = [...top.querySelectorAll('.evcap span.ev-ph')].filter(s => s.offsetParent);   // BigText: every line of the opening exactly the same width, the full width of the screen
+        sps.forEach(s => { s.style.setProperty('letter-spacing', '.06em', 'important'); s.style.setProperty('font-size', '20px', 'important'); s.style.width = 'max-content'; const w = s.getBoundingClientRect().width - 20 * .06; s.style.width = '';
+          s.style.setProperty('font-size', Math.min(44, 20 * W / w).toFixed(2) + 'px', 'important'); }); }
+      // 1b. every other statement becomes an even block: its shorter lines grow until they are as long as its longest line
+      SV.querySelectorAll('.mir-sing .evcap').forEach(p => { if (p.closest('.mir-top')) return; const sps = [...p.querySelectorAll('span.ev-ph')].filter(s => s.offsetParent); if (sps.length < 2) return;
+        const fs = parseFloat(sps[0].style.fontSize) || parseFloat(getComputedStyle(sps[0]).fontSize), ws = sps.map(s => { s.style.width = 'max-content'; const w = s.offsetWidth; s.style.width = ''; return w; }), mx = Math.max(...ws);
+        sps.forEach((s, i) => s.style.setProperty('font-size', (fs * Math.min(1.4, mx / ws[i])).toFixed(2) + 'px', 'important')); });
+      // Sandy's set sizes (Oct 25): the Studio's opening title 18px, "Seamless, dreamlike immersion" 17px
+      SV.querySelectorAll('.st-top-say .evcap span.ev-ph').forEach(x => x.style.setProperty('font-size', '18px', 'important'));
+      SV.querySelectorAll('.st-ground .evcap span.ev-ph').forEach(x => x.style.setProperty('font-size', '17px', 'important'));
+      // 1c. even line spacing (the Capsize / text-box-trim method): each line's box is trimmed to exactly its capitals, then every gap between lines is the same
+      SV.querySelectorAll('.mir-sing').forEach(b => { const sps = [...b.querySelectorAll('.evcap span.ev-ph')].filter(s => s.offsetParent); if (!sps.length) return;
+        const g = Math.round(Math.min(...sps.map(s => parseFloat(s.style.fontSize) || 16)) * 1.0);
+        sps.forEach((s, i) => s.style.setProperty('margin-top', i ? g + 'px' : '0px', 'important')); });
+      // 2. spacing: walk down the page; every statement sits G below what is above it, and what follows sits G below the statement
+      const studio = !!SV.querySelector('.st-stage');
+      const flow = studio ? [top, ...SV.querySelector('.st-stage').children] : [...SV.querySelector('.sv-body').children].filter(e => !e.matches('.mir-open, .mir-open-ph, .el-names, script'));
+      const seq = flow.filter(e => e.offsetParent && e.getBoundingClientRect().height > 2);
+      const nav = (document.querySelector('.site-nav') || SV).getBoundingClientRect().bottom - SV.scrollTop;   // the menu is fixed: measure it where the page's top is, so scrolling never adds space
+      seq.forEach((el, i) => {
+        if (!el.matches('.mir-sing')) return;
+        const prev = seq[i - 1], next = seq[i + 1], above = prev ? vis(prev)[1] : nav;
+        const big = el.querySelector('.mir-big'); if (big) { big.style.removeProperty('translate'); delete big.dataset.ty; }
+        setMT(el, above + G - words(el)[0]);
+        if (next && !next.matches('.mir-sing')) setMT(next, words(el)[1] + G - vis(next)[0]);
+      });
+    };
+    const fit = () => { fit0(); if (innerWidth <= 760) phoneBalance(); };
     let q = 0; const soon = () => { cancelAnimationFrame(q); q = requestAnimationFrame(fit); };
     new MutationObserver(soon).observe(SV, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
     addEventListener('resize', soon); if (document.fonts) document.fonts.ready.then(soon); SV.addEventListener('click', () => setTimeout(soon, 30));
@@ -5183,7 +5258,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
         // Oct 24: The Studio follows The Mirror exactly: The Mirror's spacing, and every line stops at the same width as The Mirror's lines, leaving the same black margins left and right
         el.style.setProperty('letter-spacing', '.16em', 'important'); el.style.setProperty('padding-left', '.16em', 'important');
         const grow = el.closest('.st-top-say') ? 1.14 : el.closest('.st-say:not(.st-based)') ? 1.25 : el.closest('.st-based') ? 1.21 : 1;   // Oct 24: halfway back toward the earlier, bigger sizes (Seamless, dreamlike… stays as it is)
-        const fs = Math.min(fitTo(el, Math.min(innerWidth - 96, 1500, 1238) * 0.95) * grow, fitTo(el, el.closest('.st-top-say') ? Math.min(innerWidth - 280, 1420) : innerWidth - 80)); el.style.setProperty('font-size', fs.toFixed(2) + 'px', 'important');   // Oct 24: scaled back 3%;   // as big as The Mirror's (52px, and 43px for the line under it) whenever the window is wide enough; the line under: 13 inches to the first line's 15   // the line under the opening: 13 inches to the first line's 15   // the first line keeps clear black space at both sides
+        const fs = Math.min(fitTo(el, Math.min(innerWidth - 96, 1500, 1238) * 0.95) * grow, fitTo(el, el.closest('.st-top-say') ? Math.min(innerWidth - 280, 1420) : innerWidth - 80)); el.style.setProperty('font-size', (el.closest('.st-ground') ? Math.min(fs, 38) : fs).toFixed(2) + 'px', 'important');   // Oct 24: scaled back 3%;   // as big as The Mirror's (52px, and 43px for the line under it) whenever the window is wide enough; the line under: 13 inches to the first line's 15   // the line under the opening: 13 inches to the first line's 15   // the first line keeps clear black space at both sides
         el.style.translate = ''; const er = el.getBoundingClientRect(), pr = el.parentElement.getBoundingClientRect();
         el.style.translate = ((pr.left + pr.right) / 2 - (er.left + er.right) / 2).toFixed(1) + 'px 0';   // wider than its column or not: its centre sits on the page's centre
         return; }
@@ -5207,7 +5282,7 @@ html body #section-view .mir-sing.mir-top .mir-small { text-transform: uppercase
   const ease = x => (x = Math.max(0, Math.min(1, x)), x * x * (3 - 2 * x));
   const hide = el => { el.style.setProperty('clip-path', 'inset(0 0 100% 0)', 'important'); };
   const collect = () => {
-    if (innerWidth <= 760 || !SV.querySelector('.mir-stage, .st-stage')) return;   // only The Studio and The Mirror; the artist's pages stay as they are
+    if (!SV.querySelector('.mir-stage, .st-stage')) return;   // only The Studio and The Mirror; the artist's pages stay as they are
     const found = [...SV.querySelectorAll(PICK)].filter(el => !seen.has(el) && !el.closest(SKIP) && !el.querySelector('img, video, canvas, iframe, button, input, .reel, .pano') && el.textContent.trim() && el.getClientRects().length);
     const fresh = found.filter(el => !found.some(o => o !== el && o.contains(el)) && !items.some(it => it.el.contains(el)));
     fresh.forEach(el => { seen.add(el); el.classList.add('lz');
