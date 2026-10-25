@@ -1731,6 +1731,10 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
 
 /* Oct 25 PHONE: the water-drop picture cropped in at the sides (Sandy's request), so the ripple fills the phone */
 @media (max-width: 760px) { html body #section-view .st-stage .st-fern img { aspect-ratio: 1080 / 494 !important; height: auto !important; object-fit: cover !important; object-position: 50% 55% !important; } }
+
+/* Oct 25: the opening titles — the light always sits in front of the words */
+html body #section-view .mir-sing.mir-top > p { position: relative; z-index: 1; }
+html body #section-view .mir-sing.mir-top > #lz-bar { z-index: 50 !important; mix-blend-mode: normal; pointer-events: none; }
 </style>
 
 
@@ -5325,7 +5329,7 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
   };
   new MutationObserver(collect).observe(SV, { childList: true, subtree: true });
   const sweepBar = (r, y, o) => { bar.style.left = (r.left - r.width * .04) + 'px'; bar.style.width = (r.width * 1.08) + 'px'; bar.style.top = (y - 1) + 'px'; bar.style.opacity = o; };
-  (function f(now) { requestAnimationFrame(f);
+  (function f(now) { requestAnimationFrame(f); if (!bar.isConnected || (bar.parentElement !== document.body && (!busy || bar.parentElement !== busy.el))) { bar.style.cssText = 'opacity:0'; document.body.appendChild(bar); }
     items = items.filter(it => it.el.isConnected);
     if (busy && !busy.el.isConnected) busy = null;
     if (!SV.classList.contains('on') || SV.classList.contains('arriving')) { bar.style.opacity = 0; return; }
@@ -5359,24 +5363,26 @@ html body #section-view .lz.lz-fold.lz-in { opacity: 1 !important; transform: no
         const rg = document.createRange(); rg.selectNodeContents(big); const wb = rg.getBoundingClientRect(), bb = big.getBoundingClientRect(), top = bb.top - 10, end = bb.bottom + 4, DN = 1.3, F = .5;
         const y = top + (end - top) * ease(t / DN), o = t < DN ? 1 : Math.max(0, 1 - (t - DN) / F);
         bar.style.cssText = `left:${wb.left}px;top:${y - 1}px;width:${wb.width}px;height:2px;opacity:${o};box-shadow:0 0 18px 3px rgba(170,200,255,.75),0 0 50px 8px rgba(120,160,255,.35)`;
-        big.style.setProperty('clip-path', t < DN ? `inset(-40% -10% ${Math.max(0, big.getBoundingClientRect().bottom - y).toFixed(1)}px -10%)` : 'none', 'important');
+        big.style.setProperty('clip-path', t < DN ? `inset(-40% -10% ${Math.max(0, big.getBoundingClientRect().bottom - y + LAG).toFixed(1)}px -10%)` : 'none', 'important');
         if (t > DN + F) { bar.style.cssText = 'opacity:0'; busy.done = 1; busy = null; } return; }
       const tw = e => { const rg = document.createRange(); rg.selectNodeContents(e); return rg.getBoundingClientRect(); };   // the words themselves, not the box
       const vr = e => { const sp = [...e.querySelectorAll('span.ev-ph')].find(x => x.offsetParent); return (sp || e).getBoundingClientRect(); };   // the letters themselves (on the phone the line box is taller than the letters)
       const bb = vr(big), bs = vr(sm), wb = tw(big), wsm = tw(sm);
       const DN = 1.3, GO = .9, UP = 1.5, F = .5, T1 = DN, T2 = T1 + GO, T3 = T2 + UP;
       const top = bb.top - 10, mid = bb.bottom + 4, bot = bs.bottom + 18;
-      const flat = (y, cx, w, h, o) => { bar.style.cssText = `left:${cx - w / 2}px;top:${y - h / 2}px;width:${w}px;height:${h}px;opacity:${o};box-shadow:0 0 ${10 + h * 4}px ${1 + h}px rgba(170,200,255,.75),0 0 ${30 + h * 10}px ${4 + h * 2}px rgba(120,160,255,.35)`; };
+      if (bar.parentElement !== el) { el.style.position = 'relative'; el.style.isolation = 'isolate'; el.appendChild(bar); }   // the light travels inside the title itself, so it can never drift from the words
+      const er = el.getBoundingClientRect(), LAG = 5;   // the words only appear once the light has passed: they trail just behind it, coming out from underneath
+      const flat = (y, cx, w, h, o) => { bar.style.cssText = `position:absolute;z-index:20;left:${cx - w / 2 - er.left}px;top:${y - h / 2 - er.top}px;width:${w}px;height:${h}px;opacity:${o};box-shadow:0 0 ${10 + h * 4}px ${1 + h}px rgba(170,200,255,.75),0 0 ${30 + h * 10}px ${4 + h * 2}px rgba(120,160,255,.35)`; };
       const clip = (e, v) => e.style.setProperty('clip-path', v, 'important');
       const c1 = (wb.left + wb.right) / 2, c2 = (wsm.left + wsm.right) / 2;
-      if (t < T1) { const y = top + (mid - top) * ease(t / DN); flat(y, c1, wb.width, 2, 1); clip(big, `inset(-40% -10% ${Math.max(0, big.getBoundingClientRect().bottom - y).toFixed(1)}px -10%)`); clip(sm, 'inset(0 0 100% 0)'); return; }
+      if (t < T1) { const y = top + (mid - top) * ease(t / DN); flat(y, c1, wb.width, 2, 1); clip(big, `inset(-40% -10% ${Math.max(0, big.getBoundingClientRect().bottom - y + LAG).toFixed(1)}px -10%)`); clip(sm, 'inset(0 0 100% 0)'); return; }
       clip(big, 'none');
       if (t < T2) { const u = ease((t - T1) / GO), y = mid + (bot - mid) * u; flat(y, c1 + (c2 - c1) * u, wb.width + (wsm.width - wb.width) * u, 2 + 2 * u, 1); clip(sm, 'inset(0 0 100% 0)'); return; }   // past the first line, growing to the second line's width
       if (!wave || wave.el !== el) wave = { el, t0: now, D: UP };
       const stop = innerWidth <= 760 ? (bb.bottom + bs.top) / 2 : bs.top - 6;   // phone: the light comes to rest exactly between the two lines
-      if (t < T3) { const y = bot - (bot - stop) * ease((t - T2) / UP); flat(y, c2, wsm.width, 4, 1); clip(sm, `inset(${Math.max(0, y - sm.getBoundingClientRect().top).toFixed(1)}px -10% -60% -10%)`); return; }   // rising: the second line appears from the bottom up
+      if (t < T3) { const y = bot - (bot - stop) * ease((t - T2) / UP); flat(y, c2, wsm.width, 4, 1); clip(sm, `inset(${Math.max(0, y + LAG - sm.getBoundingClientRect().top).toFixed(1)}px -10% -60% -10%)`); return; }   // rising: the second line appears from the bottom up
       clip(sm, 'none'); const u = Math.min(1, (t - T3) / F); flat(stop, c2, wsm.width, 4 * (1 - u) + 1, 1 - u);
-      if (u >= 1) { bar.style.cssText = 'opacity:0'; busy.done = 1; busy = null; }
+      if (u >= 1) { bar.style.cssText = 'opacity:0'; document.body.appendChild(bar); busy.done = 1; busy = null; }
       return;
     }
     if (el.classList.contains('mir-open')) { if (!el.querySelector('.scanline')) { const i = document.createElement('i'); i.className = 'scanline'; el.appendChild(i); } op = { el, t0: now }; busy.done = 1; busy = null; return; }
