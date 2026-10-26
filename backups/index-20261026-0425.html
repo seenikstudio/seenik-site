@@ -1,10 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta name="robots" content="noindex">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Seenik Space Preview</title>
+<title>Seenik Dome Immersion</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@400&family=Nunito:wght@900&family=Ubuntu:wght@300;400;500&family=Roboto:wght@700&display=swap">
@@ -1474,7 +1473,7 @@
 
   .bmask { position: fixed; left: 0; right: 0; background: #000; pointer-events: none; opacity: 0; transition: opacity 1.4s ease; }
   #bm-top { top: 0; }  #bm-bot { bottom: 0; }  #bm-mid { }
-  #space-credit { transition: opacity .8s ease; }  body.space-bled #space-credit { opacity: 0; }  .wave-live { width: 100%; display: block; mix-blend-mode: screen; -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent); -webkit-mask-composite: source-in; mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent) intersect, linear-gradient(transparent, #000 18%, #000 82%, transparent); }  #section-view .fr.mir-lined { aspect-ratio: 1800 / 420 !important; isolation: auto; }
+  #space-credit { transition: opacity .8s ease; }  body.space-bled #space-credit { opacity: 0; }  .wave-live { width: 100%; display: block; mix-blend-mode: screen; -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent); -webkit-mask-composite: source-in; mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent) intersect, linear-gradient(transparent, #000 18%, #000 82%, transparent); }  #section-view .fr.mir-lined { aspect-ratio: 1280 / 412 !important; isolation: auto; }
   /* All the pictures (The Studio and The Mirror, desktop): no frames, stretched to both edges of the screen at any width, top and bottom fading into the space */
   @media (min-width: 761px) {
     #section-view .st-photo, #section-view .st-pier { outline: 0 !important; border: 0 !important; padding: 0 !important; box-shadow: none !important; width: 100vw !important; max-width: none !important; margin-left: calc(50% - 50vw) !important; justify-self: start !important; }
@@ -1779,6 +1778,33 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
   html body #artist-view .frame:active .media { transform: translateY(4px) !important; box-shadow: 0 1px 0 #1b1d24, 0 4px 10px rgba(0,0,0,.6) !important; }
   html body #artist-view .rows { gap: 30px !important; }
 }
+
+/* Oct 25: the four elementals play as videos, in the same squares as the picture */
+.el-vids { display: none; }
+@media (min-width: 761px) {
+  #section-view .fr.mir-wide { position: relative; }
+  #section-view .el-vids { display: block; position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+  #section-view .el-vids video { position: absolute; top: 19.264%; width: 21.623%; aspect-ratio: 1; object-fit: cover; display: block; }
+}
+@media (max-width: 760px) {
+  #section-view .el4 i { overflow: hidden; }
+  #section-view .el4 i video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+}
+
+/* Oct 25: the elementals hold still as you scroll or pass over them (no zoom), and on the phone each sits in a thin black frame */
+html body #section-view .fr.mir-wide:not(.mir-lined) img, html body #section-view .fr.mir-wide:not(.mir-lined):hover img { transform: none !important; transition: none !important; }
+html body #section-view .fr.mir-wide:not(.mir-lined) .el-vids video, html body #section-view .el4 i, html body #section-view .el4 i video { transform: none !important; transition: none !important; animation: none !important; }
+@media (max-width: 760px) {
+  html body #section-view .el4 { gap: 14px !important; padding: 14px !important; background: transparent !important; box-sizing: border-box; }   /* space shows between them */
+  html body #section-view .fr.mir-wide:not(.mir-lined) { background: transparent !important; }
+  html body #section-view .el4 i { outline: 1px solid rgba(0,0,0,.85); box-shadow: 0 0 0 2px rgba(255,255,255,.12), 0 10px 22px rgba(0,0,0,.7); }   /* each one a floating button: a thin dark line, a faint light rim, a soft shadow; square corners, nothing cropped */
+}
+
+/* Oct 25: the wave shows its whole frame, with no faded edges (its black is pure black, so it melts into space by itself) */
+html body #section-view .mir-lined img, html body #section-view .mir-lined { -webkit-mask: none !important; mask: none !important; }
+
+/* Oct 25: the wave plays as a plain video: its full frame, no blending, no faded edges */
+html body #section-view .wave-live { mix-blend-mode: screen !important; }   /* the video keeps all its own light; its edges fade softly into space (the original fade) */
 </style>
 
 
@@ -1817,7 +1843,7 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
   </section>
   <div id="artist-head" hidden><h2>Sandy Heidebrecht</h2><p>Film &amp; TV · Immersive · Creator of <i>The Mirror</i></p><span class="contact">Contact</span></div>
   <div class="band" id="band-top" aria-hidden="true"></div><div class="band" id="band-bot" aria-hidden="true"></div>
-  <audio id="music" src="../music.mp3" preload="auto"></audio>
+  <audio id="music" src="music.mp3" preload="auto"></audio>
   <div class="bottom">
     <div class="modes" hidden role="group" aria-label="What the particles form">
       <button type="button" class="mode" id="m-shape" aria-pressed="true">Shape</button>
@@ -1828,8 +1854,8 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="space-img/contact-data.js"></script>
-<script src="space-img/space-data.js"></script>
+<script src="preview/space-img/contact-data.js"></script>
+<script src="preview/space-img/space-data.js"></script>
 <script>
 // ===== Seenik: floating through real space (preview) =====
 // Stars, gas layers and the globular cluster are real 3D objects; the camera drifts forward through them.
@@ -2157,65 +2183,8 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
     cluster.visible = false; cluster.userData.glow.material.opacity = 0.6 * cf;
     cluster.children[0].material.uniforms.uFade.value = cf;
     deep.position.copy(camera.position);
-    astroStep(dt);
     renderer.render(scene, camera);
   }
-  /* ===== Oct 25: one astronaut (NASA 3D model: EMU spacesuit with MMU, public domain) drifts slowly in and out of frame. The Mirror only. Phone loads a lighter model. ===== */
-  const ASTRO = { root: null, mats: [], loading: false, t: 0, on: 0, cyc: -1, p: null };
-  const AS = PHONE ? { file: 'astronaut-m.glb', scale: 2.6, dist: 26, cross: 34, gap: 9 } : { file: 'astronaut.glb', scale: 4, dist: 34, cross: 46, gap: 10 };
-  function astroLoad() {
-    if (ASTRO.loading) return; ASTRO.loading = true;
-    const dir = 'space-img/astro/';
-    const add = (src, cb) => { const s = document.createElement('script'); s.src = dir + src; s.onload = cb; document.head.appendChild(s); };
-    add('GLTFLoader.js', () => add('DRACOLoader.js', () => {
-      const dl = new THREE.DRACOLoader(); dl.setDecoderPath(dir); dl.setDecoderConfig({ type: 'wasm' });
-      const gl = new THREE.GLTFLoader(); gl.setDRACOLoader(dl);
-      gl.load(dir + AS.file, g => {
-        /* light only the astronaut: a cool sky fill, a warm key light from the upper right, a pink rim from behind (the Mirror haze) */
-        scene.add(new THREE.HemisphereLight(0xa8b8ff, 0x1a0c18, 0.55));
-        const key = new THREE.DirectionalLight(0xfff1e0, 1.7); key.position.set(4, 3, 3); scene.add(key);
-        const rim = new THREE.DirectionalLight(0xff9ad0, 1.1); rim.position.set(-4, -1, -4); scene.add(rim);
-        /* a soft reflection of space for the gold visor */
-        const c = document.createElement('canvas'); c.width = 256; c.height = 128; const x = c.getContext('2d');
-        x.fillStyle = '#000'; x.fillRect(0, 0, 256, 128);
-        const glow = (cx, cy, r, col) => { const gr = x.createRadialGradient(cx, cy, 0, cx, cy, r); gr.addColorStop(0, col); gr.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = gr; x.fillRect(0, 0, 256, 128); };
-        glow(190, 40, 28, 'rgba(255,240,220,1)'); glow(60, 80, 60, 'rgba(200,80,160,.6)'); glow(130, 20, 70, 'rgba(70,90,200,.35)');
-        const et = new THREE.CanvasTexture(c); et.mapping = THREE.EquirectangularReflectionMapping;
-        const pm = new THREE.PMREMGenerator(renderer); const env = pm.fromEquirectangular(et).texture; pm.dispose(); et.dispose();
-        const m = g.scene; const box = new THREE.Box3().setFromObject(m); m.position.sub(box.getCenter(new THREE.Vector3()));
-        const root = new THREE.Group(); root.add(m); root.scale.setScalar(AS.scale); root.visible = false;
-        m.traverse(o => { if (!o.isMesh) return; o.renderOrder = 20; o.frustumCulled = false;
-          const mt = o.material; mt.envMap = env; mt.envMapIntensity = mt.metalness > 0.9 ? 1.6 : 0.5;
-          mt.transparent = true; mt.opacity = 1; mt.depthWrite = true; mt.depthTest = true; ASTRO.mats.push(mt); });
-        scene.add(root); ASTRO.root = root;
-      });
-    }));
-  }
-  const rnd = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
-  const aV = new THREE.Vector3();
-  function astroStep(dt) {
-    const want = curPage === 'mirror' ? 1 : 0;
-    if (want && !ASTRO.loading) astroLoad();
-    if (want && ASTRO.on < 0.02) { ASTRO.t = 0; ASTRO.cyc = -1; }   /* each visit: the astronaut drifts in a few seconds after you arrive */
-    ASTRO.on += (want - ASTRO.on) * Math.min(1, dt * 2.5);
-    const R = ASTRO.root; if (!R) return;
-    ASTRO.t += dt * (reduced ? 0.6 : 1);
-    const per = AS.cross + AS.gap, lt = ASTRO.t - 5, k = Math.floor(lt / per), u = (lt - k * per) / AS.cross;
-    if (lt < 0 || u > 1 || ASTRO.on < 0.01) { R.visible = false; return; }
-    if (k !== ASTRO.cyc) { ASTRO.cyc = k;   /* a new pass: alternate sides, its own height, slant and spin */
-      const s = k % 2 ? -1 : 1, hh = AS.dist * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)), hw = hh * camera.aspect, pad = AS.scale * 1.6;
-      const y0 = (rnd(k) - 0.5) * hh * 0.7;
-      ASTRO.p = { s, x0: -s * (hw + pad), x1: s * (hw + pad), y0, y1: y0 + (rnd(k + 9) - 0.5) * hh * 0.5, ry: rnd(k + 3) * 6.28, rx: (rnd(k + 5) - 0.5) * 0.8, rz: (rnd(k + 7) - 0.5) * 1.2, sp: 0.04 + rnd(k + 11) * 0.05 };
-    }
-    const P = ASTRO.p, e = u * u * (3 - 2 * u) * 0.35 + u * 0.65;   /* almost even drift, easing very slightly */
-    aV.set(P.x0 + (P.x1 - P.x0) * e, P.y0 + (P.y1 - P.y0) * e, -AS.dist - Math.sin(u * 3.14) * AS.dist * 0.15);
-    camera.updateMatrixWorld(); R.position.copy(camera.localToWorld(aV));
-    const tt = ASTRO.t;
-    R.rotation.set(P.rx + Math.sin(tt * 0.07) * 0.25, P.ry + tt * P.sp * P.s, P.rz + Math.sin(tt * 0.05 + 1) * 0.3);
-    for (const mt of ASTRO.mats) mt.opacity = ASTRO.on;
-    R.visible = true;
-  }
-
   requestAnimationFrame(frame);
   window.__space = { renderer, scene, camera, Q, setTravel: v => { travel = v % L; nebT = v * 2 % LN; menuK = document.body.classList.contains('space-band') ? 1 : 0; } };
 })();
@@ -3320,7 +3289,7 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
   // ======== The Artist page: The Artist lifts off its ring, flies to the top and becomes the name ========
   const AV = document.getElementById('artist-view'), avName = document.getElementById('av-name'), avRows = document.getElementById('av-rows');
   const AV_ROWS = [[['Film Work', 32], ['Digital Media', 190], ['Art & Photography', 210]]];
-  const AV_IMGS = { 'Film Work': '../img/title-film.jpg', 'Video Clips': '../img/title-clips.jpg', 'Digital Media': '../img/title-social.jpg', 'Photography': '../img/title-photo.jpg?v=2', 'Art & Photography': '../img/title-photo.jpg?v=2', 'Art': '../img/title-art.jpg?v=3', 'Experience': '../img/title-exp.jpg' };   // titled frames: one image, label in front
+  const AV_IMGS = { 'Film Work': 'img/title-film.jpg', 'Video Clips': 'img/title-clips.jpg', 'Digital Media': 'img/title-social.jpg', 'Photography': 'img/title-photo.jpg?v=2', 'Art & Photography': 'img/title-photo.jpg?v=2', 'Art': 'img/title-art.jpg?v=3', 'Experience': 'img/title-exp.jpg' };   // titled frames: one image, label in front
   function avStill(hue, seed, w = 960, h = 540) {   // placeholder stills until the real images arrive
     const c = document.createElement('canvas'); c.width = w; c.height = h;
     const g = c.getContext('2d');
@@ -3810,7 +3779,7 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
   const PROJ_SETS = {1: [["The Set", [1], 0, [2, 3, 4, 5]]], 2: [["Home", [0], 5, [1, 2, 3, 4]], ["Flowers Freezing Time Lapse", [6], 13, [7, 8, 9, 10, 11, 12]], ["Frozen Behind Glass", [14], 21, [15, 16, 17, 18, 19, 20]], ["Underwater", [22], null, [23, 24, 25, 26]], ["The Visiting Room", [27], 32, [28, 29, 30, 31]], ["Lantern Dance", [33], null, [34, 35]], ["Mirror Floor & Denna Art", [36], null, [37, 38, 39, 40]]], 3: [["Nikhil's Private Command Centre", [0], 5, [1, 2, 3, 4]], ["Military Habitat", [6], 22, [7, 8, 9, 10, 11, 12, "h03-13", 14, 15, 16, 17, 18, 19, 20, 21]], ["Art Studio", [23], 26, [24, 25]], ["London Council Flats 1989", [27], 38, [28, 29, 30, 31, 32, 33, 34, 35, 36, 37]], ["Insurance Office", [39], 46, [40, 41, 42, 43, 44, 45]], ["Outpost 17: Main Room", [47], 54, [48, 49, 50, 51, 52, 53]], ["Scout's Quarters", [55], 64, [56, 57, 58, 59, 60, 61, 62, 63]], ["Empty Office", [65], null, [66, 67]], ["Coast Mansion", [68], null, [69, 70, 71, 72, 73, 74]], ["Nikhil's Office", [75], null, [76, 77, 78, 79, 80, 81]], ["Hollander's Office", [82], null, [83, 84, 85, 86]]], 4: [["Bullpen", [0], null, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]], ["Penthouse", [13], null, [14, 15, 16, 17, 18, 19]]], 5: [["Art Class", [10], null, [11, 12, 13, 14, 15, 16, 17, 18]], ["Police Bullpen", [19], null, [20, 21, 22, 23, 24, 25]], ["Scott's Apartment", [1], null, [2, 3, 4, 5, 6, 7, 8, 9]]], 6: [["School Newsroom", [0], null, [1, 2, 3, 4, 5, 6, 7, 8]], ["Nerd Cave Dream Sequence", [9], null, [10, 11, 12, 13]], ["Guidance Counselor Office", [14], null, [15, 16, 17, 18, 19, 20, 21, 22]], ["Green Room", [23], null, [24, 25, 26, 27]], ["Bowling Alley", [28], null, [29, 30]]], 7: [["Matilda AI", [0], null, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]], ["Greenhouse Module", [11], null, [12, 13, 14, 15, 16, 17, 18, 19]], ["Cargo Bay Module", [20], null, [21, 22, 23, 24, 25, 26, 27, 28, 29, 30]], ["Living Quarters Module", [31], null, [32, 33, 34, 35, 36, 37, 38, 39]], ["Lab Module", [40], null, [41, 42, 43, 44, 45, 46, 47, 48, 49, 50]], ["Conference Room", [51], null, [52, 53, 54, 55, 56, 57, 58, 59]], ["Faraday Cage", [60], null, [61, 62, 63, 64, 65, 66]]], 8: [["Law Office", [0], null, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]], ["Ariana's House", [22], null, [23, 24, 25, 26, 27, 28, 29, 30]], ["Oliver's Bedroom", [15], null, [16, 17, 18, 19, 20, 21]]], 9: [["Church Fair", [0], null, [1, 2, 3, 4, 5, 6]], ["Sensitivity Training Room", [7], null, [8, 9, 10, 11, 12, 13]], ["Phone Store", [14], null, [15, 16]]], 10: [["Smith's Grocery", [0], null, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]], ["Airport Convenience Store", [13], 18, [14, 15, 16, 17]]]};   // per set: name, hero(es), concept board, gallery (Invasion S03, in portfolio order)
   const PROJ_TOP = { 5: 'top-05' };   // a concept board for the whole project, shown on its own above the sets
   const SPEC_VIDS = [['LOUPE', "Grace's fictional Instagram-style feed"], ['THREDD', 'A fictional Reddit app, dark / green theme'], ['REAL_YOU', 'Lock-screen glitch and reveal, notification stack'], ['SIT_ALONE', 'Ritual title card with a glitch reveal into a 5:49 lock screen'], ['EMAIL', "Grace's inbox, a rejection chain of emails"]];
-  const IMG = n => '../img/' + n + '.jpg', P2 = i => String(i).padStart(2, '0');
+  const IMG = n => 'img/' + n + '.jpg', P2 = i => String(i).padStart(2, '0');
   const GAL = [0, 6, 41, 87, 20, 26, 31, 67, 31, 17, 19];   // gallery images per film credit (from the portfolio)
   const SOC_YT = ['ghDde60PnqQ', '6R8P0X7psjc', 'n8nmUN3zrAs', 'iZkt3YqgZ5g', 'jV_xOIiUoDk', 'Moux2gPuZik'];
   const tile = (src, t, s) => `<button type="button" class="sq" data-t="${t}" data-s="${s}"><img alt="" src="${src}"><span class="cap"><span>${t}</span><em>${s}</em></span></button>`;
@@ -3861,13 +3830,13 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
         <section class="fw-sec"><div class="sec-head"><span class="kicker">02 · Film &amp; television</span><h3>Commercial</h3></div><div class="fw-two">${strip(f.slice(3, 7), '100%')}${strip(f.slice(7, 11), '100%')}</div><div class="fw-one">${strip(f.slice(3, 11), '100%', 'left')}</div></section>
         <div class="fw-end"><button type="button" class="fw-go" data-go="contact">Contact</button><button type="button" class="fw-go" data-go="resume">CV</button></div>`; } },
     clips: { title: 'Video Clips', sub: 'Made in the pandemic', back: 'artist', spaced: true, render: () => {
-      const cell = ([t, y], i) => `<button type="button" class="reel clip" data-vid="../vid/clip-${P2(i)}.mp4" data-ar="16 / 9" data-t="${t}" data-s="${y}"><span class="lab">${t}<em>${y}</em></span><span class="m"><img alt="" loading="lazy" src="${IMG('clip-' + P2(i))}"></span></button>`;
+      const cell = ([t, y], i) => `<button type="button" class="reel clip" data-vid="vid/clip-${P2(i)}.mp4" data-ar="16 / 9" data-t="${t}" data-s="${y}"><span class="lab">${t}<em>${y}</em></span><span class="m"><img alt="" loading="lazy" src="${IMG('clip-' + P2(i))}"></span></button>`;
       const strip3 = list => `<div class="reel-strip clip-strip"><div class="sprockets" aria-hidden="true"></div><div class="reel-row">${list.join('')}</div><div class="sprockets" aria-hidden="true"></div></div>`;
       const f = CLIP_ITEMS.map(cell);
       return `<div class="clip-head"><div class="slate"><span class="slate-v"><span class="dk">Therapy sessions in digital media, illustrating inner dialogue and self-discovery.</span>${evenPh('Therapy sessions in digital media, illustrating inner dialogue and self-discovery.')}</span></div><h3 class="art-head"><span class="dk">A visual language of symmetry, flow and kaleidoscopic patterns.</span>${evenPh('A visual language of symmetry, flow and kaleidoscopic patterns.')}</h3></div><section class="fx-gate clip-sec">${strip3(f.slice(0, 3))}${strip3(f.slice(3))}</section>`; } },
     social: { title: 'Digital Media', back: 'artist', spaced: true, render: () => `<p class="reel-intro"><span>What's the soundtrack to your life right now?</span><span>Every moment is telling a story, and it's really fun to capture.</span>${evenPh("What's the soundtrack to your life right now? Every moment is telling a story, and it's really fun to capture.")}</p>` + REEL_ROWS.map((r, ri) => `<section class="reel-sec fx-${r.fx}">
         <div class="reel-txt"><span class="kicker">${P2(ri + 1)} · ${r.k}</span><h3>${r.t}</h3><p><span class="dk">${r.p}</span>${evenPh(r.p)}</p>${r.link ? `<a href="${r.link[1]}" target="_blank" rel="noopener">${r.link[0]} ↗</a>` : ''}</div>
-        <div class="reel-strip"><div class="sprockets" aria-hidden="true"></div><div class="reel-row">${r.v.map(([id, t, y, ar, note]) => `<button type="button" class="reel" data-vid="../vid/${id}.mp4" data-ar="${ar}"${note ? ` data-note="${note}"` : ''} data-t="${t}" data-s="${y}"><span class="lab">${t}<em>${y}</em></span><span class="m"><img alt="" ${r.fx === 'gate' ? '' : 'loading="lazy" '}src="${IMG(id)}?v=10"></span></button>`).join('')}</div><div class="sprockets" aria-hidden="true"></div></div>
+        <div class="reel-strip"><div class="sprockets" aria-hidden="true"></div><div class="reel-row">${r.v.map(([id, t, y, ar, note]) => `<button type="button" class="reel" data-vid="vid/${id}.mp4" data-ar="${ar}"${note ? ` data-note="${note}"` : ''} data-t="${t}" data-s="${y}"><span class="lab">${t}<em>${y}</em></span><span class="m"><img alt="" ${r.fx === 'gate' ? '' : 'loading="lazy" '}src="${IMG(id)}?v=10"></span></button>`).join('')}</div><div class="sprockets" aria-hidden="true"></div></div>
       </section>`).join('') },
     photo: { title: 'Art & Photography', back: 'artist', spaced: true, render: () => {
       const w = 'calc((var(--vw, 100vw) - 48px - 3 * var(--tile-gap)) / 4)';
@@ -3888,7 +3857,7 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
       return `<div class="proj wide${inf.key ? '' : ' poster'} k${i}"><div class="m"><img alt="" style="--ty:${['46%', '40%', '14%'][i] || '50%'}" src="${inf.key ? IMG(inf.key) : filmImgs[i]}"></div><div class="info"><span>${y}</span>
         <dl>${inf.credits.map(([k, v]) => `<dt>${k === 'Production Designer' ? '<span class="dk">Production </span>Designer' : k}</dt><dd>${v}</dd>`).join('')}</dl>
         ${inf.list ? `<ul>${inf.list.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}
-        <button type="button" class="pj-info" aria-expanded="false">Info</button><p><span class="dk">${inf.text || `Write-up coming: your role on ${t} and what you did.`}</span>${evenPh(inf.text || `Write-up coming: your role on ${t} and what you did.`)}</p></div></div>${gal ? `<div class="gal">${gal}</div>` : ''}${inf.note ? `<section class="pj-con"><h3 class="fw-group">Grace's Phone</h3><button type="button" class="pj-info" aria-expanded="false">Info</button><p class="pj-note"><span class="dk">${inf.note}</span>${evenPh(inf.note)}</p>` : ''}${i === 0 ? reel('pj-phones', SPEC_VIDS.map(([n, d]) => [`<video src="../vid/spec-${n}.mp4" poster="${IMG('spec-' + n)}" muted loop playsinline autoplay preload="auto"></video>`, n.replace('_', ' '), d + '<span class="pj-ctl"><button type="button" class="pj-pp" aria-label="Pause"></button><span class="pj-bar"><i></i></span></span>'])) : ''}${inf.note ? '</section>' : ''}${i === 2 ? reel('pj-wide', [[`<span data-vid="../vid/vh-film.mp4" data-ar="1920 / 804" data-t="Visiting Hours" style="display:contents;cursor:pointer"><img alt="" style="cursor:pointer" src="${IMG('vh-film')}"><span class="pj-play" aria-hidden="true" style="cursor:pointer"></span></span>`, 'Visiting Hours', ''], [`<span data-vid="../vid/vh-bts.mp4" data-ar="1920 / 1012" data-t="Behind the Scenes" style="display:contents;cursor:pointer"><img alt="" style="cursor:pointer" src="${IMG('vh-bts')}"><span class="pj-play" aria-hidden="true" style="cursor:pointer"></span></span>`, 'Behind the Scenes', '']]) : ''}${inf.concepts ? inf.concepts.map(([n, l]) => `<section class="pj-con"><h3 class="fw-group">${n}</h3><div class="pj-reel pj-cr${l.length === 1 ? ' one' : ''}"><div class="pj-sp" aria-hidden="true"></div><div class="pj-row">${l.map(m => `<button type="button" class="gp pj-cb" data-t="${t}" data-s="${n} · concept"><img loading="lazy" alt="" src="${IMG(m)}"></button>`).join('')}</div><div class="pj-sp" aria-hidden="true"></div></div></section>`).join('') : ''}${sets ? `<div class="sets">${PROJ_TOP[i] ? `<section class="set set-concept"><h3 class="fw-group">Concept</h3><button type="button" class="gp" data-t="${t}" data-s="Concept board"><img loading="lazy" alt="" src="${IMG(PROJ_TOP[i])}?v=6"></button></section>` : ''}${sets}</div>` : ''}`; } },
+        <button type="button" class="pj-info" aria-expanded="false">Info</button><p><span class="dk">${inf.text || `Write-up coming: your role on ${t} and what you did.`}</span>${evenPh(inf.text || `Write-up coming: your role on ${t} and what you did.`)}</p></div></div>${gal ? `<div class="gal">${gal}</div>` : ''}${inf.note ? `<section class="pj-con"><h3 class="fw-group">Grace's Phone</h3><button type="button" class="pj-info" aria-expanded="false">Info</button><p class="pj-note"><span class="dk">${inf.note}</span>${evenPh(inf.note)}</p>` : ''}${i === 0 ? reel('pj-phones', SPEC_VIDS.map(([n, d]) => [`<video src="vid/spec-${n}.mp4" poster="${IMG('spec-' + n)}" muted loop playsinline autoplay preload="auto"></video>`, n.replace('_', ' '), d + '<span class="pj-ctl"><button type="button" class="pj-pp" aria-label="Pause"></button><span class="pj-bar"><i></i></span></span>'])) : ''}${inf.note ? '</section>' : ''}${i === 2 ? reel('pj-wide', [[`<span data-vid="vid/vh-film.mp4" data-ar="1920 / 804" data-t="Visiting Hours" style="display:contents;cursor:pointer"><img alt="" style="cursor:pointer" src="${IMG('vh-film')}"><span class="pj-play" aria-hidden="true" style="cursor:pointer"></span></span>`, 'Visiting Hours', ''], [`<span data-vid="vid/vh-bts.mp4" data-ar="1920 / 1012" data-t="Behind the Scenes" style="display:contents;cursor:pointer"><img alt="" style="cursor:pointer" src="${IMG('vh-bts')}"><span class="pj-play" aria-hidden="true" style="cursor:pointer"></span></span>`, 'Behind the Scenes', '']]) : ''}${inf.concepts ? inf.concepts.map(([n, l]) => `<section class="pj-con"><h3 class="fw-group">${n}</h3><div class="pj-reel pj-cr${l.length === 1 ? ' one' : ''}"><div class="pj-sp" aria-hidden="true"></div><div class="pj-row">${l.map(m => `<button type="button" class="gp pj-cb" data-t="${t}" data-s="${n} · concept"><img loading="lazy" alt="" src="${IMG(m)}"></button>`).join('')}</div><div class="pj-sp" aria-hidden="true"></div></div></section>`).join('') : ''}${sets ? `<div class="sets">${PROJ_TOP[i] ? `<section class="set set-concept"><h3 class="fw-group">Concept</h3><button type="button" class="gp" data-t="${t}" data-s="Concept board"><img loading="lazy" alt="" src="${IMG(PROJ_TOP[i])}?v=6"></button></section>` : ''}${sets}</div>` : ''}`; } },
     art: { title: 'Art', back: 'artist', spaced: true, render: (sub) => {
       const roll = (list, dir, secs, kind) => { const t = list.map(([n, w, h]) => `<button type="button" class="ap" style="--ar:${w} / ${h}" data-t="Art" data-s=""><img alt="" src="${IMG(n)}?v=5"></button>`).join('');
         return `<div class="fs art-roll" data-kind="${kind}"><div class="sprockets" aria-hidden="true"></div><div class="mq"><div class="mq-track ${dir}" style="animation-duration:${secs}s${kind === 'bw' ? `;animation-delay:-${(secs * .37).toFixed(1)}s` : ''}">${t}${t}</div></div><div class="sprockets" aria-hidden="true"></div></div>`; };
@@ -3907,12 +3876,12 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
           <label class="sf"><textarea name="message" rows="2" placeholder="Message" required></textarea><i aria-hidden="true"></i></label>
           <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form><div class="contact-extra"><span class="contact-mail">sandy@seenik.studio</span><div class="socials"><a href="https://www.facebook.com/sandy.heidebrecht" target="_blank" rel="noopener" aria-label="Facebook"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-8.2h2.8l.4-3.2h-3.2V8.6c0-.9.3-1.6 1.6-1.6h1.7V4.1c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3v2.4H7.3v3.2h2.8V22h3.4z"/></svg></a><a href="https://www.instagram.com/sandybeaches23/" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 1.2.1 1.8.2 2.2.4.6.2 1 .5 1.4.9.4.4.7.8.9 1.4.2.4.4 1 .4 2.2.1 1.3.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.2 1.8-.4 2.2-.2.6-.5 1-.9 1.4-.4.4-.8.7-1.4.9-.4.2-1 .4-2.2.4-1.3.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-1.8-.2-2.2-.4-.6-.2-1-.5-1.4-.9-.4-.4-.7-.8-.9-1.4-.2-.4-.4-1-.4-2.2C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8c.1-1.2.2-1.8.4-2.2.2-.6.5-1 .9-1.4.4-.4.8-.7 1.4-.9.4-.2 1-.4 2.2-.4C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.7.1-1.1.1-1.7.2-2.1.4-.5.2-.9.4-1.3.8-.4.4-.6.8-.8 1.3-.2.4-.3 1-.4 2.1C2.6 9.9 2.6 10.3 2.6 12s0 2.1.1 3.3c.1 1.1.2 1.7.4 2.1.2.5.4.9.8 1.3.4.4.8.6 1.3.8.4.2 1 .3 2.1.4 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1.1-.1 1.7-.2 2.1-.4.5-.2.9-.4 1.3-.8.4-.4.6-.8.8-1.3.2-.4.3-1 .4-2.1.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c-.1-1.1-.2-1.7-.4-2.1-.2-.5-.4-.9-.8-1.3-.4-.4-.8-.6-1.3-.8-.4-.2-1-.3-2.1-.4C15.5 4 15.1 4 12 4zm0 3.1a4.9 4.9 0 110 9.8 4.9 4.9 0 010-9.8zm0 8.1a3.2 3.2 0 100-6.4 3.2 3.2 0 000 6.4zm5.1-8.3a1.1 1.1 0 110-2.3 1.1 1.1 0 010 2.3z"/></svg></a><a href="https://www.youtube.com/@innerpeaces1799" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.6 7.2a2.5 2.5 0 00-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.5 2.5 0 002.4 7.2C2 8.8 2 12 2 12s0 3.2.4 4.8a2.5 2.5 0 001.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.5 2.5 0 001.8-1.8c.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3L10 15z"/></svg></a></div></div></div>` },
     studio: { title: 'The Studio', back: null, spaced: true, render: () => `<div class="mir-sing mir-top st-top-say"><p class="mir-big">Seenik brings a music-driven story arc to the fulldome</p></div><div class="mir-sing mir-top st-top-desk"><p class="mir-big">Seenik brings a music-driven story arc</p><p class="mir-small">to the fulldome</p></div>
-        <div class="st-stage"><div class="st-top"><div class="st-lead"><img class="st-logo" alt="Seenik" draggable="false" src="space-img/logo-alpha.png"><p class="st-ph-txt">${evenPh("Seenik brings a music-driven story arc to the fulldome medium, grounded in earth imagery and the geometric patterns that exist all around and inside of us.")}</p></div><div class="st-dform"><form class="cform st-form" data-to="studio" novalidate>
+        <div class="st-stage"><div class="st-top"><div class="st-lead"><img class="st-logo" alt="Seenik" draggable="false" src="preview/space-img/logo-alpha.png"><p class="st-ph-txt">${evenPh("Seenik brings a music-driven story arc to the fulldome medium, grounded in earth imagery and the geometric patterns that exist all around and inside of us.")}</p></div><div class="st-dform"><form class="cform st-form" data-to="studio" novalidate>
           <h3>Contact</h3>
           <label class="sf"><input name="name" type="text" autocomplete="name" placeholder="Name" required><i aria-hidden="true"></i></label>
           <label class="sf"><input name="email" type="email" autocomplete="email" placeholder="Email" required><i aria-hidden="true"></i></label>
           <label class="sf"><textarea name="message" rows="2" placeholder="Message" required></textarea><i aria-hidden="true"></i></label>
-          <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form></div></div><div class="mir-sing st-ground"><p class="mir-big">Seamless, dreamlike immersion</p></div><figure class="st-fern"><img alt="A drop falling into still water, its ripples forming a geometric pattern of light" draggable="false" src="space-img/studio-fern.jpg?v=2"><img class="desk-drop" alt="" draggable="false" src="space-img/studio-drop-desk.jpg?v=4"></figure><div class="mir-sing st-say"><p class="mir-big">Grounded in earth imagery<br class="ph-br"> and the geometric patterns of creation</p></div><figure class="st-photo"><img alt="Mountains dissolving into a leaf" draggable="false" src="${IMG('studio-journey')}"></figure></div>
+          <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form></div></div><div class="mir-sing st-ground"><p class="mir-big">Seamless, dreamlike immersion</p></div><figure class="st-fern"><img alt="A drop falling into still water, its ripples forming a geometric pattern of light" draggable="false" src="preview/space-img/studio-fern.jpg?v=2"><img class="desk-drop" alt="" draggable="false" src="preview/space-img/studio-drop-desk.jpg?v=4"></figure><div class="mir-sing st-say"><p class="mir-big">Grounded in earth imagery<br class="ph-br"> and the geometric patterns of creation</p></div><figure class="st-photo"><img alt="Mountains dissolving into a leaf" draggable="false" src="${IMG('studio-journey')}"></figure></div>
         <div class="mir-sing st-say st-based"><p class="mir-big">Based in North Vancouver,<br class="ph-br"> where the mountains meet the sea</p></div>
         <figure class="studio-place st-pier"><img alt="North Vancouver at night, from the pier" src="${IMG('studio-pier')}"></figure>
         <div class="st-contact"><form class="cform st-form" data-to="studio" novalidate>
@@ -3928,10 +3897,10 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
       const sing = (big, small, x = '', ph = '') => `<div class="mir-sing${x}"><p class="mir-big">${big}</p>${small ? `<p class="mir-small">${small}</p>` : ''}${ph}</div>`;
       return sing('A world you inhabit', 'A ' + wv('single living thing') + ' you move through', ' mir-top') + `<p class="mir-open-ph" style="--m:40">${evenPh("A world you inhabit. A single living thing you move through.")}</p>`
         + `<div class="mir-stage"><div class="mir-hero"><div class="mir-title3d" aria-label="The Mirror"><span class="t3"><span class="b" aria-hidden="true">THE MIRROR</span><span class="f">THE MIRROR</span></span><span class="sub">A FULLDOME CINEMATIC 48-min EXPERIENCE</span></div><div class="mir-par"><img alt="The Mirror" draggable="false" src="${IMG('seenik-00')}"></div></div><canvas class="mir-tri" aria-hidden="true"></canvas></div>`
-        + sing('Every visual<br class="ph-br"> flows from the music', 'Through photorealistic worlds —<br class="ph-br"> the cosmos, the deep ocean', ' mir-first', `<p class="mir-one">${evenPh('Every visual flows from the music, through photorealistic worlds — the cosmos, the deep ocean.')}</p>`) + one('seenik-02c', 'The Music Tells the Story', '1572 / 523', ' mir-lined')
+        + sing('Every visual<br class="ph-br"> flows from the music', 'Through photorealistic worlds —<br class="ph-br"> the cosmos, the deep ocean', ' mir-first', `<p class="mir-one">${evenPh('Every visual flows from the music, through photorealistic worlds — the cosmos, the deep ocean.')}</p>`) + one('seenik-02c', 'The Music Tells the Story', '1280 / 412', ' mir-lined')
         + sing('Experience the power of<br class="ph-br"> the elemental forces', '', ' mir-wind') + one('seenik-03c', 'Effects that Mirror Nature', '1540 / 462')
         + sing('The same patterns that<br class="ph-br"> build a galaxy build us', '', ' mir-close')
-        + `<div class="mir-galaxy"><video src="../vid/deep-field.mp4" autoplay muted loop playsinline preload="auto" aria-label="A flight through thousands of real galaxies, from James Webb Space Telescope data"></video></div><p class="mir-credit">Visualization: NASA, ESA, CSA, STScI · F. Summers, G. Bacon, J. DePasquale, L. Hustak, J. Olmsted, A. Pagan</p>`; } }
+        + `<div class="mir-galaxy"><video src="vid/deep-field.mp4" autoplay muted loop playsinline preload="auto" aria-label="A flight through thousands of real galaxies, from James Webb Space Telescope data"></video></div><p class="mir-credit">Visualization: NASA, ESA, CSA, STScI · F. Summers, G. Bacon, J. DePasquale, L. Hustak, J. Olmsted, A. Pagan</p>`; } }
   };
   function layoutWall() {   // salon wall: justified rows, every piece keeps its true shape
     const wall = document.getElementById('wall'); if (!wall) return;
@@ -4005,9 +3974,11 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
     const dots = () => SV.querySelectorAll('.reel-txt').forEach(r => { if (r.querySelector('.gdot')) return; const h = r.querySelector('h3'); if (!h) return;
       const d = document.createElement('button'); d.type = 'button'; d.className = 'gdot'; d.innerHTML = '<i></i><i></i><i></i>'; d.setAttribute('aria-label', 'Show the words'); d.setAttribute('aria-expanded', 'false'); h.after(d); });
     SV.addEventListener('click', e => { const t = e.target.closest('.gdot:not(.fold), .reel-txt h3'); if (!t || innerWidth > 760) return; const r = t.closest('.reel-txt'); if (!r) return; const on = r.classList.toggle('open'); const d = r.querySelector('.gdot'); if (d) d.setAttribute('aria-expanded', on); });
+    const EL_V = n => `<video src="preview/space-img/el-${n}.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`;   // Oct 25: the four elementals are videos
     const quads = () => SV.querySelectorAll('.fr.mir-wide:not(.mir-lined)').forEach(f => { if (f.querySelector('.el4')) return; const src = f.querySelector('img').src;   // the four elementals: one picture, shown as two rows of two
       const X = [25, 1179, 409, 792];   // top: murmurations, kaleidoscope; bottom: cymatics, fractals — the pictures tell it, no names   // each picture's square inside the 1540 x 462 image (333 px), without the label strip
-      f.insertAdjacentHTML('beforeend', `<span class="el4">${X.map((x, k) => `<i style="background-image:url('${src}');background-position:${(x / (1540 - 333) * 100).toFixed(3)}% ${(89 / (462 - 333) * 100).toFixed(3)}%"></i>`).join('')}</span>`); });
+      const VN = ['murmuration', 'kaleidoscope', 'cymatics', 'fractal'];
+      f.insertAdjacentHTML('beforeend', `<span class="el4">${X.map((x, k) => `<i style="background-image:url('${src}');background-position:${(x / (1540 - 333) * 100).toFixed(3)}% ${(89 / (462 - 333) * 100).toFixed(3)}%">${EL_V(VN[k])}</i>`).join('')}</span>`); });
     const caps = () => SV.querySelectorAll('.mir-thru .mir-small, .st-say .mir-big, .st-based .mir-big, .mir-wind .mir-big, .mir-close .mir-big, .mir-top .mir-big, .mir-top .mir-small, .st-ground .mir-big, .mir-first .mir-big, .mir-first .mir-small').forEach(el => { if (el.classList.contains('evcap')) return;
       const t = el.textContent.replace(/\s+/g, ' ').trim(); el.innerHTML = `<span class="dk">${el.innerHTML}</span>` + (t.length <= 30 || el.closest('.mir-top:not(.st-top-say)') || el.matches('.mir-first .mir-big') ? `<span class="ev-ph one">${t}</span>` : (() => { const w = t.split(' '); let best = null; for (let i = 1; i < w.length; i++) { const a = w.slice(0, i).join(' '), b = w.slice(i).join(' '), d = Math.abs(a.length - b.length); if (!best || d < best[0]) best = [d, a, b]; } return `<span class="ev-ph">${best[1]}</span><span class="ev-ph">${best[2]}</span>`; })()); el.classList.add('evcap'); });
     const fit0 = () => { if (innerWidth > 760) return; caps(); dots(); folds(); quads(); SV.querySelectorAll('span.ev-ph.one').forEach(sp => { if (!sp.offsetParent) return;   // one line: the size that exactly fills the width
@@ -5075,14 +5046,14 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
   const clipEls = [document.getElementById('stage'), document.getElementById('stars')], sparkle = document.getElementById('stars');
   if (location.protocol === 'file:') document.documentElement.classList.add('local-file');   // double-clicked file: the Studio's water and sea effects cannot read the pictures, so show the plain pictures
   if (location.protocol === 'file:') {   // double-clicked file: give the Studio's cloud and water effects copies of their pictures they are allowed to read
-    const sc = document.createElement('script'); sc.src = 'space-img/studio-local.js'; document.head.appendChild(sc);
+    const sc = document.createElement('script'); sc.src = 'preview/space-img/studio-local.js'; document.head.appendChild(sc);
     const swap = () => { if (!window.STUDIO_LOCAL) return; document.querySelectorAll('img').forEach(im => { for (const k in STUDIO_LOCAL) if (im.src.indexOf(k + '.jpg') > -1 && im.src.indexOf('data:') !== 0) im.src = STUDIO_LOCAL[k]; }); };
     new MutationObserver(swap).observe(document.body, { childList: true, subtree: true }); sc.onload = swap;
   }
   // The Mirror's wave: the version with its black made see-through, so the top blends into the space
   // The Mirror's wave: Sandy's animated version, slowed and stretched; its black drops out (screen blend) and the edges fade into space
   new MutationObserver(() => document.querySelectorAll('img[src*="seenik-02c"]').forEach(im => {
-    const v = document.createElement('video'); v.src = 'space-img/wave-pingpong.mp4'; v.muted = true;   // plays forward, then backward: no jump back to the start
+    const v = document.createElement('video'); v.src = 'preview/space-img/wave-cool-v5.mp4'; v.muted = true; v.defaultMuted = true; v.setAttribute('muted', '');   /* Oct 25: Sandy's final wave, its background cleaned to pure black */   // plays forward, then backward: no jump back to the start
      v.loop = true; v.autoplay = true; v.playsInline = true; v.setAttribute('playsinline', '');
     v.className = 'wave-live'; im.replaceWith(v); v.play().catch(() => {});
   })).observe(document.body, { childList: true, subtree: true });
@@ -5136,7 +5107,7 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
   })();
 })();
 </script>
-<script src="space-img/eye-data.js"></script>
+<script src="preview/space-img/eye-data.js"></script>
 <script>
 // ===== The Mirror: the eye in 3D (space preview) =====
 // Sandy's eye picture is taken apart into layers that sit at different depths and is put back together live:
@@ -5341,9 +5312,10 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
   (function f() { requestAnimationFrame(f);
     const SV = document.querySelector('#section-view.on'), b = innerWidth > 760 && SV ? [...SV.querySelectorAll('.fr.mir-wide:not(.mir-lined)')].find(x => x.querySelector('img[src*="seenik-03c"], img[src*="elementals-clean"]')) : null;
     if (b !== btn) { if (names) names.remove(); names = null; btn = b; if (!b) return;
-      const im = b.querySelector('img'); if (im && /seenik-03c/.test(im.src)) im.src = 'space-img/elementals-clean.jpg';
+      const im = b.querySelector('img'); if (im && /seenik-03c/.test(im.src)) im.src = 'preview/space-img/elementals-clean.jpg';
       names = document.createElement('div'); names.className = 'el-names'; names.setAttribute('aria-hidden', 'true');
-      names.innerHTML = N.map(([t, x]) => `<span style="left:${x}%">${t}</span>`).join(''); b.parentElement.appendChild(names); }
+      names.innerHTML = N.map(([t, x]) => `<span style="left:${x}%">${t}</span>`).join(''); b.parentElement.appendChild(names);
+      if (!b.querySelector('.el-vids')) b.insertAdjacentHTML('beforeend', `<span class="el-vids">${[['murmuration', 25], ['cymatics', 409], ['fractal', 792], ['kaleidoscope', 1179]].map(([n, x]) => `<video style="left:${(x / 1540 * 100).toFixed(3)}%" src="preview/space-img/el-${n}.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`).join('')}</span>`); }
     if (!btn || !names) return;
     const op = names.offsetParent || document.body, r = btn.getBoundingClientRect(), pr = op.getBoundingClientRect();
     names.style.left = (r.left - pr.left + op.scrollLeft - op.clientLeft) + 'px'; names.style.top = (r.top - pr.top + op.scrollTop - op.clientTop + r.height * (37 / 462)) + 'px'; names.style.width = r.width + 'px';

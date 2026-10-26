@@ -1,10 +1,10 @@
 <!doctype html>
 <html lang="en">
-<head>
+<head><script>window.WAVE_SRC='space-img/wave-just-cool.mp4';document.documentElement.style.setProperty('--wave-ar','1280 / 374');</script>
 <meta name="robots" content="noindex">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Seenik Space Preview</title>
+<title>Seenik Wave 2 Preview</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@400&family=Nunito:wght@900&family=Ubuntu:wght@300;400;500&family=Roboto:wght@700&display=swap">
@@ -1474,7 +1474,7 @@
 
   .bmask { position: fixed; left: 0; right: 0; background: #000; pointer-events: none; opacity: 0; transition: opacity 1.4s ease; }
   #bm-top { top: 0; }  #bm-bot { bottom: 0; }  #bm-mid { }
-  #space-credit { transition: opacity .8s ease; }  body.space-bled #space-credit { opacity: 0; }  .wave-live { width: 100%; display: block; mix-blend-mode: screen; -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent); -webkit-mask-composite: source-in; mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent) intersect, linear-gradient(transparent, #000 18%, #000 82%, transparent); }  #section-view .fr.mir-lined { aspect-ratio: 1800 / 420 !important; isolation: auto; }
+  #space-credit { transition: opacity .8s ease; }  body.space-bled #space-credit { opacity: 0; }  .wave-live { width: 100%; display: block; mix-blend-mode: screen; -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent); -webkit-mask-composite: source-in; mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent) intersect, linear-gradient(transparent, #000 18%, #000 82%, transparent); }  #section-view .fr.mir-lined { aspect-ratio: var(--wave-ar, 1280 / 500) !important; isolation: auto; }
   /* All the pictures (The Studio and The Mirror, desktop): no frames, stretched to both edges of the screen at any width, top and bottom fading into the space */
   @media (min-width: 761px) {
     #section-view .st-photo, #section-view .st-pier { outline: 0 !important; border: 0 !important; padding: 0 !important; box-shadow: none !important; width: 100vw !important; max-width: none !important; margin-left: calc(50% - 50vw) !important; justify-self: start !important; }
@@ -1779,6 +1779,33 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
   html body #artist-view .frame:active .media { transform: translateY(4px) !important; box-shadow: 0 1px 0 #1b1d24, 0 4px 10px rgba(0,0,0,.6) !important; }
   html body #artist-view .rows { gap: 30px !important; }
 }
+
+/* Oct 25: the four elementals play as videos, in the same squares as the picture */
+.el-vids { display: none; }
+@media (min-width: 761px) {
+  #section-view .fr.mir-wide { position: relative; }
+  #section-view .el-vids { display: block; position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+  #section-view .el-vids video { position: absolute; top: 19.264%; width: 21.623%; aspect-ratio: 1; object-fit: cover; display: block; }
+}
+@media (max-width: 760px) {
+  #section-view .el4 i { overflow: hidden; }
+  #section-view .el4 i video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+}
+
+/* Oct 25: the elementals hold still as you scroll or pass over them (no zoom), and on the phone each sits in a thin black frame */
+html body #section-view .fr.mir-wide:not(.mir-lined) img, html body #section-view .fr.mir-wide:not(.mir-lined):hover img { transform: none !important; transition: none !important; }
+html body #section-view .fr.mir-wide:not(.mir-lined) .el-vids video, html body #section-view .el4 i, html body #section-view .el4 i video { transform: none !important; transition: none !important; animation: none !important; }
+@media (max-width: 760px) {
+  html body #section-view .el4 { gap: 14px !important; padding: 14px !important; background: transparent !important; box-sizing: border-box; }   /* space shows between them */
+  html body #section-view .fr.mir-wide:not(.mir-lined) { background: transparent !important; }
+  html body #section-view .el4 i { outline: 1px solid rgba(0,0,0,.85); box-shadow: 0 0 0 2px rgba(255,255,255,.12), 0 10px 22px rgba(0,0,0,.7); }   /* each one a floating button: a thin dark line, a faint light rim, a soft shadow; square corners, nothing cropped */
+}
+
+/* Oct 25: the wave shows its whole frame, with no faded edges (its black is pure black, so it melts into space by itself) */
+html body #section-view .mir-lined img, html body #section-view .mir-lined { -webkit-mask: none !important; mask: none !important; }
+
+/* Oct 25: the wave plays as a plain video: its full frame, no blending, no faded edges */
+html body #section-view .wave-live { mix-blend-mode: screen !important; }   /* the video keeps all its own light; its edges fade softly into space (the original fade) */
 </style>
 
 
@@ -3871,7 +3898,7 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
       const sing = (big, small, x = '', ph = '') => `<div class="mir-sing${x}"><p class="mir-big">${big}</p>${small ? `<p class="mir-small">${small}</p>` : ''}${ph}</div>`;
       return sing('A world you inhabit', 'A ' + wv('single living thing') + ' you move through', ' mir-top') + `<p class="mir-open-ph" style="--m:40">${evenPh("A world you inhabit. A single living thing you move through.")}</p>`
         + `<div class="mir-stage"><div class="mir-hero"><div class="mir-title3d" aria-label="The Mirror"><span class="t3"><span class="b" aria-hidden="true">THE MIRROR</span><span class="f">THE MIRROR</span></span><span class="sub">A FULLDOME CINEMATIC 48-min EXPERIENCE</span></div><div class="mir-par"><img alt="The Mirror" draggable="false" src="${IMG('seenik-00')}"></div></div><canvas class="mir-tri" aria-hidden="true"></canvas></div>`
-        + sing('Every visual<br class="ph-br"> flows from the music', 'Through photorealistic worlds —<br class="ph-br"> the cosmos, the deep ocean', ' mir-first', `<p class="mir-one">${evenPh('Every visual flows from the music, through photorealistic worlds — the cosmos, the deep ocean.')}</p>`) + one('seenik-02c', 'The Music Tells the Story', '1572 / 523', ' mir-lined')
+        + sing('Every visual<br class="ph-br"> flows from the music', 'Through photorealistic worlds —<br class="ph-br"> the cosmos, the deep ocean', ' mir-first', `<p class="mir-one">${evenPh('Every visual flows from the music, through photorealistic worlds — the cosmos, the deep ocean.')}</p>`) + one('seenik-02c', 'The Music Tells the Story', '1280 / 500', ' mir-lined')
         + sing('Experience the power of<br class="ph-br"> the elemental forces', '', ' mir-wind') + one('seenik-03c', 'Effects that Mirror Nature', '1540 / 462')
         + sing('The same patterns that<br class="ph-br"> build a galaxy build us', '', ' mir-close')
         + `<div class="mir-galaxy"><video src="../vid/deep-field.mp4" autoplay muted loop playsinline preload="auto" aria-label="A flight through thousands of real galaxies, from James Webb Space Telescope data"></video></div><p class="mir-credit">Visualization: NASA, ESA, CSA, STScI · F. Summers, G. Bacon, J. DePasquale, L. Hustak, J. Olmsted, A. Pagan</p>`; } }
@@ -3948,9 +3975,11 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
     const dots = () => SV.querySelectorAll('.reel-txt').forEach(r => { if (r.querySelector('.gdot')) return; const h = r.querySelector('h3'); if (!h) return;
       const d = document.createElement('button'); d.type = 'button'; d.className = 'gdot'; d.innerHTML = '<i></i><i></i><i></i>'; d.setAttribute('aria-label', 'Show the words'); d.setAttribute('aria-expanded', 'false'); h.after(d); });
     SV.addEventListener('click', e => { const t = e.target.closest('.gdot:not(.fold), .reel-txt h3'); if (!t || innerWidth > 760) return; const r = t.closest('.reel-txt'); if (!r) return; const on = r.classList.toggle('open'); const d = r.querySelector('.gdot'); if (d) d.setAttribute('aria-expanded', on); });
+    const EL_V = n => `<video src="space-img/el-${n}.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`;   // Oct 25: the four elementals are videos
     const quads = () => SV.querySelectorAll('.fr.mir-wide:not(.mir-lined)').forEach(f => { if (f.querySelector('.el4')) return; const src = f.querySelector('img').src;   // the four elementals: one picture, shown as two rows of two
       const X = [25, 1179, 409, 792];   // top: murmurations, kaleidoscope; bottom: cymatics, fractals — the pictures tell it, no names   // each picture's square inside the 1540 x 462 image (333 px), without the label strip
-      f.insertAdjacentHTML('beforeend', `<span class="el4">${X.map((x, k) => `<i style="background-image:url('${src}');background-position:${(x / (1540 - 333) * 100).toFixed(3)}% ${(89 / (462 - 333) * 100).toFixed(3)}%"></i>`).join('')}</span>`); });
+      const VN = ['murmuration', 'kaleidoscope', 'cymatics', 'fractal'];
+      f.insertAdjacentHTML('beforeend', `<span class="el4">${X.map((x, k) => `<i style="background-image:url('${src}');background-position:${(x / (1540 - 333) * 100).toFixed(3)}% ${(89 / (462 - 333) * 100).toFixed(3)}%">${EL_V(VN[k])}</i>`).join('')}</span>`); });
     const caps = () => SV.querySelectorAll('.mir-thru .mir-small, .st-say .mir-big, .st-based .mir-big, .mir-wind .mir-big, .mir-close .mir-big, .mir-top .mir-big, .mir-top .mir-small, .st-ground .mir-big, .mir-first .mir-big, .mir-first .mir-small').forEach(el => { if (el.classList.contains('evcap')) return;
       const t = el.textContent.replace(/\s+/g, ' ').trim(); el.innerHTML = `<span class="dk">${el.innerHTML}</span>` + (t.length <= 30 || el.closest('.mir-top:not(.st-top-say)') || el.matches('.mir-first .mir-big') ? `<span class="ev-ph one">${t}</span>` : (() => { const w = t.split(' '); let best = null; for (let i = 1; i < w.length; i++) { const a = w.slice(0, i).join(' '), b = w.slice(i).join(' '), d = Math.abs(a.length - b.length); if (!best || d < best[0]) best = [d, a, b]; } return `<span class="ev-ph">${best[1]}</span><span class="ev-ph">${best[2]}</span>`; })()); el.classList.add('evcap'); });
     const fit0 = () => { if (innerWidth > 760) return; caps(); dots(); folds(); quads(); SV.querySelectorAll('span.ev-ph.one').forEach(sp => { if (!sp.offsetParent) return;   // one line: the size that exactly fills the width
@@ -5025,7 +5054,7 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
   // The Mirror's wave: the version with its black made see-through, so the top blends into the space
   // The Mirror's wave: Sandy's animated version, slowed and stretched; its black drops out (screen blend) and the edges fade into space
   new MutationObserver(() => document.querySelectorAll('img[src*="seenik-02c"]').forEach(im => {
-    const v = document.createElement('video'); v.src = 'space-img/wave-pingpong.mp4'; v.muted = true;   // plays forward, then backward: no jump back to the start
+    const v = document.createElement('video'); v.src = (window.WAVE_SRC || 'space-img/wave-test03-cool.mp4') + '?v=2'; v.muted = true; v.defaultMuted = true; v.setAttribute('muted', '');   /* Oct 25: Sandy's final wave, its background cleaned to pure black */   // plays forward, then backward: no jump back to the start
      v.loop = true; v.autoplay = true; v.playsInline = true; v.setAttribute('playsinline', '');
     v.className = 'wave-live'; im.replaceWith(v); v.play().catch(() => {});
   })).observe(document.body, { childList: true, subtree: true });
@@ -5286,7 +5315,8 @@ body:not(.artist-on), body:not(.artist-on) #stage, body:not(.artist-on) canvas#s
     if (b !== btn) { if (names) names.remove(); names = null; btn = b; if (!b) return;
       const im = b.querySelector('img'); if (im && /seenik-03c/.test(im.src)) im.src = 'space-img/elementals-clean.jpg';
       names = document.createElement('div'); names.className = 'el-names'; names.setAttribute('aria-hidden', 'true');
-      names.innerHTML = N.map(([t, x]) => `<span style="left:${x}%">${t}</span>`).join(''); b.parentElement.appendChild(names); }
+      names.innerHTML = N.map(([t, x]) => `<span style="left:${x}%">${t}</span>`).join(''); b.parentElement.appendChild(names);
+      if (!b.querySelector('.el-vids')) b.insertAdjacentHTML('beforeend', `<span class="el-vids">${[['murmuration', 25], ['cymatics', 409], ['fractal', 792], ['kaleidoscope', 1179]].map(([n, x]) => `<video style="left:${(x / 1540 * 100).toFixed(3)}%" src="space-img/el-${n}.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`).join('')}</span>`); }
     if (!btn || !names) return;
     const op = names.offsetParent || document.body, r = btn.getBoundingClientRect(), pr = op.getBoundingClientRect();
     names.style.left = (r.left - pr.left + op.scrollLeft - op.clientLeft) + 'px'; names.style.top = (r.top - pr.top + op.scrollTop - op.clientTop + r.height * (37 / 462)) + 'px'; names.style.width = r.width + 'px';

@@ -1474,7 +1474,7 @@
 
   .bmask { position: fixed; left: 0; right: 0; background: #000; pointer-events: none; opacity: 0; transition: opacity 1.4s ease; }
   #bm-top { top: 0; }  #bm-bot { bottom: 0; }  #bm-mid { }
-  #space-credit { transition: opacity .8s ease; }  body.space-bled #space-credit { opacity: 0; }  .wave-live { width: 100%; display: block; mix-blend-mode: screen; -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent); -webkit-mask-composite: source-in; mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent) intersect, linear-gradient(transparent, #000 18%, #000 82%, transparent); }  #section-view .fr.mir-lined { aspect-ratio: 1800 / 420 !important; isolation: auto; }
+  #space-credit { transition: opacity .8s ease; }  body.space-bled #space-credit { opacity: 0; }  .wave-live { width: 100%; display: block; mix-blend-mode: screen; -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent), linear-gradient(transparent, #000 18%, #000 82%, transparent); -webkit-mask-composite: source-in; mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent) intersect, linear-gradient(transparent, #000 18%, #000 82%, transparent); }  #section-view .fr.mir-lined { aspect-ratio: var(--wave-ar, 1280 / 500) !important; isolation: auto; }
   /* All the pictures (The Studio and The Mirror, desktop): no frames, stretched to both edges of the screen at any width, top and bottom fading into the space */
   @media (min-width: 761px) {
     #section-view .st-photo, #section-view .st-pier { outline: 0 !important; border: 0 !important; padding: 0 !important; box-shadow: none !important; width: 100vw !important; max-width: none !important; margin-left: calc(50% - 50vw) !important; justify-self: start !important; }
@@ -1800,6 +1800,16 @@ html body #section-view .fr.mir-wide:not(.mir-lined) .el-vids video, html body #
   html body #section-view .fr.mir-wide:not(.mir-lined) { background: transparent !important; }
   html body #section-view .el4 i { outline: 1px solid rgba(0,0,0,.85); box-shadow: 0 0 0 2px rgba(255,255,255,.12), 0 10px 22px rgba(0,0,0,.7); }   /* each one a floating button: a thin dark line, a faint light rim, a soft shadow; square corners, nothing cropped */
 }
+
+/* Oct 25: the wave shows its whole frame, with no faded edges (its black is pure black, so it melts into space by itself) */
+html body #section-view .mir-lined img, html body #section-view .mir-lined { -webkit-mask: none !important; mask: none !important; }
+
+/* Oct 25: the wave plays as a plain video: its full frame, no blending, no faded edges */
+html body #section-view .wave-live { mix-blend-mode: screen !important; }
+html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9); }   /* Oct 25: softened a little so it sits with the eye and the videos */
+@media (max-width: 760px) { html body #section-view .wave-live { filter: blur(.25px) contrast(.95) saturate(.95); } }   /* phone: no blur, it is drawn much smaller */   /* the video keeps all its own light; its edges fade softly into space (the original fade) */
+
+
 </style>
 
 
@@ -3852,7 +3862,7 @@ html body #section-view .fr.mir-wide:not(.mir-lined) .el-vids video, html body #
       return `<div class="proj wide${inf.key ? '' : ' poster'} k${i}"><div class="m"><img alt="" style="--ty:${['46%', '40%', '14%'][i] || '50%'}" src="${inf.key ? IMG(inf.key) : filmImgs[i]}"></div><div class="info"><span>${y}</span>
         <dl>${inf.credits.map(([k, v]) => `<dt>${k === 'Production Designer' ? '<span class="dk">Production </span>Designer' : k}</dt><dd>${v}</dd>`).join('')}</dl>
         ${inf.list ? `<ul>${inf.list.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}
-        <button type="button" class="pj-info" aria-expanded="false">Info</button><p><span class="dk">${inf.text || `Write-up coming: your role on ${t} and what you did.`}</span>${evenPh(inf.text || `Write-up coming: your role on ${t} and what you did.`)}</p></div></div>${gal ? `<div class="gal">${gal}</div>` : ''}${inf.note ? `<section class="pj-con"><h3 class="fw-group">Grace's Phone</h3><button type="button" class="pj-info" aria-expanded="false">Info</button><p class="pj-note"><span class="dk">${inf.note}</span>${evenPh(inf.note)}</p>` : ''}${i === 0 ? reel('pj-phones', SPEC_VIDS.map(([n, d]) => [`<video src="../vid/spec-${n}.mp4" poster="${IMG('spec-' + n)}" muted loop playsinline autoplay preload="auto"></video>`, n.replace('_', ' '), d + '<span class="pj-ctl"><button type="button" class="pj-pp" aria-label="Pause"></button><span class="pj-bar"><i></i></span></span>'])) : ''}${inf.note ? '</section>' : ''}${i === 2 ? reel('pj-wide', [[`<span data-vid="../vid/vh-film.mp4" data-ar="1920 / 804" data-t="Visiting Hours" style="display:contents;cursor:pointer"><img alt="" style="cursor:pointer" src="${IMG('vh-film')}"><span class="pj-play" aria-hidden="true" style="cursor:pointer"></span></span>`, 'Visiting Hours', ''], [`<span data-vid="../vid/vh-bts.mp4" data-ar="1920 / 1012" data-t="Behind the Scenes" style="display:contents;cursor:pointer"><img alt="" style="cursor:pointer" src="${IMG('vh-bts')}"><span class="pj-play" aria-hidden="true" style="cursor:pointer"></span></span>`, 'Behind the Scenes', '']]) : ''}${inf.concepts ? inf.concepts.map(([n, l]) => `<section class="pj-con"><h3 class="fw-group">${n}</h3><div class="pj-reel pj-cr${l.length === 1 ? ' one' : ''}"><div class="pj-sp" aria-hidden="true"></div><div class="pj-row">${l.map(m => `<button type="button" class="gp pj-cb" data-t="${t}" data-s="${n} · concept"><img loading="lazy" alt="" src="${IMG(m)}"></button>`).join('')}</div><div class="pj-sp" aria-hidden="true"></div></div></section>`).join('') : ''}${sets ? `<div class="sets">${PROJ_TOP[i] ? `<section class="set set-concept"><h3 class="fw-group">Concept</h3><button type="button" class="gp" data-t="${t}" data-s="Concept board"><img loading="lazy" alt="" src="${IMG(PROJ_TOP[i])}?v=6"></button></section>` : ''}${sets}</div>` : ''}`; } },
+        <button type="button" class="pj-info" aria-expanded="false">Info</button><p><span class="dk">${inf.text || `Write-up coming: your role on ${t} and what you did.`}</span>${evenPh(inf.text || `Write-up coming: your role on ${t} and what you did.`)}</p></div></div>${gal ? `<div class="gal">${gal}</div>` : ''}${inf.note ? `<section class="pj-con"><h3 class="fw-group">Grace's Phone</h3><button type="button" class="pj-info" aria-expanded="false">Info</button><p class="pj-note"><span class="dk">${inf.note}</span>${evenPh(inf.note)}</p>` : ''}${i === 0 ? reel('pj-phones', SPEC_VIDS.map(([n, d]) => [`<video src="../vid/spec-${n}.mp4" poster="${IMG('spec-' + n)}" muted loop playsinline autoplay preload="auto" data-vid="../vid/spec-${n}.mp4" data-ar="1080 / 2340" data-t="${n.replace('_', ' ')}" data-s="${d}" style="cursor:zoom-in"></video>`, n.replace('_', ' '), d + '<span class="pj-ctl"><button type="button" class="pj-pp" aria-label="Pause"></button><span class="pj-bar"><i></i></span></span>'])) : ''}${inf.note ? '</section>' : ''}${i === 2 ? reel('pj-wide', [[`<span data-vid="../vid/vh-film.mp4" data-ar="1920 / 804" data-t="Visiting Hours" style="display:contents;cursor:pointer"><img alt="" style="cursor:pointer" src="${IMG('vh-film')}"><span class="pj-play" aria-hidden="true" style="cursor:pointer"></span></span>`, 'Visiting Hours', ''], [`<span data-vid="../vid/vh-bts.mp4" data-ar="1920 / 1012" data-t="Behind the Scenes" style="display:contents;cursor:pointer"><img alt="" style="cursor:pointer" src="${IMG('vh-bts')}"><span class="pj-play" aria-hidden="true" style="cursor:pointer"></span></span>`, 'Behind the Scenes', '']]) : ''}${inf.concepts ? inf.concepts.map(([n, l]) => `<section class="pj-con"><h3 class="fw-group">${n}</h3><div class="pj-reel pj-cr${l.length === 1 ? ' one' : ''}"><div class="pj-sp" aria-hidden="true"></div><div class="pj-row">${l.map(m => `<button type="button" class="gp pj-cb" data-t="${t}" data-s="${n} · concept"><img loading="lazy" alt="" src="${IMG(m)}"></button>`).join('')}</div><div class="pj-sp" aria-hidden="true"></div></div></section>`).join('') : ''}${sets ? `<div class="sets">${PROJ_TOP[i] ? `<section class="set set-concept"><h3 class="fw-group">Concept</h3><button type="button" class="gp" data-t="${t}" data-s="Concept board"><img loading="lazy" alt="" src="${IMG(PROJ_TOP[i])}?v=6"></button></section>` : ''}${sets}</div>` : ''}`; } },
     art: { title: 'Art', back: 'artist', spaced: true, render: (sub) => {
       const roll = (list, dir, secs, kind) => { const t = list.map(([n, w, h]) => `<button type="button" class="ap" style="--ar:${w} / ${h}" data-t="Art" data-s=""><img alt="" src="${IMG(n)}?v=5"></button>`).join('');
         return `<div class="fs art-roll" data-kind="${kind}"><div class="sprockets" aria-hidden="true"></div><div class="mq"><div class="mq-track ${dir}" style="animation-duration:${secs}s${kind === 'bw' ? `;animation-delay:-${(secs * .37).toFixed(1)}s` : ''}">${t}${t}</div></div><div class="sprockets" aria-hidden="true"></div></div>`; };
@@ -3892,7 +3902,7 @@ html body #section-view .fr.mir-wide:not(.mir-lined) .el-vids video, html body #
       const sing = (big, small, x = '', ph = '') => `<div class="mir-sing${x}"><p class="mir-big">${big}</p>${small ? `<p class="mir-small">${small}</p>` : ''}${ph}</div>`;
       return sing('A world you inhabit', 'A ' + wv('single living thing') + ' you move through', ' mir-top') + `<p class="mir-open-ph" style="--m:40">${evenPh("A world you inhabit. A single living thing you move through.")}</p>`
         + `<div class="mir-stage"><div class="mir-hero"><div class="mir-title3d" aria-label="The Mirror"><span class="t3"><span class="b" aria-hidden="true">THE MIRROR</span><span class="f">THE MIRROR</span></span><span class="sub">A FULLDOME CINEMATIC 48-min EXPERIENCE</span></div><div class="mir-par"><img alt="The Mirror" draggable="false" src="${IMG('seenik-00')}"></div></div><canvas class="mir-tri" aria-hidden="true"></canvas></div>`
-        + sing('Every visual<br class="ph-br"> flows from the music', 'Through photorealistic worlds —<br class="ph-br"> the cosmos, the deep ocean', ' mir-first', `<p class="mir-one">${evenPh('Every visual flows from the music, through photorealistic worlds — the cosmos, the deep ocean.')}</p>`) + one('seenik-02c', 'The Music Tells the Story', '1572 / 523', ' mir-lined')
+        + sing('Every visual<br class="ph-br"> flows from the music', 'Through photorealistic worlds —<br class="ph-br"> the cosmos, the deep ocean', ' mir-first', `<p class="mir-one">${evenPh('Every visual flows from the music, through photorealistic worlds — the cosmos, the deep ocean.')}</p>`) + one('seenik-02c', 'The Music Tells the Story', '1280 / 500', ' mir-lined')
         + sing('Experience the power of<br class="ph-br"> the elemental forces', '', ' mir-wind') + one('seenik-03c', 'Effects that Mirror Nature', '1540 / 462')
         + sing('The same patterns that<br class="ph-br"> build a galaxy build us', '', ' mir-close')
         + `<div class="mir-galaxy"><video src="../vid/deep-field.mp4" autoplay muted loop playsinline preload="auto" aria-label="A flight through thousands of real galaxies, from James Webb Space Telescope data"></video></div><p class="mir-credit">Visualization: NASA, ESA, CSA, STScI · F. Summers, G. Bacon, J. DePasquale, L. Hustak, J. Olmsted, A. Pagan</p>`; } }
@@ -5048,7 +5058,7 @@ html body #section-view .fr.mir-wide:not(.mir-lined) .el-vids video, html body #
   // The Mirror's wave: the version with its black made see-through, so the top blends into the space
   // The Mirror's wave: Sandy's animated version, slowed and stretched; its black drops out (screen blend) and the edges fade into space
   new MutationObserver(() => document.querySelectorAll('img[src*="seenik-02c"]').forEach(im => {
-    const v = document.createElement('video'); v.src = 'space-img/wave-pingpong.mp4'; v.muted = true;   // plays forward, then backward: no jump back to the start
+    const v = document.createElement('video'); v.src = (window.WAVE_SRC || 'space-img/wave3-topaz.mp4'); v.muted = true; v.defaultMuted = true; v.setAttribute('muted', '');   /* Oct 25: Sandy's final wave, its background cleaned to pure black */   // plays forward, then backward: no jump back to the start
      v.loop = true; v.autoplay = true; v.playsInline = true; v.setAttribute('playsinline', '');
     v.className = 'wave-live'; im.replaceWith(v); v.play().catch(() => {});
   })).observe(document.body, { childList: true, subtree: true });
@@ -5156,11 +5166,11 @@ html body #section-view .fr.mir-wide:not(.mir-lined) .el-vids video, html body #
       // the gas flows: a slow vortex (two crossfading turns so it never smears) plus curling drift
       float T1 = fract(t * 0.035), T2 = fract(t * 0.035 + 0.5), wv = 1.0 - abs(T1 * 2.0 - 1.0);
       float vf = exp(-r / 520.0);
-      vec2 f1 = rot(d, -(T1 - 0.5) * 0.55 * vf), f2 = rot(d, -(T2 - 0.5) * 0.55 * vf);
+      vec2 f1 = rot(d, -(T1 - 0.5) * 0.42 * vf), f2 = rot(d, -(T2 - 0.5) * 0.42 * vf);
       vec2 curl = vec2(vn(p / 160.0 + vec2(t * 0.06, 0.0)), vn(p / 160.0 + vec2(0.0, t * 0.05) + 7.3)) - 0.5;
       vec2 zf = -d * 0.03 * uB;                       // the far nebula moves less than the eye as you drift in: depth
-      vec2 pn = C + f1 + curl * 38.0 + refr - par * 0.55 + zf;
-      vec2 pn2 = C + f2 + curl * 38.0 + refr - par * 0.55 + zf;
+      vec2 pn = C + f1 + curl * 30.0 + refr - par * 0.55 + zf;
+      vec2 pn2 = C + f2 + curl * 30.0 + refr - par * 0.55 + zf;
       float lumN = dot(S(base, pn, 1.5), vec3(0.33));
       pn += par * 0.35 * lumN; pn2 += par * 0.35 * lumN;   // wisps lift toward the viewer
       vec3 neb = mix(S(base, pn2, 0.0), S(base, pn, 0.0), wv);
@@ -5191,7 +5201,7 @@ html body #section-view .fr.mir-wide:not(.mir-lined) .el-vids video, html body #
       col += inDome * (vec3(0.92, 0.95, 1.0) * spec * 0.22 + vec3(0.8, 0.88, 1.0) * streak * 0.0) + vec3(0.55, 0.65, 1.0) * rim * 0.14;
 
       // --- a breath of bloom: bright parts glow softly
-      col += S(base, p, 4.0) * 0.16;
+      col += S(base, p, 4.0) * 0.11;
 
       // --- the schematic: the geometry the eye and the nebula are built from, drawn in light ON the picture (locked to it, never sliding)
       // all of it sits at the depth of the glass dome, so it moves only as the eye itself moves
