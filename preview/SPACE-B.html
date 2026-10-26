@@ -5354,7 +5354,7 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
   (function f() { requestAnimationFrame(f);
     const SV = document.querySelector('#section-view.on'); if (!SV || innerWidth <= 760) { key = ''; return; }
     const els = [...SV.querySelectorAll('.mir-sing .mir-big, .mir-sing .mir-small')].filter(e => e.offsetParent);
-    const k = innerWidth + 'x' + els.length + (SV.querySelector('.sv-t') || {}).textContent + (document.fonts ? document.fonts.status : ''); if (!els.length || k === key) return; key = k;   // refit once the real fonts have loaded
+    const k = innerWidth + 'x' + els.length + (SV.querySelector('.sv-t') || {}).textContent + (document.fonts ? document.fonts.status : ''); if (!els.length) { key = ''; return; } if (k === key && !els.some(e => !e._fit)) return; key = k; els.forEach(e => e._fit = 1);   /* Oct 26: a page rebuilt (e.g. after Contact) is always refitted */   // refit once the real fonts have loaded
     const studio = false;   // Oct 24: The Studio uses The Mirror's setup exactly: every statement one line across, sized to fill the width
     let BIG = 0, SMALL = 0;
     if (studio) {   // measure The Mirror's opening lines, off screen, the way The Mirror sizes them
