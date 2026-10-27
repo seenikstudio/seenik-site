@@ -1822,6 +1822,11 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
 @media (max-width: 760px) { html body #section-view .wave-live { filter: blur(.25px) contrast(.95) saturate(.95); } }   /* phone: no blur, it is drawn much smaller */   /* the video keeps all its own light; its edges fade softly into space (the original fade) */
 
 
+
+/* Oct 27: on the phone the Studio's mountain-and-leaf and pier pictures are short looping videos (clouds, moving water) made from the sharp Topaz photos; the desktop keeps the live effects */
+.st-photo .ph-loop, .st-pier .ph-loop { display: none; }
+@media (max-width: 760px) { html body #section-view .st-photo .ph-loop, html body #section-view .st-pier .ph-loop { display: block !important; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  html body #section-view .st-photo, html body #section-view .st-pier { position: relative; } }
 </style>
 
 
@@ -3818,7 +3823,8 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
   };
   const VIDEO_TEXT = ['Made during the pandemic: therapy sessions in digital media, illustrating inner dialogue and self-discovery.', 'A visual language of symmetry, flow and kaleidoscopic patterns, every decision aligns with the music.'];
   const frameHTML = (src, t, s, w, ar, extra = '') => `<button type="button" class="fr${extra}" style="--w:${w};--ar:${ar}" data-t="${t}" data-s="${s}"><img alt="" src="${src}"><span class="cap"><span>${t}</span><em>${s}</em></span></button>`;
-  const PHV = i => i < 2 ? '?v=2' : i >= 8 ? '?v=3' : '';
+  const IMGP = k => (innerWidth <= 760 ? '../img/ph/photo-' : '../img/photo-') + k + '.jpg';   /* Oct 27: phones get their own sharp copies of the album photos, made at the size the phone shows them */
+  const PHV = i => '?v=4';   /* Oct 27: every album photo upscaled in Topaz */
   const PHOTO_ORDER = [11, 1, 6, 3, 10, 2, 9, 5, 7, 4, 32, 24, 14, 15, 12, 13, 16, 17, 18, 19, 20, 21, 22, 31, 27, 29, 30, 26, 25, 23, 33, 8];   // the photo order, by contact-sheet number; the first one is shown big
   const PHOTO_SEQ = (() => {   /* Oct 26: Sandy's favourites play first, shuffled: 6 and 2 never in the first three (they are used elsewhere on the site); 10 and 4 never back to back; then the rest, shuffled */
     const sh = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
@@ -3866,8 +3872,8 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
       </section>`).join('') },
     photo: { title: 'Art & Photography', back: 'artist', spaced: true, render: () => {
       const w = 'calc((var(--vw, 100vw) - 48px - 3 * var(--tile-gap)) / 4)';
-      const f = PHOTO_ORDER.map((n, k) => { const i = n - 1; return frameHTML(IMG('photo-' + P2(i)) + PHV(i), 'Photograph ' + (k + 1), 'Photography', w, '2.39 / 1', n === PHOTO_SEQ[0] ? ' sel' : '').replace('class="fr', `data-p="${i}" data-k="${k}" class="fr`); });
-      return `<p class="reel-intro">${evenBoth('From the North Shore mountains to sunsets in Brazil, Belize and Mexico: snapshots of colour and light. Looking through a lens of wonder. Beauty lives everywhere, and in all things.')}</p><div class="pano"><div class="view" id="pano-view"><img alt="" src="${IMG('photo-' + P2(PHOTO_SEQ[0] - 1)) + PHV(PHOTO_SEQ[0] - 1)}"></div><button type="button" class="pano-nav prev" aria-label="Previous photograph"></button><button type="button" class="pano-nav next" aria-label="Next photograph"></button><div class="meta"><span id="pano-t">Photograph ${PHOTO_ORDER.indexOf(PHOTO_SEQ[0]) + 1}</span><span>${PHOTO_ORDER.length} photographs</span></div></div>
+      const f = PHOTO_ORDER.map((n, k) => { const i = n - 1; return frameHTML(IMGP(P2(i)) + PHV(i), 'Photograph ' + (k + 1), 'Photography', w, '2.39 / 1', n === PHOTO_SEQ[0] ? ' sel' : '').replace('class="fr', `data-p="${i}" data-k="${k}" class="fr`); });
+      return `<p class="reel-intro">${evenBoth('From the North Shore mountains to sunsets in Brazil, Belize and Mexico: snapshots of colour and light. Looking through a lens of wonder. Beauty lives everywhere, and in all things.')}</p><div class="pano"><div class="view" id="pano-view"><img alt="" src="${IMGP(P2(PHOTO_SEQ[0] - 1)) + PHV(PHOTO_SEQ[0] - 1)}"></div><button type="button" class="pano-nav prev" aria-label="Previous photograph"></button><button type="button" class="pano-nav next" aria-label="Next photograph"></button><div class="meta"><span id="pano-t">Photograph ${PHOTO_ORDER.indexOf(PHOTO_SEQ[0]) + 1}</span><span>${PHOTO_ORDER.length} photographs</span></div></div>
         <div class="ph-roll">${strip(f.concat(f), 'calc(6 * ' + w + ' + 5 * var(--tile-gap) + 40px)', 'left')}</div>` + PAGES.art.render('under-photo'); } },
     proj: { title: '', back: 'film', render: (i) => {
       const [t, y] = FILM_ITEMS[i], inf = FILM_INFO[t] || { credits: [] };
@@ -3907,9 +3913,9 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
           <label class="sf"><input name="name" type="text" autocomplete="name" placeholder="Name" required><i aria-hidden="true"></i></label>
           <label class="sf"><input name="email" type="email" autocomplete="email" placeholder="Email" required><i aria-hidden="true"></i></label>
           <label class="sf"><textarea name="message" rows="2" placeholder="Message" required></textarea><i aria-hidden="true"></i></label>
-          <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form></div></div><div class="mir-sing st-ground"><p class="mir-big">Seamless, dreamlike immersion</p></div><figure class="st-fern"><img alt="A drop falling into still water, its ripples forming a geometric pattern of light" draggable="false" src="space-img/studio-fern.jpg?v=2"><img class="desk-drop" alt="" draggable="false" src="space-img/studio-drop-desk.jpg?v=4"><video class="st-drop-vid" src="space-img/ripple-loop-a.mp4" muted loop autoplay playsinline preload="auto" aria-label="A drop falling into still water, its ripples forming a geometric pattern of light"></video></figure><div class="mir-sing st-say"><p class="mir-big">Grounded in earth imagery<br class="ph-br"> and the geometric patterns of creation</p></div><figure class="st-photo"><img alt="Mountains dissolving into a leaf" draggable="false" src="${IMG('studio-journey-2')}"></figure></div>
+          <button type="submit"><span>Send</span></button><p class="sent" hidden></p></form></div></div><div class="mir-sing st-ground"><p class="mir-big">Seamless, dreamlike immersion</p></div><figure class="st-fern"><img alt="A drop falling into still water, its ripples forming a geometric pattern of light" draggable="false" src="space-img/studio-fern.jpg?v=2"><img class="desk-drop" alt="" draggable="false" src="space-img/studio-drop-desk.jpg?v=4"><video class="st-drop-vid" src="space-img/ripple-loop-a.mp4" muted loop autoplay playsinline preload="auto" aria-label="A drop falling into still water, its ripples forming a geometric pattern of light"></video></figure><div class="mir-sing st-say"><p class="mir-big">Grounded in earth imagery<br class="ph-br"> and the geometric patterns of creation</p></div><figure class="st-photo"><img alt="Mountains dissolving into a leaf" draggable="false" src="${IMG('studio-journey-2')}"><video class="ph-loop" muted loop autoplay playsinline preload="none" data-src="space-img/studio-journey-loop.mp4?v=2"></video></figure></div>
         <div class="mir-sing st-say st-based"><p class="mir-big">Based in North Vancouver,<br class="ph-br"> where the mountains meet the sea</p></div>
-        <figure class="studio-place st-pier"><img alt="North Vancouver at night, from the pier" src="${IMG('studio-pier')}"></figure>
+        <figure class="studio-place st-pier"><img alt="North Vancouver at night, from the pier" src="${IMG('studio-pier') + '?v=4'}"><video class="ph-loop" muted loop autoplay playsinline preload="none" data-src="space-img/studio-pier-loop.mp4"></video></figure>
         <div class="st-contact"><form class="cform st-form" data-to="studio" novalidate>
           <h3>Contact</h3>
           <label class="sf"><input name="name" type="text" autocomplete="name" placeholder="Name" required><i aria-hidden="true"></i></label>
@@ -4146,7 +4152,7 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
     const fi = e.target.closest('.fr[data-i]');
     if (fi) { const i = +fi.dataset.i, k = filmOrder.indexOf(i); [filmOrder[0], filmOrder[k]] = [filmOrder[k], filmOrder[0]]; document.getElementById('fw-feature').innerHTML = featureHTML(i); document.getElementById('fw-strips').innerHTML = filmStrips(); SV.scrollTo({ top: 0, behavior: 'smooth' }); return; }
     const pf = e.target.closest('.fr[data-p]');
-    if (pf) { const n = +pf.dataset.p; document.getElementById('pano-view').innerHTML = `<img alt="" src="${IMG('photo-' + P2(n)) + PHV(n)}">`; document.getElementById('pano-t').textContent = 'Photograph ' + (+pf.dataset.k + 1); SV.querySelectorAll('.fr[data-p]').forEach(x => x.classList.toggle('sel', x === pf)); return; }
+    if (pf) { const n = +pf.dataset.p; document.getElementById('pano-view').innerHTML = `<img alt="" src="${IMGP(P2(n)) + PHV(n)}">`; document.getElementById('pano-t').textContent = 'Photograph ' + (+pf.dataset.k + 1); SV.querySelectorAll('.fr[data-p]').forEach(x => x.classList.toggle('sel', x === pf)); return; }
     if (e.target.closest('.soc .big a.yt')) return;
     const t = e.target.closest('.sq, .band-ph, .piece, .plinth, .fr, .frl, .gp, .ap, .cv-pg, .pano .view, .soc .big'); if (!t) return;
     // the lightbox steps through everything in the same group (a set: hero, board and its filmstrip)
@@ -4265,7 +4271,8 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
   // The Studio picture is water: the cursor draws slow ripples through the mountains and the leaf (placeholder until a water picture goes here)
   (function stWater() {
     let host = null, R = null, sc, cam, U, ht, data, a, b, N = 160, M = 48, mx = -1, my = -1, on = false, lx = -1, ly = -1;
-    const setup = h => { host = h; let img = h.querySelector('img');
+    const setup = h => { if (innerWidth <= 760) { host = h; return; }   /* Oct 27 phone: the plain photo, as sharp as the album; no live effect */
+      host = h; let img = h.querySelector('img');
       if (window.JOURNEY_DATA) { if (!h._jimg) { h._jimg = new Image(); h._jimg.src = window.JOURNEY_DATA; } img = h._jimg; }   /* Oct 27: the picture is also kept inside the page as data, so the clouds and water work even when the page is opened from the Mac's files */
       if (!img.complete || !img.naturalWidth) { host = null; return; }
       if (!window.JOURNEY_DATA) try { const tc = document.createElement('canvas'); tc.width = tc.height = 2; const tg = tc.getContext('2d'); tg.drawImage(img, 0, 0, 2, 2); tg.getImageData(0, 0, 1, 1); } catch (e) { return; }   /* Oct 27: if the browser won't let the picture be drawn live, the plain picture shows instead of a black box */
@@ -4309,7 +4316,8 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
   // The pier at night: the harbour water moves and its reflections shimmer
   (function stPier() {
     let host = null, R = null, sc, cam, U, cv;
-    const setup = h => { const img = h.querySelector('img'); if (!img || !img.complete || !img.naturalWidth) return false; host = h;
+    const setup = h => { if (innerWidth <= 760) { host = h; return false; }   /* Oct 27 phone: the plain photo, as sharp as the album; no live effect */
+      const img = h.querySelector('img'); if (!img || !img.complete || !img.naturalWidth) return false; host = h;
       R = new THREE.WebGLRenderer({ antialias: false, alpha: false }); R.setPixelRatio(Math.min(3, devicePixelRatio)); cv = R.domElement; cv.className = 'st-sea'; h.appendChild(cv);
       const src = window.__fitTex(img, h.offsetWidth * Math.min(3, devicePixelRatio), __small('PIER_DATA_S')); if (!src) { cv.remove(); R.dispose(); R = null; host = null; return false; } const t = new THREE.Texture(src); t.needsUpdate = true; t.minFilter = THREE.LinearFilter;
       U = { tex: { value: t }, time: { value: 0 } }; sc = new THREE.Scene(); cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -4336,6 +4344,7 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
     const tick = () => { requestAnimationFrame(tick);
       const h = document.querySelector('.st-pier'); if (!h) { if (R) { R.dispose(); R = null; } host = null; return; }
       if (h !== host) { if (R) { R.dispose(); R = null; } if (!setup(h)) return; }
+      if (!R) return;
       const img = h.querySelector('img'), r = img.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
       cv.style.left = img.offsetLeft + 'px'; cv.style.top = img.offsetTop + 'px'; cv.style.width = r.width + 'px'; cv.style.height = r.height + 'px';
       R.setSize(r.width, r.height, false); U.time.value = performance.now() / 1000; R.render(sc, cam); };
@@ -4630,7 +4639,7 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
       row.addEventListener('pointermove', e => { if (!down) return; moved = Math.max(moved, Math.abs(e.clientX - sx)); row.scrollLeft = sl - (e.clientX - sx); loop(); hold(); });
       row.addEventListener('click', e => { if (moved > 6) { e.preventDefault(); e.stopPropagation(); } else hold(); }, true);
       row.addEventListener('wheel', hold, { passive: true }); row.addEventListener('scroll', () => { if (performance.now() < idle) loop(); }, { passive: true }); };
-    const show = (v, nx) => { const n = +nx.dataset.p, src = IMG('photo-' + P2(n)) + PHV(n);   // the picture leaves the film and is in the big frame at once: never two of the same on screen
+    const show = (v, nx) => { const n = +nx.dataset.p, src = IMGP(P2(n)) + PHV(n);   // the picture leaves the film and is in the big frame at once: never two of the same on screen
       v.innerHTML = `<img alt="" src="${src}">`; document.getElementById('pano-t').textContent = 'Photograph ' + (+nx.dataset.k + 1);
       SV.querySelectorAll('.ph-roll .fr').forEach(x => { const on = x.dataset.p === nx.dataset.p; x.classList.toggle('sel', on); }); };
     const tick = now => { requestAnimationFrame(tick); const v = document.getElementById('pano-view'), r = SV.querySelector('.ph-roll .row');
@@ -4639,7 +4648,7 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
       { const W0 = document.documentElement.clientWidth, W = Math.min(W0, PAGE_MAX), side = (W0 - W) / 2;   // the big picture and every film roll: the same black border on both sides
         SV.querySelectorAll('.pano, .ph-roll, .art-rolls').forEach(pn => { const L = pn.parentElement.getBoundingClientRect().left, ml = Math.round(side + 24 - L) + 'px';
           if (pn.style.marginLeft !== ml) { pn.style.marginLeft = ml; pn.style.width = (W - 48) + 'px'; pn.style.justifySelf = 'start'; pn.style.overflow = 'hidden'; } }); }
-      if (!pre) { pre = true; PHOTO_ORDER.forEach(n => { const i = new Image(); i.src = IMG('photo-' + P2(n - 1)) + PHV(n - 1); }); last = now; prev = now; r.querySelectorAll('.fr.sel').forEach(x => r.querySelectorAll(`.fr[data-p="${x.dataset.p}"]`).forEach(y => y.classList.add('sel'))); }
+      if (!pre) { pre = true; PHOTO_ORDER.forEach(n => { const i = new Image(); i.src = IMGP(P2(n - 1)) + PHV(n - 1); }); last = now; prev = now; r.querySelectorAll('.fr.sel').forEach(x => r.querySelectorAll(`.fr[data-p="${x.dataset.p}"]`).forEach(y => y.classList.add('sel'))); }
       const dt = Math.min(.05, (now - prev) / 1000); prev = now;
       if (now > idle && !down) { const half = row.scrollWidth / 2; const pitch = (row.querySelector('.fr') || {}).offsetWidth + 14 || 490; X += pitch / 5 * dt; if (X >= half) X -= half; row.scrollLeft = X; } else X = row.scrollLeft;
       if (now < idle || now - last < 5000) return; last = now;
@@ -5525,6 +5534,11 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
     const want = ((vr.top + vr.height * .874) + (pr.top + pr.height * .08)) / 2, d = Math.round(want - mid);
     if (Math.abs(d - cur) < 2) return; say.dataset.cy = d; say.style.translate = '0 ' + d + 'px'; };
   setInterval(fit, 400); addEventListener('resize', fit);
+})();
+</script>
+<script>
+(function phLoops() {   /* Oct 27 phone: start the Studio loops only on the phone, once they are on the page */
+  setInterval(() => { if (innerWidth > 760) return; document.querySelectorAll('video.ph-loop[data-src]').forEach(v => { v.src = v.dataset.src; v.removeAttribute('data-src'); v.muted = true; v.play().catch(() => {}); }); }, 500);
 })();
 </script>
 </html>
