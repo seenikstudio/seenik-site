@@ -1835,7 +1835,10 @@ html body #section-view .mir-galaxy.gx.gx-on video.gx-src { opacity: 0 !importan
 html body #section-view .mir-galaxy.gx:not(.gx-on) video.gx-src { -webkit-mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 45%, transparent 100%) !important; mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 45%, transparent 100%) !important; }   /* until the 3D starts (or if it can't): the video's edges melt into space, never a black box */
 html body #section-view .mir-galaxy.gx canvas.gx-3d { position: absolute; left: 0; top: -12%; width: 100%; height: 124%; display: block; pointer-events: none; }
 @media (min-width: 761px) { html body #section-view .mir-galaxy.gx { margin-top: -90px !important; } }   /* Oct 27 desktop: the galaxy sits closer under 'The same patterns…' */
+   /* Oct 28 desktop: 'Based in North Vancouver…' a little closer to both pictures, still centred */
 html body #section-view .mir-credit.gx-credit { display: none !important; }   /* the old deep-field credit; the galaxy is now Sandy's own footage */
+
+@media (min-width: 761px) { html body #section-view.on .sv-body .mir-sing.st-say.st-based { padding-top: 47px !important; padding-bottom: 47px !important; } }   /* Oct 28 desktop: 'Based in North Vancouver…' a little closer to both pictures, still centred */
 </style>
 
 
