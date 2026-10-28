@@ -1826,6 +1826,16 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
 .st-photo .ph-loop, .st-pier .ph-loop { display: none; }
 @media (max-width: 760px) { html body #section-view .st-photo .ph-loop, html body #section-view .st-pier .ph-loop { display: block !important; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   html body #section-view .st-photo, html body #section-view .st-pier { position: relative; } }
+
+/* Oct 27: The Mirror's galaxy floats in the site's own space, in 3D: its black is gone, stars drift in front of it, and it turns as you move */
+html body #section-view .mir-galaxy.gx { position: relative; aspect-ratio: 16 / 9; -webkit-mask: none !important; mask: none !important; overflow: visible !important; }
+html body #section-view .mir-galaxy.gx video.gx-src { position: absolute; inset: 0; width: 100% !important; height: 100% !important; -webkit-mask: none !important; mask: none !important; mix-blend-mode: screen; }
+html body #section-view .mir-galaxy.gx.gx-on video.gx-src { opacity: 0 !important; pointer-events: none; }
+@media (max-width: 760px) { html body #section-view .mir-galaxy.gx:not(.gx-on) video.gx-src { width: 140% !important; left: -20% !important; height: 140% !important; top: -20% !important; } }   /* phone, plain video too: as big as the 3D one */
+html body #section-view .mir-galaxy.gx:not(.gx-on) video.gx-src { -webkit-mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 45%, transparent 100%) !important; mask: radial-gradient(ellipse 50% 50% at 50% 50%, #000 45%, transparent 100%) !important; }   /* until the 3D starts (or if it can't): the video's edges melt into space, never a black box */
+html body #section-view .mir-galaxy.gx canvas.gx-3d { position: absolute; left: 0; top: -12%; width: 100%; height: 124%; display: block; pointer-events: none; }
+@media (min-width: 761px) { html body #section-view .mir-galaxy.gx { margin-top: -90px !important; } }   /* Oct 27 desktop: the galaxy sits closer under 'The same patterns…' */
+html body #section-view .mir-credit.gx-credit { display: none !important; }   /* the old deep-field credit; the galaxy is now Sandy's own footage */
 </style>
 
 
@@ -3931,7 +3941,7 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
         + sing('Every visual<br class="ph-br"> flows from the music', 'Through photorealistic worlds —<br class="ph-br"> the cosmos, the deep ocean', ' mir-first', `<p class="mir-one">${evenPh('Every visual flows from the music, through photorealistic worlds — the cosmos, the deep ocean.')}</p>`) + one('seenik-02c', 'The Music Tells the Story', '1280 / 500', ' mir-lined')
         + sing('Experience the power of<br class="ph-br"> the elemental forces', '', ' mir-wind') + one('seenik-03c', 'Effects that Mirror Nature', '1540 / 462')
         + sing('The same patterns that<br class="ph-br"> build a galaxy build us', '', ' mir-close')
-        + `<div class="mir-galaxy"><video src="vid/deep-field.mp4" autoplay muted loop playsinline preload="auto" aria-label="A flight through thousands of real galaxies, from James Webb Space Telescope data"></video></div><p class="mir-credit">Visualization: NASA, ESA, CSA, STScI · F. Summers, G. Bacon, J. DePasquale, L. Hustak, J. Olmsted, A. Pagan</p>`; } }
+        + `<div class="mir-galaxy gx"><video class="gx-src" src="vid/galaxy-float.mp4" preload-note="" data-ph="vid/galaxy-float-ph.mp4" autoplay muted loop playsinline preload="auto" aria-label="A spiral galaxy turning in space"></video></div><p class="mir-credit gx-credit">Visualization: NASA, ESA, CSA, STScI · F. Summers, G. Bacon, J. DePasquale, L. Hustak, J. Olmsted, A. Pagan</p>`; } }
   };
   function layoutWall() {   // salon wall: justified rows, every piece keeps its true shape
     const wall = document.getElementById('wall'); if (!wall) return;
@@ -5538,6 +5548,60 @@ html body #section-view .wave-live { filter: blur(.6px) contrast(.9) saturate(.9
 <script>
 (function phLoops() {   /* Oct 27 phone: start the Studio loops only on the phone, once they are on the page */
   setInterval(() => { if (innerWidth > 760) return; document.querySelectorAll('video.ph-loop[data-src]').forEach(v => { v.src = v.dataset.src; v.removeAttribute('data-src'); v.muted = true; v.play().catch(() => {}); }); }, 500);
+})();
+</script>
+<script>
+(function galaxy3D() {   /* Oct 27: the galaxy as a glowing disc deep in space: black becomes see-through, near stars pass in front, the view turns with the mouse / phone tilt and shifts as you scroll */
+  if (!window.THREE) return;
+  const PH = innerWidth <= 760, m = { x: 0, y: 0, tx: 0, ty: 0, used: 0 };
+  addEventListener('pointermove', e => { m.tx = e.clientX / innerWidth * 2 - 1; m.ty = e.clientY / innerHeight * 2 - 1; m.used = performance.now(); }, { passive: true });
+  addEventListener('deviceorientation', e => { if (e.gamma == null) return; m.tx = Math.max(-1, Math.min(1, e.gamma / 30)); m.ty = Math.max(-1, Math.min(1, (e.beta - 45) / 30)); m.used = performance.now(); }, { passive: true });
+  let host = null, R, sc, cam, gal, stars, U, vid, cv;
+  if (location.protocol === 'file:') { const sc0 = document.createElement('script'); sc0.src = 'preview/space-img/gx-data.js'; sc0.onload = () => { fetch(PH ? window.GX_DATA_PH : window.GX_DATA).then(r => r.blob()).then(b => { const v = document.querySelector('video.gx-src'); if (v) { v.dataset.swapped = 1; v.src = URL.createObjectURL(b); v.play().catch(() => {}); } host = null; }); }; document.head.appendChild(sc0); }   /* preview opened from the Mac's files: the galaxy video is read from inside the page so the 3D works there too (the live site never loads this) */
+  const build = h => {
+    vid = h.querySelector('video.gx-src'); if (!vid) { host = h; return; }
+    if (PH && vid.dataset.ph && !vid.dataset.swapped) { vid.dataset.swapped = 1; vid.src = vid.dataset.ph; vid.play().catch(() => {}); }
+    if (vid.readyState < 2) return;   // wait for the first frame
+    try { const t = document.createElement('canvas'); t.width = t.height = 2; const g2 = t.getContext('2d'); g2.drawImage(vid, 0, 0, 2, 2); g2.getImageData(0, 0, 1, 1); } catch (e) { host = h; return; }   /* opened from the Mac's files: the plain video floats instead (black blended away) */
+    host = h;
+    if (PH && vid.dataset.ph && !vid.dataset.swapped) { vid.dataset.swapped = 1; vid.src = vid.dataset.ph; vid.play().catch(() => {}); }
+    try { R = new THREE.WebGLRenderer({ alpha: true, premultipliedAlpha: true, antialias: true }); } catch (e) { R = null; return; }
+    R.setPixelRatio(Math.min(PH ? 3 : 2, devicePixelRatio)); R.setClearColor(0x000000, 0);
+    cv = R.domElement; cv.className = 'gx-3d'; h.appendChild(cv);
+    sc = new THREE.Scene(); cam = new THREE.PerspectiveCamera(34, 16 / 9 * (100 / 124), .05, 50); cam.position.set(0, 0, 3.2);
+    const tex = new THREE.VideoTexture(vid); tex.minFilter = THREE.LinearFilter; tex.magFilter = THREE.LinearFilter;
+    U = { tex: { value: tex } };
+    const ph = 2 * 3.2 * Math.tan(17 * Math.PI / 180) * .86, pw = ph * 16 / 9;
+    gal = new THREE.Mesh(new THREE.PlaneGeometry(pw, ph), new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, premultipliedAlpha: true,
+      vertexShader: 'varying vec2 v; void main(){ v = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }',
+      fragmentShader: 'uniform sampler2D tex; varying vec2 v; void main(){ vec3 c = texture2D(tex, v).rgb; float e = smoothstep(0., .06, v.x) * smoothstep(1., .94, v.x) * smoothstep(0., .08, v.y) * smoothstep(1., .92, v.y); c *= e; float a = max(c.r, max(c.g, c.b)); gl_FragColor = vec4(c, a); }' }));
+    gal.position.z = -.4; gal.position.y = PH ? 0 : .1; if (PH) gal.scale.setScalar(1.4); sc.add(gal);   /* phone: the galaxy reaches the left and right edges of the screen */   /* desktop: lifted a little, closer to 'The same patterns…' above it */
+    const N = PH ? 140 : 320, pos = new Float32Array(N * 3), sz = new Float32Array(N), phs = new Float32Array(N);
+    for (let i = 0; i < N; i++) { pos[i * 3] = (Math.random() * 2 - 1) * 2.1; pos[i * 3 + 1] = (Math.random() * 2 - 1) * 1.25; pos[i * 3 + 2] = -.2 + Math.random() * 2.6; sz[i] = .5 + Math.pow(Math.random(), 3) * 2.4; phs[i] = Math.random(); }
+    const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.setAttribute('size', new THREE.BufferAttribute(sz, 1)); g.setAttribute('phase', new THREE.BufferAttribute(phs, 1));
+    U.time = { value: 0 }; U.px = { value: R.getPixelRatio() * 22 };
+    stars = new THREE.Points(g, new THREE.ShaderMaterial({ uniforms: U, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending,
+      vertexShader: 'attribute float size; attribute float phase; uniform float time, px; varying float a; void main(){ vec3 p = position; p.z = mod(position.z + time * .05 * (.5 + phase) + .2, 2.6) - .2; vec4 mv = modelViewMatrix * vec4(p, 1.); gl_Position = projectionMatrix * mv; float d = -mv.z; gl_PointSize = size * px / d; vec2 s = gl_Position.xy / gl_Position.w; a = (.55 + .45 * sin(time * 1.1 + phase * 40.)) * (1. - smoothstep(.7, 1., max(abs(s.x), abs(s.y)))) * smoothstep(.25, .9, d) * smoothstep(3.4, 2.6, d); }',
+      fragmentShader: 'varying float a; void main(){ vec2 d = gl_PointCoord - .5; float k = exp(-dot(d, d) * 20.) * a; if (k < .01) discard; gl_FragColor = vec4(vec3(.85, .9, 1.) * k, k); }' }));
+    stars.frustumCulled = false; sc.add(stars);
+    h.classList.add('gx-on');
+  };
+  (function f(now) { requestAnimationFrame(f);
+    const h = document.querySelector('#section-view.on .mir-galaxy.gx');
+    if (!h) { if (R) { R.dispose(); if (cv) cv.remove(); R = null; } host = null; return; }
+    if (h !== host) { if (R) { R.dispose(); if (cv) cv.remove(); R = null; } build(h); }
+    if (!R) return;
+    const live = vid && vid.readyState >= 2 && !vid.paused; h.classList.toggle('gx-on', live); cv.style.visibility = live ? '' : 'hidden';   /* the 3D shows only while the video is really playing; otherwise the plain galaxy shows */
+    const r = cv.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+    if (cv.width !== Math.round(r.width * R.getPixelRatio())) R.setSize(r.width, r.height, false);
+    const t = now / 1000, idle = now - m.used > 4000;
+    const tx = idle ? Math.sin(t * .17) * .45 : m.tx, ty = idle ? Math.sin(t * .12) * .3 : m.ty;
+    m.x += (tx - m.x) * .04; m.y += (ty - m.y) * .04;
+    const c = Math.max(-1, Math.min(1, (r.top + r.height / 2 - innerHeight / 2) / innerHeight));   // -1 above, 0 centred, 1 below
+    cam.position.x = m.x * .35; cam.position.y = -m.y * .22 + c * .3; cam.lookAt(0, c * .12, -.4);
+    gal.rotation.set(.18 + m.y * .1 + c * .08, m.x * .14, 0);
+    U.time.value = t; R.render(sc, cam);
+  })();
 })();
 </script>
 </html>
