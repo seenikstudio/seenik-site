@@ -2377,7 +2377,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
         if (budState === 'hidden') showRing(tmp.set(o.x + d.x * tz, o.y + d.y * tz, RING_Z), 'Click');
         return;
       }
-      if (onRing || atCentre) { if (budState === 'hidden') showRing(tmp.set(o.x + d.x * tz, o.y + d.y * tz, RING_Z), 'Click'); document.getElementById('skip-intro').click(); return; }   // one click at the centre always works
+      if (onRing || atCentre) { if (budState === 'hidden') showRing(tmp.set(o.x + d.x * tz, o.y + d.y * tz, RING_Z), 'Click'); introGo(); return; }   // one click at the centre always works
     }
     if (phase === 'idle' && !(e.pointerType === 'touch' && mode === 'shape')) burst();
   });
@@ -2528,6 +2528,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     return scale[idx % 5] + 12 * Math.floor(idx / 5) - 12;
   }
   function playChord() {
+    if (window.__noChord) return;   /* arriving from the intro: the song's last beat is the only sound */
     const base = pickSemi();
     [0, 4, 7, 12].forEach((s, i) => note(base + [0, 2, 4, 7][i] + (i === 3 ? 12 : 0), 0.6, i * 0.06));
   }
@@ -2819,6 +2820,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
   })();
   let frameSize = 3.6;
   function setupAudio() {
+    if (location.protocol === 'file:') { analyser = null; return; }   /* preview from the Mac: plain audio so the sound works (file:// blocks the analyser) */
     try {
       if (!actx) initAudio();
       if (actx.state === 'suspended') actx.resume();
@@ -2933,7 +2935,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     for (let i = 0; i < WN; i++) { WP[i].applyMatrix4(inv); WV[i].set(0, 0, 0); }
     resetBud();
   }
-  budHit.addEventListener('pointerdown', e => { e.stopPropagation(); if (e.button > 0 || phase === 'end') return; document.getElementById('skip-intro').click(); });   // Click: fires on press
+  budHit.addEventListener('pointerdown', e => { e.stopPropagation(); if (e.button > 0 || phase === 'end') return; introGo(); });   // Click: fires on press
   budHit.addEventListener('click', e => { e.stopPropagation(); if (phase === 'end') openMenu(); else if (e.detail === 0) document.getElementById('skip-intro').click(); });   // Begin: a full click (it can be held and moved)
   skipBtn.addEventListener('pointerdown', e => e.stopPropagation());
   skipBtn.addEventListener('click', e => { e.stopPropagation(); finishMusic(); });
@@ -2954,6 +2956,97 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
         ePts[i].set(Math.max(-half, Math.min(half, gx)), gy, 0.3); eVel[i].set(0, 0, 0); } }
     frameEl.classList.remove('show');
     setTimeout(() => { skipping = false; if (phase === 'end') openMenu(); }, 30); });
+  /* ======== Oct 30: the intro plays inside the site (desktop). Click → real startReveal() burst → intro-player.html?embed (cymatics → murmuration → grid → flight → grid burst) → real skip path → finishMusic() → openMenu() ======== */
+  var introActive = false, introFrame = null; const INTRO_ON = innerWidth > 760;
+  if (INTRO_ON) { introFrame = document.createElement('iframe'); introFrame.src = 'intro-player.html?embed'; introFrame.setAttribute('aria-hidden', 'true'); introFrame.setAttribute('allowtransparency', 'true');
+    introFrame.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;border:0;background:transparent;opacity:0;pointer-events:none;z-index:4;transition:opacity .6s ease'; document.body.appendChild(introFrame); }
+  function introPost(m) { try { introFrame.contentWindow.postMessage(m, '*'); } catch (e) {} }
+  function introLayout() { layoutMenu(); const rings = menuRings.map(m => { const c = m.home.clone().project(camera), e = m.home.clone().add(new THREE.Vector3(m.R, 0, 0)).project(camera);
+      const x = (c.x + 1) / 2 * innerWidth, y = (1 - c.y) / 2 * innerHeight; return { x, y, r: Math.abs((e.x + 1) / 2 * innerWidth - x) }; }); return { type: 'layout', rings, band: bandPx() }; }
+  function introGo() { if (!INTRO_ON || phase !== 'idle' || !introFrame) { document.getElementById('skip-intro').click(); return; }
+    startReveal(); introActive = true; introPost({ type: 'start' }); introPost(introLayout()); introPost(introPlan()); introFrame.style.transition = 'opacity .6s ease'; introFrame.style.opacity = 1; }
+  function introStop() { if (!introActive) return; introActive = false; introPost({ type: 'stop' }); introFrame.style.transition = 'opacity .5s ease'; introFrame.style.opacity = 0; }
+  (function introTick() { requestAnimationFrame(introTick); if (!introActive) return; const ct = music.currentTime || 0; introPost({ type: 't', t: ct });
+    if (ct >= 20.1 && phase !== 'menu') { document.getElementById('skip-intro').click(); introStop(); } })();   /* fallback only: normally the hand-off below happens first */
+  /* hand-off: the intro sends where its particles are and how fast they move; the real three rings and the real field points start from exactly there and carry on themselves; the intro disappears on that same frame (no fade) */
+  const introNdc = new THREE.Vector2();
+  function introToWorld(x, y, z, out) { ray.setFromCamera(introNdc.set(x / innerWidth * 2 - 1, -(y / innerHeight * 2 - 1)), camera); const o = ray.ray.origin, d = ray.ray.direction, tz = (z - o.z) / d.z; return out.set(o.x + d.x * tz, o.y + d.y * tz, z); }
+  /* the site plans its own end state before the intro starts: the exact strip cluster points (startField's rule) and the exact ring points; the intro flies its grid points and ring particles to exactly these, then the site takes over with everything already in place */
+  let introPlanData = null;
+  function introPlan() {
+    placeFrame(); layoutMenu();
+    const [topPx, botPx] = bandPx(), dist = camera.position.z - 0.3, visH = 2 * dist * Math.tan(THREE.MathUtils.degToRad(22.5)), visW = visH * camera.aspect;
+    const e = frameSize / (WROWS - 1), bandH = (botPx - topPx) / innerHeight * visH, bandW = visW * 0.96, L = e * 1.3;
+    const n = Math.max(20, Math.min(PFN_MAX, Math.round(bandW * bandH * 2 / (Math.sqrt(3) * e * e) * 2.2)));
+    const hw = bandW / 2, top = (0.5 - topPx / innerHeight) * visH, bot = (0.5 - botPx / innerHeight) * visH;
+    const v = new THREE.Vector3(), toPx = (x, y, z) => { v.set(x, y, z).project(camera); return [(v.x + 1) / 2 * innerWidth, (1 - v.y) / 2 * innerHeight]; };
+    const rp = menuRings.map(m => { const c = toPx(m.home.x, m.home.y, m.home.z), e2 = toPx(m.home.x + m.R, m.home.y, m.home.z); return { x: c[0], y: c[1], r: Math.abs(e2[0] - c[0]) }; });
+    const pts = [], world = []; let guard = 0;
+    while (pts.length < n && guard++ < n * 60) { const x = (Math.random() * 2 - 1) * hw, y = bot + Math.random() * (top - bot), q = toPx(x, y, 0.3);
+      if (rp.some(r => Math.hypot(q[0] - r.x, q[1] - r.y) < r.r * 1.15 * 1.6)) continue; pts.push(q); world.push([x, y]); }
+    const l0 = toPx(0, 0, 0.3), l1 = toPx(L, 0, 0.3);
+    const rings = menuRings.map(m => ({ pts: m.spec.map(s0 => { const a = s0.a + m.spin * s0.sp, q = toPx(m.home.x + Math.cos(a) * s0.r, m.home.y + Math.sin(a) * s0.r, m.home.z + s0.z); return [q[0], q[1], s0.b]; }) }));
+    introPlanData = { n: pts.length, L, world, hw, top, bot };
+    return { type: 'plan', field: { pts, L: Math.abs(l1[0] - l0[0]) }, rings };
+  }
+  function introHandover() {
+    if (!introActive || phase === 'menu' || !introPlanData) return;
+    const P = introPlanData;
+    /* never stop the song here: its last beat must ring out in full as the homepage appears */
+    const keepPause = music.pause; music.pause = function () {}; window.__noChord = true;
+    try { frameEl.classList.remove('show'); finishMusic(); endT = 200; endVis = 1; openMenu(); startField(); } finally { music.pause = keepPause; setTimeout(() => { window.__noChord = false; }, 400); }
+    PFN = P.n; fieldL = P.L; fieldBox = { hw: P.hw, top: P.top, bot: P.bot };
+    for (let i = 0; i < PFN; i++) { ePts[i].set(P.world[i][0], P.world[i][1], 0.3); const a = Math.random() * Math.PI * 2, sp = 0.004 + Math.random() * 0.01; eVel[i].set(Math.cos(a) * sp * 0.5, Math.sin(a) * sp * 0.5, 0); }
+    menuRings.forEach(m => { m.g.position.copy(m.home); m.g.rotation.set(0, 0, 0); m.g.updateMatrixWorld(); m.vis = 1;
+      for (let i = 0; i < m.n; i++) { const s0 = m.spec[i], a = s0.a + m.spin * s0.sp; m.pts[i].set(Math.cos(a) * s0.r, Math.sin(a) * s0.r, s0.z); m.vel[i].set(0, 0, 0); } });
+    introActive = false; introPost({ type: 'stop' }); introFrame.style.transition = 'none'; introFrame.style.opacity = 0; }
+  addEventListener('message', e => { const m = e.data || {}; if (m.type === 'hand') introHandover(m); });
+  /* Oct 30: Skip (top-right "Skip intro" and the "Skip" under the video) during the intro goes straight to the homepage: three circles on the strip with the clusters, never the old Begin wall */
+  function introSkipHome(e) {
+    if (!introActive || !introPlanData) return;
+    e.stopImmediatePropagation(); e.preventDefault(); window.__pvPaused = false;
+    const P = introPlanData;
+    frameEl.classList.remove('show'); finishMusic(); endT = 200; endVis = 1;
+    openMenu(); startField();
+    PFN = P.n; fieldL = P.L; fieldBox = { hw: P.hw, top: P.top, bot: P.bot };
+    for (let i = 0; i < PFN; i++) { ePts[i].set(P.world[i][0], P.world[i][1], 0.3); const a = Math.random() * Math.PI * 2, sp = 0.004 + Math.random() * 0.01; eVel[i].set(Math.cos(a) * sp * 0.5, Math.sin(a) * sp * 0.5, 0); }
+    introActive = false; introPost({ type: 'stop' }); introFrame.style.transition = 'opacity .4s ease'; introFrame.style.opacity = 0; }
+  skipIntro.addEventListener('click', introSkipHome, true);
+  skipBtn.addEventListener('click', introSkipHome, true);
+  /* ======== PREVIEW TIMELINE (only when opened from the Mac as a file, desktop): play/pause, speed, drag to any moment of the intro. Never shows on the live site. ======== */
+  if (location.protocol === 'file:' && INTRO_ON) {
+    const bar = document.createElement('div'); bar.id = 'pv-bar';
+    bar.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:10000;display:flex;align-items:center;gap:12px;padding:10px 16px 14px;background:linear-gradient(transparent,rgba(0,0,0,.8));font:400 11px/1 var(--mono, monospace);color:#e8edf3';
+    bar.innerHTML = '<button id="pv-pp" type="button" style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.4);color:#fff;cursor:pointer">▶</button>'
+      + '<select id="pv-rate" style="background:#000;color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:6px;padding:6px"><option value="1">1×</option><option value="0.5">0.5×</option><option value="0.25">0.25×</option><option value="0.1">0.1×</option></select>'
+      + '<div style="position:relative;flex:1;height:34px"><div id="pv-marks" style="position:absolute;left:0;right:0;top:0;height:14px"></div><input id="pv-scrub" type="range" min="0" max="20.6" step="0.01" value="0" style="position:absolute;left:0;right:0;bottom:0;width:100%;margin:0;accent-color:#9fd8ff;cursor:pointer"></div>'
+      + '<span id="pv-clock" style="min-width:90px;text-align:right;font-size:13px">0.00 s</span>';
+    document.body.appendChild(bar);
+    ['pointerdown', 'click'].forEach(ev => bar.addEventListener(ev, e => e.stopPropagation()));
+    const pp = bar.querySelector('#pv-pp'), sc = bar.querySelector('#pv-scrub'), ck = bar.querySelector('#pv-clock'), rt = bar.querySelector('#pv-rate'), mk = bar.querySelector('#pv-marks');
+    [['Round', 0], ['Square', 2.9], ['Murmuration', 5.17], ['Grid', 8.47], ['Fill', 10.07], ['Flight', 11.97], ['Clap: to grid', 16.85], ['Burst', 18.25], ['Home', 18.84]].forEach(([n, t]) => { const sp = document.createElement('span'); sp.textContent = n; sp.style.cssText = `position:absolute;left:${t / 20.6 * 100}%;border-left:1px solid rgba(255,255,255,.45);padding-left:3px;font-size:10px;white-space:nowrap;cursor:pointer;opacity:.85`; sp.addEventListener('click', () => pvSeek(t)); mk.appendChild(sp); });
+    let dragging = false;
+    function pvStartAt(t) {   /* start the real intro from the real Click, then jump */
+      window.__pvPaused = false;
+      const go = () => { if (phase === 'idle') { introGo(); if (t > 1) phaseT = 60; const j = () => { if ((music.currentTime || 0) > 0.05 || !music.paused) { try { music.currentTime = t; } catch (e) {} } else setTimeout(j, 30); }; j(); } else setTimeout(go, 40); };
+      if (phase !== 'idle') resetAll(); go(); }
+    function pvSeek(t) { t = Math.max(0, Math.min(20.6, t));
+      if (introActive) { try { music.currentTime = t; } catch (e) {} introPost({ type: 't', t, jump: true }); } else pvStartAt(t); }
+    sc.addEventListener('input', () => { dragging = true; pvSeek(+sc.value); });
+    sc.addEventListener('change', () => { dragging = false; });
+    function pvToggle() {   /* stop / start the preview at any moment, including after the homepage has appeared */
+      const live = introActive || (phase === 'menu' && !music.ended && music.currentTime > 0);
+      if (!live) { window.__pvPaused = false; pvStartAt(0); return; }
+      if (window.__pvPaused || music.paused) { window.__pvPaused = false; const pr = music.play(); if (pr) pr.catch(() => {}); }
+      else { window.__pvPaused = true; music.pause(); } }
+    pp.addEventListener('click', pvToggle);
+    addEventListener('keydown', e => { if (e.code === 'Space' && !/input|textarea|select/i.test((e.target && e.target.tagName) || '')) { e.preventDefault(); pvToggle(); } });
+    rt.addEventListener('change', () => { const r = +rt.value; window.__pvRate = r; music.playbackRate = r; });
+    music.addEventListener('play', () => { introPost({ type: 'play' }); }); music.addEventListener('pause', () => { introPost({ type: 'pause' }); });
+    (function pvTick() { requestAnimationFrame(pvTick); const t = music.currentTime || 0; pp.textContent = (music.paused || window.__pvPaused) ? '▶' : '❚❚'; if (!dragging) sc.value = t; ck.textContent = t.toFixed(2) + ' s'; music.playbackRate = window.__pvRate || 1; })();
+  }
+  skipIntro.addEventListener('click', () => { if (introActive) introStop(); });
+  skipBtn.addEventListener('click', () => { if (introActive) introStop(); });
   (function skipShow() { requestAnimationFrame(skipShow); const want = innerWidth > 760 && !document.body.classList.contains('artist-on') && (phase === 'idle' || phase === 'burst' || phase === 'dance' || phase === 'end');
     if (skipIntro.hidden === want) skipIntro.hidden = !want; })();
 
@@ -4749,7 +4842,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
   const R = 0.75;
   let t0 = performance.now();
   function frame(now) {
-    const dt = Math.max(0, Math.min(2, (now - t0) / 16.67)); t0 = now;
+    const dt = Math.max(0, Math.min(2, (now - t0) / 16.67)) * (window.__pvPaused ? 0 : (window.__pvRate || 1)); t0 = now;
     const spin = reduced ? 0.0006 : 0.0022;
     group.rotation.y += spin * dt;
     group.rotation.x = Math.sin(now * 0.00018) * 0.35;
@@ -4959,7 +5052,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     // ---- the click sequence
     if (phase !== 'idle') {
       phaseT += dt;
-      if (phase === 'burst' && phaseT > 50) { phase = 'dance'; phaseT = 0; startPlate(); frameEl.classList.add('show'); skipBtn.hidden = false; }
+      if (phase === 'burst' && phaseT > 50) { phase = 'dance'; phaseT = 0; startPlate(); if (!introActive) frameEl.classList.add('show'); skipBtn.hidden = false; }
       if (phase === 'return' && phaseT > 120) { phase = 'idle'; phaseT = 0; }
       if (phase === 'dance') { readMusic(now); stepPlate(dt, now, false); }
       const sphereVis = phase === 'burst' ? Math.max(0, 1 - phaseT / 50)
@@ -4978,7 +5071,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
           const land = phase !== 'dance' ? 0.25 : Math.min(0.35, 0.02 + phaseT * 0.004);
           v.multiplyScalar(Math.pow(0.88, dt)); p.addScaledVector(v, dt);
           p.x += (PU[i] * half - p.x) * land * dt; p.y += (PV[i] * half - p.y) * land * dt; p.z += (0.3 - p.z) * land * dt;
-          k = (phase === 'menu' || phase === 'artist') ? 0 : phase === 'end' ? 0.75 * Math.max(0, 1 - phaseT / 70) : 0.85 + B * 0.25;
+          k = (phase === 'menu' || phase === 'artist') ? 0 : phase === 'end' ? 0.75 * Math.max(0, 1 - phaseT / 70) * (introActive ? 0 : 1) : (0.85 + B * 0.25) * (introActive ? Math.max(0, 1 - phaseT / 30) : 1);
         } else {
           const s = WH[i];
           v.x += (s.x - p.x) * 0.02 * dt; v.y += (s.y - p.y) * 0.02 * dt; v.z += (s.z - p.z) * 0.02 * dt;
