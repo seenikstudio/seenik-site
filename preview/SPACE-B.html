@@ -2373,7 +2373,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
       const o = ray.ray.origin, d = ray.ray.direction, tz = (RING_Z - o.z) / d.z;
       const atCentre = Math.hypot(o.x + d.x * tz, o.y + d.y * tz) < CENTRE_R;
       if (e.pointerType === 'touch') {   // Oct 25 phone: first touch shows Click under your thumb; drag to play with the logo; tap Click again to go on
-        if (onRing && budState !== 'hidden') { document.getElementById('skip-intro').click(); return; }
+        if (onRing && budState !== 'hidden') { introGo(); return; }
         if (budState === 'hidden') showRing(tmp.set(o.x + d.x * tz, o.y + d.y * tz, RING_Z), 'Click');
         return;
       }
@@ -2960,10 +2960,31 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
   var introActive = false, introFrame = null; const INTRO_ON = innerWidth > 760;
   if (INTRO_ON) { introFrame = document.createElement('iframe'); introFrame.src = 'intro-player.html?embed'; introFrame.setAttribute('aria-hidden', 'true'); introFrame.setAttribute('allowtransparency', 'true');
     introFrame.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;border:0;background:transparent;opacity:0;pointer-events:none;z-index:4;transition:opacity .6s ease'; document.body.appendChild(introFrame); }
+  /* ======== Oct 31: PHONE intro = pre-rendered landscape video, played sideways to fill the screen (rotated in portrait, upright if the phone itself turns). Ends on the last beat (18.84) on the real stacked circles; the song is never cut. ======== */
+  let introPhoneVid = null, introPhoneOn = false;
+  if (!INTRO_ON) { introPhoneVid = document.createElement('video'); introPhoneVid.id = 'intro-phone'; introPhoneVid.src = 'space-img/intro-phone.mp4?v=1'; introPhoneVid.muted = true; introPhoneVid.playsInline = true; introPhoneVid.setAttribute('playsinline', ''); introPhoneVid.preload = 'auto';
+    const st = document.createElement('style'); st.textContent = '#intro-phone{position:fixed;left:50%;top:50%;width:100vh;width:100dvh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);object-fit:cover;z-index:4;opacity:0;pointer-events:none;background:#000;transition:opacity .5s ease}@media (orientation:landscape){#intro-phone{width:100vw;height:100vh;height:100dvh;transform:translate(-50%,-50%)}}body.intro-phone-on #skip-intro{display:inline-flex!important}';
+    document.head.appendChild(st); document.body.appendChild(introPhoneVid); }
+  function introGoPhone() {
+    startReveal(); introActive = true; introPhoneOn = true; document.body.classList.add('intro-phone-on'); document.getElementById('skip-intro').hidden = false;
+    try { introPhoneVid.currentTime = 0; const pr = introPhoneVid.play(); if (pr) pr.catch(() => {}); } catch (e) {}
+    introPhoneVid.style.transition = 'opacity .5s ease'; introPhoneVid.style.opacity = 1; }
+  function introPhoneStop(keepMusic) {
+    if (!introPhoneOn) return; introPhoneOn = false; introActive = false; document.body.classList.remove('intro-phone-on');
+    introPhoneVid.style.transition = 'none'; introPhoneVid.style.opacity = 0; try { introPhoneVid.pause(); } catch (e) {} }
+  function introPhoneHome() {   /* the last beat: the real stacked circles, the song keeps ringing */
+    if (!introPhoneOn || phase === 'menu') return;
+    const keepPause = music.pause; music.pause = function () {}; window.__noChord = true;
+    try { frameEl.classList.remove('show'); finishMusic(); endT = 200; endVis = 1; openMenu(); startField(); } finally { music.pause = keepPause; setTimeout(() => { window.__noChord = false; }, 400); }
+    introPhoneStop(true); }
+  (function introPhoneTick() { requestAnimationFrame(introPhoneTick); if (!introPhoneOn) return; const ct = music.currentTime || 0;
+    if (music.paused && !introPhoneVid.paused) introPhoneVid.pause(); else if (!music.paused && introPhoneVid.paused) { const pr = introPhoneVid.play(); if (pr) pr.catch(() => {}); }
+    if (Math.abs(introPhoneVid.currentTime - ct) > 0.15) { try { introPhoneVid.currentTime = ct; } catch (e) {} }
+    if (ct >= 18.84) introPhoneHome(); })();
   function introPost(m) { try { introFrame.contentWindow.postMessage(m, '*'); } catch (e) {} }
   function introLayout() { layoutMenu(); const rings = menuRings.map(m => { const c = m.home.clone().project(camera), e = m.home.clone().add(new THREE.Vector3(m.R, 0, 0)).project(camera);
       const x = (c.x + 1) / 2 * innerWidth, y = (1 - c.y) / 2 * innerHeight; return { x, y, r: Math.abs((e.x + 1) / 2 * innerWidth - x) }; }); return { type: 'layout', rings, band: bandPx() }; }
-  function introGo() { if (!INTRO_ON || phase !== 'idle' || !introFrame) { document.getElementById('skip-intro').click(); return; }
+  function introGo() { if (!INTRO_ON && phase === 'idle' && introPhoneVid) { introGoPhone(); return; } if (!INTRO_ON || phase !== 'idle' || !introFrame) { document.getElementById('skip-intro').click(); return; }
     startReveal(); introActive = true; introPost({ type: 'start' }); introPost(introLayout()); introPost(introPlan()); introFrame.style.transition = 'opacity .6s ease'; introFrame.style.opacity = 1; }
   function introStop() { if (!introActive) return; introActive = false; introPost({ type: 'stop' }); introFrame.style.transition = 'opacity .5s ease'; introFrame.style.opacity = 0; }
   (function introTick() { requestAnimationFrame(introTick); if (!introActive) return; const ct = music.currentTime || 0; introPost({ type: 't', t: ct });
@@ -3012,6 +3033,8 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     for (let i = 0; i < PFN; i++) { ePts[i].set(P.world[i][0], P.world[i][1], 0.3); const a = Math.random() * Math.PI * 2, sp = 0.004 + Math.random() * 0.01; eVel[i].set(Math.cos(a) * sp * 0.5, Math.sin(a) * sp * 0.5, 0); }
     introActive = false; introPost({ type: 'stop' }); introFrame.style.transition = 'opacity .4s ease'; introFrame.style.opacity = 0; }
   skipIntro.addEventListener('click', introSkipHome, true);
+  skipIntro.addEventListener('click', () => introPhoneStop(false), true);
+  skipBtn.addEventListener('click', () => introPhoneStop(false), true);
   skipBtn.addEventListener('click', introSkipHome, true);
   /* ======== PREVIEW TIMELINE (only when opened from the Mac as a file, desktop): play/pause, speed, drag to any moment of the intro. Never shows on the live site. ======== */
   if (location.protocol === 'file:' && INTRO_ON) {
