@@ -864,6 +864,7 @@
   #snd svg { width: 16px; height: 16px; }
   #playbar .sndwrap { position: absolute; right: calc(100% + 12px); top: 50%; transform: translateY(-50%); display: flex; align-items: center; pointer-events: auto; }   /* Skip stays centred; the speaker sits just left of it */
   #playbar .vol { position: absolute; right: calc(100% + 10px); top: 50%; transform: translateY(-50%); width: 0; opacity: 0; overflow: hidden; transition: width .3s, opacity .3s; display: flex; align-items: center; }
+  .sndwrap.open .vol { width: 84px !important; opacity: 1 !important; }   /* Oct 31: tap the speaker and the slider slides out, then tucks away */
   @media (hover: hover) { #playbar .sndwrap:hover .vol { width: 84px; opacity: 1; } }
   #replay { pointer-events: auto; cursor: pointer; font: 400 11px/1 var(--mono); letter-spacing: 0.22em; text-transform: uppercase; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 10px 18px; }
   #replay:hover { border-color: var(--fg); }
@@ -1863,7 +1864,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
   <button type="button" id="click-here" hidden>Click here</button>
   <button type="button" id="coin-hit" aria-label="Click" hidden></button>
   <div id="ring-label" aria-hidden="true">Click</div>
-  <div id="playbar"><span class="sndwrap"><span class="vol"><input id="vol" type="range" min="0" max="100" value="100" aria-label="Volume"></span><button type="button" id="snd" aria-label="Mute"></button></span><button type="button" id="back" hidden><svg aria-hidden="true"><rect class="track"></rect><rect class="prog"></rect></svg>Skip<small id="skip-left"></small></button><button type="button" id="replay" hidden>Replay</button></div>
+  <div id="playbar"><span class="sndwrap"><span class="vol"><input id="vol" type="range" min="0" max="100" value="60" aria-label="Volume"></span><button type="button" id="snd" aria-label="Mute"></button></span><button type="button" id="back" hidden><svg aria-hidden="true"><rect class="track"></rect><rect class="prog"></rect></svg>Skip<small id="skip-left"></small></button><button type="button" id="replay" hidden>Replay</button></div>
   <div id="frame" aria-hidden="true"></div>
   <section id="section-view" aria-label="Section"><div class="sv-inner"></div></section>
   <section id="artist-view" aria-label="The Artist">
@@ -2794,6 +2795,11 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     e.stopPropagation(); replayBtn.hidden = true; resetAll();
     const go = () => { if (phase === 'idle') startReveal(); else setTimeout(go, 60); }; setTimeout(go, 60);
   });
+  /* Oct 31: first tap opens the volume slider; a tap while it is open mutes / unmutes; it tucks away after 2.5 s untouched */
+  let sndCloseT = 0; const sndWrapEl = sndBtn.closest('.sndwrap');
+  function sndArm() { clearTimeout(sndCloseT); sndCloseT = setTimeout(() => sndWrapEl && sndWrapEl.classList.remove('open'), 2500); }
+  sndBtn.addEventListener('click', e => { if (sndWrapEl && !sndWrapEl.classList.contains('open')) { e.stopImmediatePropagation(); e.stopPropagation(); sndWrapEl.classList.add('open'); sndArm(); } else sndArm(); }, true);
+  volIn.addEventListener('input', sndArm);
   sndBtn.addEventListener('pointerdown', e => e.stopPropagation());
   sndBtn.addEventListener('click', e => { e.stopPropagation(); sndMuted = !sndMuted; if (!sndMuted && +volIn.value === 0) volIn.value = 60; applySound(); });
   volIn.addEventListener('pointerdown', e => e.stopPropagation());
@@ -2806,7 +2812,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     let w0 = 0, h0 = 0, per = 0;
     const loop = () => {
       if (!b.hidden) {
-        const r = b.getBoundingClientRect();
+        const r = { width: b.offsetWidth, height: b.offsetHeight };   /* unrotated size, so the ring stays a pill when the phone intro turns the controls */
         if (r.width !== w0 || r.height !== h0) { w0 = r.width; h0 = r.height; const h = h0, w = w0;
           rr.forEach(x => { x.setAttribute('x', .5); x.setAttribute('y', .5); x.setAttribute('width', Math.max(0, w - 1)); x.setAttribute('height', Math.max(0, h - 1)); x.setAttribute('rx', h / 2 - .5); x.setAttribute('ry', h / 2 - .5); });
           per = 2 * (w - h) + Math.PI * (h - 1); rr[1].style.strokeDasharray = per; }
@@ -2963,14 +2969,16 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
   /* ======== Oct 31: PHONE intro = pre-rendered landscape video, played sideways to fill the screen (rotated in portrait, upright if the phone itself turns). Ends on the last beat (18.84) on the real stacked circles; the song is never cut. ======== */
   let introPhoneVid = null, introPhoneOn = false;
   if (!INTRO_ON) { introPhoneVid = document.createElement('video'); introPhoneVid.id = 'intro-phone'; introPhoneVid.src = 'space-img/intro-phone.mp4?v=1'; introPhoneVid.muted = true; introPhoneVid.playsInline = true; introPhoneVid.setAttribute('playsinline', ''); introPhoneVid.preload = 'auto';
-    const st = document.createElement('style'); st.textContent = '#intro-phone{position:fixed;left:50%;top:50%;width:100vh;width:100dvh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);object-fit:cover;z-index:4;opacity:0;pointer-events:none;background:#000;transition:opacity .5s ease}@media (orientation:landscape){#intro-phone{width:100vw;height:100vh;height:100dvh;transform:translate(-50%,-50%)}}body.intro-phone-on #skip-intro{display:inline-flex!important}';
+    const st = document.createElement('style'); st.textContent = '#intro-phone{position:fixed;left:50%;top:50%;width:100vh;width:100dvh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);object-fit:cover;z-index:4;opacity:0;pointer-events:none;background:#000;transition:opacity .5s ease}@media (orientation:landscape){#intro-phone{width:100vw;height:100vh;height:100dvh;transform:translate(-50%,-50%)}}body.intro-phone-on #skip-intro{display:inline-flex!important}@media (orientation:portrait){body.intro-phone-on #playbar{display:none!important}#pv-snd{position:fixed;right:22px;bottom:186px;z-index:12;transform-origin:right center;transform:rotate(90deg);animation:pvIn1 .9s cubic-bezier(.2,.7,.2,1) both}#pv-snd .sndwrap{position:static;transform:none;display:flex;flex-direction:row;gap:10px;align-items:center}#pv-snd .vol{position:static;transform:none;width:0;opacity:0;overflow:hidden;transition:width .3s,opacity .3s}body.intro-phone-on #skip-intro{position:fixed;right:-18px;bottom:110px;transform:rotate(90deg);z-index:12;animation:pvIn2 .9s cubic-bezier(.2,.7,.2,1) .08s both}body.intro-phone-on .top .mark{position:fixed;right:12px;top:12px;left:auto;transform-origin:top left;transform:translateX(100%) rotate(90deg);z-index:12;animation:pvIn3 .9s cubic-bezier(.2,.7,.2,1) .16s both}@keyframes pvIn1{from{opacity:0;transform:rotate(0deg)}to{opacity:1;transform:rotate(90deg)}}@keyframes pvIn2{from{opacity:0;transform:rotate(0deg) translateX(-30px)}to{opacity:1;transform:rotate(90deg)}}@keyframes pvIn3{from{opacity:0;transform:translateX(100%) rotate(0deg) translateY(-20px)}to{opacity:1;transform:translateX(100%) rotate(90deg)}}body.intro-phone-back .top .mark{animation:pvBack .9s cubic-bezier(.2,.7,.2,1) both}@keyframes pvBack{from{opacity:0;transform:rotate(90deg) translateY(-30px);transform-origin:top left}to{opacity:1;transform:none}}}';   /* Oct 31: controls turn with the sideways video */
     document.head.appendChild(st); document.body.appendChild(introPhoneVid); }
+  let pvSndHome = null, pvSndBox = null;
   function introGoPhone() {
+    { const sw = document.querySelector('#playbar .sndwrap'); if (sw && innerHeight > innerWidth) { pvSndHome = sw.parentNode; pvSndBox = document.createElement('div'); pvSndBox.id = 'pv-snd'; pvSndBox.appendChild(sw); document.body.appendChild(pvSndBox); } }
     startReveal(); introActive = true; introPhoneOn = true; document.body.classList.add('intro-phone-on'); document.getElementById('skip-intro').hidden = false;
     try { introPhoneVid.currentTime = 0; const pr = introPhoneVid.play(); if (pr) pr.catch(() => {}); } catch (e) {}
     introPhoneVid.style.transition = 'opacity .5s ease'; introPhoneVid.style.opacity = 1; }
   function introPhoneStop(keepMusic) {
-    if (!introPhoneOn) return; introPhoneOn = false; introActive = false; document.body.classList.remove('intro-phone-on');
+    if (!introPhoneOn) return; introPhoneOn = false; introActive = false; document.body.classList.remove('intro-phone-on'); document.body.classList.add('intro-phone-back'); if (pvSndBox && pvSndHome){ pvSndHome.insertBefore(pvSndBox.firstChild, pvSndHome.firstChild); pvSndBox.remove(); pvSndBox = null; } setTimeout(() => document.body.classList.remove('intro-phone-back'), 1100);
     introPhoneVid.style.transition = 'none'; introPhoneVid.style.opacity = 0; try { introPhoneVid.pause(); } catch (e) {} }
   function introPhoneHome() {   /* the last beat: the real stacked circles, the song keeps ringing */
     if (!introPhoneOn || phase === 'menu') return;
@@ -2979,6 +2987,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     introPhoneStop(true); }
   (function introPhoneTick() { requestAnimationFrame(introPhoneTick); if (!introPhoneOn) return; const ct = music.currentTime || 0;
     if (music.paused && !introPhoneVid.paused) introPhoneVid.pause(); else if (!music.paused && introPhoneVid.paused) { const pr = introPhoneVid.play(); if (pr) pr.catch(() => {}); }
+    introPhoneVid.playbackRate = music.playbackRate || 1;
     if (Math.abs(introPhoneVid.currentTime - ct) > 0.15) { try { introPhoneVid.currentTime = ct; } catch (e) {} }
     if (ct >= 18.84) introPhoneHome(); })();
   function introPost(m) { try { introFrame.contentWindow.postMessage(m, '*'); } catch (e) {} }
@@ -3033,11 +3042,15 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     for (let i = 0; i < PFN; i++) { ePts[i].set(P.world[i][0], P.world[i][1], 0.3); const a = Math.random() * Math.PI * 2, sp = 0.004 + Math.random() * 0.01; eVel[i].set(Math.cos(a) * sp * 0.5, Math.sin(a) * sp * 0.5, 0); }
     introActive = false; introPost({ type: 'stop' }); introFrame.style.transition = 'opacity .4s ease'; introFrame.style.opacity = 0; }
   skipIntro.addEventListener('click', introSkipHome, true);
+  /* Oct 31: phone Skip intro during the intro goes straight to the three circles (never the old Begin wall) */
+  function introPhoneSkip(e) { if (!introPhoneOn) return; e.stopImmediatePropagation(); e.preventDefault(); window.__pvPaused = false;
+    frameEl.classList.remove('show'); finishMusic(); endT = 200; endVis = 1; openMenu(); startField(); introPhoneStop(false); }
+  skipIntro.addEventListener('click', introPhoneSkip, true);
   skipIntro.addEventListener('click', () => introPhoneStop(false), true);
   skipBtn.addEventListener('click', () => introPhoneStop(false), true);
   skipBtn.addEventListener('click', introSkipHome, true);
   /* ======== PREVIEW TIMELINE (only when opened from the Mac as a file, desktop): play/pause, speed, drag to any moment of the intro. Never shows on the live site. ======== */
-  if (location.protocol === 'file:' && INTRO_ON) {
+  if (location.protocol === 'file:') {   /* Oct 31: the timeline also shows in the phone preview */
     const bar = document.createElement('div'); bar.id = 'pv-bar';
     bar.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:10000;display:flex;align-items:center;gap:12px;padding:10px 16px 14px;background:linear-gradient(transparent,rgba(0,0,0,.8));font:400 11px/1 var(--mono, monospace);color:#e8edf3';
     bar.innerHTML = '<button id="pv-pp" type="button" style="width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.6);background:rgba(0,0,0,.4);color:#fff;cursor:pointer">▶</button>'
