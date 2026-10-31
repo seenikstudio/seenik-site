@@ -1863,7 +1863,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
   <button type="button" id="click-here" hidden>Click here</button>
   <button type="button" id="coin-hit" aria-label="Click" hidden></button>
   <div id="ring-label" aria-hidden="true">Click</div>
-  <div id="playbar"><span class="sndwrap"><span class="vol"><input id="vol" type="range" min="0" max="100" value="60" aria-label="Volume"></span><button type="button" id="snd" aria-label="Mute"></button></span><button type="button" id="back" hidden><svg aria-hidden="true"><rect class="track"></rect><rect class="prog"></rect></svg>Skip<small id="skip-left"></small></button><button type="button" id="replay" hidden>Replay</button></div>
+  <div id="playbar"><span class="sndwrap"><span class="vol"><input id="vol" type="range" min="0" max="100" value="50" aria-label="Volume"></span><button type="button" id="snd" aria-label="Mute"></button></span><button type="button" id="back" hidden><svg aria-hidden="true"><rect class="track"></rect><rect class="prog"></rect></svg>Skip<small id="skip-left"></small></button><button type="button" id="replay" hidden>Replay</button></div>
   <div id="frame" aria-hidden="true"></div>
   <section id="section-view" aria-label="Section"><div class="sv-inner"></div></section>
   <section id="artist-view" aria-label="The Artist">
@@ -2962,8 +2962,8 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     frameEl.classList.remove('show');
     setTimeout(() => { skipping = false; if (phase === 'end') openMenu(); }, 30); });
   /* ======== Oct 30: the intro plays inside the site (desktop). Click → real startReveal() burst → preview/intro-player.html?embed (cymatics → murmuration → grid → flight → grid burst) → real skip path → finishMusic() → openMenu() ======== */
-  var introActive = false, introFrame = null; const INTRO_ON = innerWidth > 760;
-  if (INTRO_ON) { introFrame = document.createElement('iframe'); introFrame.src = 'preview/intro-player.html?embed'; introFrame.setAttribute('aria-hidden', 'true'); introFrame.setAttribute('allowtransparency', 'true');
+  var introActive = false, introFrame = null; const INTRO_ON = innerWidth > 760, INTRO_VID = INTRO_ON && !/[?&]live\b/.test(location.search);
+  if (INTRO_ON && !INTRO_VID) { introFrame = document.createElement('iframe'); introFrame.src = 'preview/intro-player.html?embed'; introFrame.setAttribute('aria-hidden', 'true'); introFrame.setAttribute('allowtransparency', 'true');
     introFrame.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;border:0;background:transparent;opacity:0;pointer-events:none;z-index:4;transition:opacity .6s ease'; document.body.appendChild(introFrame); }
   /* ======== Oct 31: PHONE intro = pre-rendered landscape video, played sideways to fill the screen (rotated in portrait, upright if the phone itself turns). Ends on the last beat (18.84) on the real stacked circles; the song is never cut. ======== */
   let introPhoneVid = null, introPhoneOn = false;
@@ -2989,10 +2989,56 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     introPhoneVid.playbackRate = music.playbackRate || 1;
     if (Math.abs(introPhoneVid.currentTime - ct) > 0.15) { try { introPhoneVid.currentTime = ct; } catch (e) {} }
     if (ct >= 18.84) introPhoneHome(); })();
+
+  /* ======== Nov 1: DESKTOP intro = pre-rendered video (4K), so every laptop plays it smoothly. Recorded at 2048x932 (x2). Scales with the window height and stays centred,
+     inside the same frame (round → square → full screen → strip) as the live intro, frame by frame. Ends on the last beat (18.84) on the real three circles; the song is never cut. ======== */
+  let dvBox = null, dvVid = null, dvOn = false; const DV_W = 2048, DV_H = 932, DV_FPS = 60;
+  if (INTRO_VID) {
+    const hi = innerHeight * (devicePixelRatio || 1) > 1000;
+    dvBox = document.createElement('div'); dvBox.id = 'intro-desk';
+    dvBox.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);overflow:hidden;z-index:4;pointer-events:none;opacity:0;visibility:hidden;background:#000';
+    dvVid = document.createElement('video'); dvVid.muted = true; dvVid.playsInline = true; dvVid.setAttribute('playsinline', ''); dvVid.preload = 'auto';
+    dvVid.src = hi ? 'preview/space-img/intro-desk-4k.mp4?v=1' : 'preview/space-img/intro-desk.mp4?v=1';
+    dvVid.style.cssText = 'position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:none;display:block';
+    dvBox.appendChild(dvVid); document.body.appendChild(dvBox);
+    const sc = document.createElement('script'); sc.src = 'preview/space-img/intro-desk-data.js?v=1'; document.head.appendChild(sc);
+  }
+  function introGoDesk() {
+    startReveal(); introActive = true; dvOn = true; document.getElementById('skip-intro').hidden = false;
+    try { dvVid.currentTime = 0; const pr = dvVid.play(); if (pr) pr.catch(() => {}); } catch (e) {}
+    dvBox.style.visibility = 'visible'; dvBox.style.transition = 'opacity .6s ease'; dvBox.style.opacity = 1; }
+  function introDeskStop() {
+    if (!dvOn) return; dvOn = false; introActive = false;
+    dvBox.style.transition = 'none'; dvBox.style.opacity = 0; dvBox.style.visibility = 'hidden'; try { dvVid.pause(); } catch (e) {} }
+  function introDeskHome() {   /* the last beat: the real three circles and strip clusters take over exactly where the video left them */
+    if (!dvOn || phase === 'menu') return;
+    const D = window.INTRO_DESK, P = D && D.plan;
+    const keepPause = music.pause; music.pause = function () {}; window.__noChord = true;
+    try { frameEl.classList.remove('show'); finishMusic(); endT = 200; endVis = 1; openMenu(); startField(); } finally { music.pause = keepPause; setTimeout(() => { window.__noChord = false; }, 400); }
+    if (P) { PFN = P.n; fieldL = P.L; fieldBox = { hw: P.hw, top: P.top, bot: P.bot };
+      for (let i = 0; i < PFN; i++) { ePts[i].set(P.world[i][0], P.world[i][1], 0.3); const a = Math.random() * Math.PI * 2, sp = 0.004 + Math.random() * 0.01; eVel[i].set(Math.cos(a) * sp * 0.5, Math.sin(a) * sp * 0.5, 0); } }
+    menuRings.forEach(m => { m.spin = 0; m.g.position.copy(m.home); m.g.rotation.set(0, 0, 0); m.g.updateMatrixWorld(); m.vis = 1;
+      for (let i = 0; i < m.n; i++) { const s0 = m.spec[i], a = s0.a; m.pts[i].set(Math.cos(a) * s0.r, Math.sin(a) * s0.r, s0.z); m.vel[i].set(0, 0, 0); } });
+    introDeskStop(); }
+  (function introDeskTick() { requestAnimationFrame(introDeskTick); if (!dvOn) return; const ct = music.currentTime || 0;
+    if (music.paused && !dvVid.paused) dvVid.pause(); else if (!music.paused && dvVid.paused) { const pr = dvVid.play(); if (pr) pr.catch(() => {}); }
+    dvVid.playbackRate = music.playbackRate || 1;
+    if (Math.abs(dvVid.currentTime - ct) > 0.15) { try { dvVid.currentTime = ct; } catch (e) {} }
+    const D = window.INTRO_DESK; if (D) {
+      const k = Math.max(innerHeight / DV_H, innerWidth / DV_W), vt = dvVid.currentTime || 0, g = D.frames[Math.max(0, Math.min(D.frames.length - 1, Math.round(vt * DV_FPS)))];
+      dvVid.style.width = DV_W * k + 'px'; dvVid.style.height = DV_H * k + 'px';
+      dvBox.style.width = g[0] * k + 'px'; dvBox.style.height = g[0] * k + 'px'; dvBox.style.borderRadius = g[1] * k + 'px';
+      dvBox.style.clipPath = (g[2] || g[3]) ? `inset(${g[2] * k}px 0 ${g[3] * k}px 0)` : '';
+      dvBox.style.boxShadow = g[4] > 0 ? `0 0 0 1px rgba(255,255,255,${g[4]})` : 'none';
+      dvBox.style.mixBlendMode = vt >= D.screenFrom ? 'screen' : 'normal';   /* the end grid and particles glow over the real space, as live */
+    }
+    if (ct >= 18.84) introDeskHome(); })();
+  function introDeskSkip(e) { if (!dvOn) return; e.stopImmediatePropagation(); e.preventDefault(); window.__pvPaused = false;
+    frameEl.classList.remove('show'); finishMusic(); endT = 200; endVis = 1; openMenu(); startField(); introDeskStop(); }
   function introPost(m) { try { introFrame.contentWindow.postMessage(m, '*'); } catch (e) {} }
   function introLayout() { layoutMenu(); const rings = menuRings.map(m => { const c = m.home.clone().project(camera), e = m.home.clone().add(new THREE.Vector3(m.R, 0, 0)).project(camera);
       const x = (c.x + 1) / 2 * innerWidth, y = (1 - c.y) / 2 * innerHeight; return { x, y, r: Math.abs((e.x + 1) / 2 * innerWidth - x) }; }); return { type: 'layout', rings, band: bandPx() }; }
-  function introGo() { if (!INTRO_ON && phase === 'idle' && introPhoneVid) { introGoPhone(); return; } if (!INTRO_ON || phase !== 'idle' || !introFrame) { document.getElementById('skip-intro').click(); return; }
+  function introGo() { if (!INTRO_ON && phase === 'idle' && introPhoneVid) { introGoPhone(); return; } if (INTRO_VID && phase === 'idle') { introGoDesk(); return; } if (!INTRO_ON || phase !== 'idle' || !introFrame) { document.getElementById('skip-intro').click(); return; }
     startReveal(); introActive = true; introPost({ type: 'start' }); introPost(introLayout()); introPost(introPlan()); introFrame.style.transition = 'opacity .6s ease'; introFrame.style.opacity = 1; }
   function introStop() { if (!introActive) return; introActive = false; introPost({ type: 'stop' }); introFrame.style.transition = 'opacity .5s ease'; introFrame.style.opacity = 0; }
   (function introTick() { requestAnimationFrame(introTick); if (!introActive) return; const ct = music.currentTime || 0; introPost({ type: 't', t: ct });
@@ -3015,7 +3061,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
       if (rp.some(r => Math.hypot(q[0] - r.x, q[1] - r.y) < r.r * 1.15 * 1.6)) continue; pts.push(q); world.push([x, y]); }
     const l0 = toPx(0, 0, 0.3), l1 = toPx(L, 0, 0.3);
     const rings = menuRings.map(m => ({ pts: m.spec.map(s0 => { const a = s0.a + m.spin * s0.sp, q = toPx(m.home.x + Math.cos(a) * s0.r, m.home.y + Math.sin(a) * s0.r, m.home.z + s0.z); return [q[0], q[1], s0.b]; }) }));
-    introPlanData = { n: pts.length, L, world, hw, top, bot };
+    introPlanData = { n: pts.length, L, world, hw, top, bot }; window.__introPlanData = introPlanData;
     return { type: 'plan', field: { pts, L: Math.abs(l1[0] - l0[0]) }, rings };
   }
   function introHandover() {
@@ -3045,6 +3091,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
   function introPhoneSkip(e) { if (!introPhoneOn) return; e.stopImmediatePropagation(); e.preventDefault(); window.__pvPaused = false;
     frameEl.classList.remove('show'); finishMusic(); endT = 200; endVis = 1; openMenu(); startField(); introPhoneStop(false); }
   skipIntro.addEventListener('click', introPhoneSkip, true);
+  skipIntro.addEventListener('click', introDeskSkip, true); skipBtn.addEventListener('click', introDeskSkip, true);
   skipIntro.addEventListener('click', () => introPhoneStop(false), true);
   skipBtn.addEventListener('click', () => introPhoneStop(false), true);
   skipBtn.addEventListener('click', introSkipHome, true);
@@ -3094,11 +3141,12 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     const g = new THREE.Group(); scene.add(g); g.visible = false;
     const R = RING_R * 1.15 * scale * (innerWidth <= 760 ? 1.7 : 1);   // phone: bigger circles, so the words sit comfortably inside
     const n = 1900, pos = new Float32Array(n * 3), col = new Float32Array(n * 3), pts = [], vel = [], spec = [];
+    let seed = 1234 + idx * 7919 + (scale !== 1 ? 99991 : 0); const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;   /* Nov 1: seeded, the desktop intro video lands on these exact dots */
     for (let i = 0; i < n; i++) {
       pts.push(new THREE.Vector3()); vel.push(new THREE.Vector3());
-      const outer = Math.random() < 0.22;
-      spec.push({ a: Math.random() * Math.PI * 2, r: R * (0.9 + Math.pow(Math.random(), 2) * (outer ? 0.45 : 0.14)),
-        z: (Math.random() - 0.5) * 0.04, sp: 0.55 + Math.random() * 0.9, b: outer ? 0.55 : 1.05 + Math.random() * 0.45, k: 0.02 + Math.random() * 0.05 });
+      const outer = rnd() < 0.22;
+      spec.push({ a: rnd() * Math.PI * 2, r: R * (0.9 + Math.pow(rnd(), 2) * (outer ? 0.45 : 0.14)),
+        z: (rnd() - 0.5) * 0.04, sp: 0.55 + rnd() * 0.9, b: outer ? 0.55 : 1.05 + rnd() * 0.45, k: 0.02 + rnd() * 0.05 });
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
