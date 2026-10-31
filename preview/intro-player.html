@@ -64,7 +64,7 @@ const FOV = 45, camera = new THREE.PerspectiveCamera(FOV, 1, 0.1, 6000);
 const tanH = Math.tan(THREE.MathUtils.degToRad(FOV/2));
 let vw = 1, vh = 1, S = 1;
 function resize(){ vw = innerWidth; vh = innerHeight; renderer.setSize(vw, vh, false); canvas.style.width = vw+'px'; canvas.style.height = vh+'px';
-  camera.aspect = vw / vh; camera.updateProjectionMatrix(); S = Math.min(vw, vh) * (PHONE ? 0.86 : 0.74); plateHalf = (S / vh) * PD * tanH * 0.98; }
+  camera.aspect = vw / vh; camera.updateProjectionMatrix(); S = Math.min(Math.min(vw, vh) * (PHONE ? 0.86 : 0.74), PHONE ? 1e9 : vh - 330);   /* Oct 31: the frame never reaches the sound / Skip buttons under it */ plateHalf = (S / vh) * PD * tanH * 0.98; }
 const PD = 10; let plateHalf = 1;
 resize(); addEventListener('resize', resize);
 
