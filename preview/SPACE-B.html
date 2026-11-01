@@ -2963,17 +2963,33 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     frameEl.classList.remove('show');
     setTimeout(() => { skipping = false; if (phase === 'end') openMenu(); }, 30); });
   /* ======== Oct 30: the intro plays inside the site (desktop). Click → real startReveal() burst → intro-player.html?embed (cymatics → murmuration → grid → flight → grid burst) → real skip path → finishMusic() → openMenu() ======== */
-  var introActive = false, introFrame = null; const INTRO_ON = innerWidth > 760, INTRO_VID = INTRO_ON && !/[?&]live\b/.test(location.search);
+  var introActive = false, introFrame = null; const IS_PHONE = Math.min(screen.width, screen.height) <= 600 && matchMedia('(pointer:coarse)').matches, INTRO_ON = innerWidth > 760 && !IS_PHONE, INTRO_VID = INTRO_ON && !/[?&]live\b/.test(location.search);
   if (INTRO_ON && !INTRO_VID) { introFrame = document.createElement('iframe'); introFrame.src = 'intro-player.html?embed'; introFrame.setAttribute('aria-hidden', 'true'); introFrame.setAttribute('allowtransparency', 'true');
     introFrame.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;border:0;background:transparent;opacity:0;pointer-events:none;z-index:4;transition:opacity .6s ease'; document.body.appendChild(introFrame); }
   /* ======== Oct 31: PHONE intro = pre-rendered landscape video, played sideways to fill the screen (rotated in portrait, upright if the phone itself turns). Ends on the last beat (18.84) on the real stacked circles; the song is never cut. ======== */
   let introPhoneVid = null, introPhoneOn = false;
   if (!INTRO_ON) { introPhoneVid = document.createElement('video'); introPhoneVid.id = 'intro-phone'; introPhoneVid.src = 'space-img/intro-phone.mp4?v=1'; introPhoneVid.muted = true; introPhoneVid.playsInline = true; introPhoneVid.setAttribute('playsinline', ''); introPhoneVid.preload = 'auto';
-    const st = document.createElement('style'); st.textContent = '#intro-phone{position:fixed;left:50%;top:50%;width:100vh;width:100dvh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);object-fit:cover;z-index:4;opacity:0;pointer-events:none;background:#000;transition:opacity .5s ease}@media (orientation:landscape){#intro-phone{width:100vw;height:100vh;height:100dvh;transform:translate(-50%,-50%)}}body.intro-phone-on #skip-intro{display:inline-flex!important}@media (orientation:portrait){body.intro-phone-on #playbar{display:none!important}#pv-snd{position:fixed;right:22px;bottom:186px;z-index:12;transform-origin:right center;transform:rotate(90deg);animation:pvIn1 .9s cubic-bezier(.2,.7,.2,1) both}#pv-snd .sndwrap{position:static;transform:none;display:flex;flex-direction:row;gap:10px;align-items:center}#pv-snd .vol{position:static;transform:none;width:0;opacity:0;overflow:hidden;transition:width .3s,opacity .3s}body.intro-phone-on #skip-intro{position:fixed;right:-18px;bottom:110px;transform:rotate(90deg);z-index:12;animation:pvIn2 .9s cubic-bezier(.2,.7,.2,1) .08s both}body.intro-phone-on .top .mark{position:fixed;right:12px;top:12px;left:auto;transform-origin:top left;transform:translateX(100%) rotate(90deg);z-index:12;animation:pvIn3 .9s cubic-bezier(.2,.7,.2,1) .16s both}@keyframes pvIn1{from{opacity:0;transform:rotate(0deg)}to{opacity:1;transform:rotate(90deg)}}@keyframes pvIn2{from{opacity:0;transform:rotate(0deg) translateX(-30px)}to{opacity:1;transform:rotate(90deg)}}@keyframes pvIn3{from{opacity:0;transform:translateX(100%) rotate(0deg) translateY(-20px)}to{opacity:1;transform:translateX(100%) rotate(90deg)}}body.intro-phone-back .top .mark{animation:pvBack .9s cubic-bezier(.2,.7,.2,1) both}@keyframes pvBack{from{opacity:0;transform:rotate(90deg) translateY(-30px);transform-origin:top left}to{opacity:1;transform:none}}}';   /* Oct 31: controls turn with the sideways video */
+    const st = document.createElement('style'); st.textContent = '#intro-phone{position:fixed;left:50%;top:50%;width:100vh;width:100dvh;height:100vw;transform:translate(-50%,-50%) rotate(90deg);object-fit:cover;z-index:4;opacity:0;pointer-events:none;background:#000;transition:opacity .5s ease}@media (orientation:landscape){#intro-phone{width:100vw;height:100vh;height:100dvh;transform:translate(-50%,-50%)}}body.intro-phone-on #skip-intro{display:inline-flex!important}body.intro-phone-on #playbar,body.intro-phone-on #back{display:none!important}@media (orientation:landscape){#pv-snd{position:fixed;right:18px;bottom:16px;z-index:12}#pv-snd .sndwrap{position:static;transform:none;display:flex;flex-direction:row;gap:10px;align-items:center}#pv-snd .vol{position:static;transform:none;width:0;opacity:0;overflow:hidden;transition:width .3s,opacity .3s}body.intro-phone-on #skip-intro{position:fixed;right:18px;top:14px;left:auto;bottom:auto;transform:none;z-index:12}}html.pv-flip body{transform:rotate(180deg);transform-origin:50vw 50vh}@media (orientation:portrait){#pv-snd{position:fixed;right:22px;bottom:186px;z-index:12;transform-origin:right center;transform:rotate(90deg);animation:pvIn1 .9s cubic-bezier(.2,.7,.2,1) both}#pv-snd .sndwrap{position:static;transform:none;display:flex;flex-direction:row;gap:10px;align-items:center}#pv-snd .vol{position:static;transform:none;width:0;opacity:0;overflow:hidden;transition:width .3s,opacity .3s}body.intro-phone-on #skip-intro{position:fixed;right:-18px;bottom:110px;transform:rotate(90deg);z-index:12;animation:pvIn2 .9s cubic-bezier(.2,.7,.2,1) .08s both}body.intro-phone-on .top .mark{position:fixed;right:12px;top:12px;left:auto;transform-origin:top left;transform:translateX(100%) rotate(90deg);z-index:12;animation:pvIn3 .9s cubic-bezier(.2,.7,.2,1) .16s both}@keyframes pvIn1{from{opacity:0;transform:rotate(0deg)}to{opacity:1;transform:rotate(90deg)}}@keyframes pvIn2{from{opacity:0;transform:rotate(0deg) translateX(-30px)}to{opacity:1;transform:rotate(90deg)}}@keyframes pvIn3{from{opacity:0;transform:translateX(100%) rotate(0deg) translateY(-20px)}to{opacity:1;transform:translateX(100%) rotate(90deg)}}body.intro-phone-back .top .mark{animation:pvBack .9s cubic-bezier(.2,.7,.2,1) both}@keyframes pvBack{from{opacity:0;transform:rotate(90deg) translateY(-30px);transform-origin:top left}to{opacity:1;transform:none}}}';   /* Oct 31: controls turn with the sideways video */
     document.head.appendChild(st); document.body.appendChild(introPhoneVid); }
   let pvSndHome = null, pvSndBox = null;
+
+  let pvLocked = false, pvFlipOn = false, pvRelArm = false;
+  function pvSetFlip(f) { if (f === pvFlipOn) return; pvFlipOn = f; document.documentElement.classList.toggle('pv-flip', f); }
+  addEventListener('devicemotion', e => { if (!pvLocked) return; const g = e.accelerationIncludingGravity; if (!g || g.x == null) return;
+    if (g.y > 6.5 || g.x > 6.5) pvSetFlip(false); else if (g.x < -6.5 || g.y < -6.5) pvSetFlip(true); });
+  function pvLock() {
+    const de = document.documentElement, rf = de.requestFullscreen || de.webkitRequestFullscreen; if (!rf) return;
+    try { const pr = rf.call(de, { navigationUI: 'hide' }); const lk = () => { try { const p2 = screen.orientation && screen.orientation.lock && screen.orientation.lock('portrait-primary'); if (p2 && p2.then) p2.then(() => { pvLocked = true; }).catch(() => {}); } catch (e) {} };
+      if (pr && pr.then) pr.then(lk).catch(() => {}); else lk(); } catch (e) {} }
+  function pvUnlock() { pvRelArm = false; pvLocked = false; pvSetFlip(false);
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+    try { if (document.fullscreenElement && document.exitFullscreen) { const p = document.exitFullscreen(); if (p && p.catch) p.catch(() => {}); } } catch (e) {} }
+  function pvArmRelease() { setTimeout(() => { pvRelArm = true; }, 600); }
+  addEventListener('pointerdown', () => { if (pvRelArm) pvUnlock(); }, true);
+  document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) { pvLocked = false; pvSetFlip(false); } });
   function introGoPhone() {
-    { const sw = document.querySelector('#playbar .sndwrap'); if (sw && innerHeight > innerWidth) { pvSndHome = sw.parentNode; pvSndBox = document.createElement('div'); pvSndBox.id = 'pv-snd'; pvSndBox.appendChild(sw); document.body.appendChild(pvSndBox); } }
+    pvLock();
+    { const sw = document.querySelector('#playbar .sndwrap'); if (sw) { pvSndHome = sw.parentNode; pvSndBox = document.createElement('div'); pvSndBox.id = 'pv-snd'; pvSndBox.appendChild(sw); document.body.appendChild(pvSndBox); } }
     startReveal(); introActive = true; introPhoneOn = true; document.body.classList.add('intro-phone-on'); document.getElementById('skip-intro').hidden = false;
     try { introPhoneVid.currentTime = 0; const pr = introPhoneVid.play(); if (pr) pr.catch(() => {}); } catch (e) {}
     introPhoneVid.style.transition = 'opacity .5s ease'; introPhoneVid.style.opacity = 1; }
@@ -2984,7 +3000,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     if (!introPhoneOn || phase === 'menu') return;
     const keepPause = music.pause; music.pause = function () {}; window.__noChord = true;
     try { frameEl.classList.remove('show'); finishMusic(); endT = 200; endVis = 1; openMenu(); startField(); } finally { music.pause = keepPause; setTimeout(() => { window.__noChord = false; }, 400); }
-    introPhoneStop(true); }
+    introPhoneStop(true); pvArmRelease(); }
   (function introPhoneTick() { requestAnimationFrame(introPhoneTick); if (!introPhoneOn) return; const ct = music.currentTime || 0;
     if (music.paused && !introPhoneVid.paused) introPhoneVid.pause(); else if (!music.paused && introPhoneVid.paused) { const pr = introPhoneVid.play(); if (pr) pr.catch(() => {}); }
     introPhoneVid.playbackRate = music.playbackRate || 1;
@@ -3004,12 +3020,17 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     dvBox.appendChild(dvVid); document.body.appendChild(dvBox);
     const sc = document.createElement('script'); sc.src = 'space-img/intro-desk-data.js?v=1'; document.head.appendChild(sc);
   }
+  let dvSndHome = null, dvSndBox = null;
+  if (INTRO_VID) { const st2 = document.createElement('style'); st2.textContent = 'body.intro-desk-on #playbar{display:none!important}#dv-snd{position:fixed;top:18px;right:160px;z-index:12}#dv-snd .sndwrap{position:relative;transform:none;right:auto;top:auto;display:flex;align-items:center}#dv-snd .vol{position:absolute;right:calc(100% + 10px);top:50%;transform:translateY(-50%);width:0;opacity:0;overflow:hidden;transition:width .3s,opacity .3s;display:flex;align-items:center}#dv-snd .vol input{width:80px;accent-color:#f2f4f7}@media (hover:hover){#dv-snd .sndwrap:hover .vol{width:84px;opacity:1}}'; document.head.appendChild(st2); }
   function introGoDesk() {
+    { const sw = document.querySelector('#playbar .sndwrap'); if (sw) { dvSndHome = sw.parentNode; dvSndBox = document.createElement('div'); dvSndBox.id = 'dv-snd'; dvSndBox.appendChild(sw); document.body.appendChild(dvSndBox); } }
+    document.body.classList.add('intro-desk-on');
     startReveal(); introActive = true; dvOn = true; document.getElementById('skip-intro').hidden = false;
     try { dvVid.currentTime = 0; const pr = dvVid.play(); if (pr) pr.catch(() => {}); } catch (e) {}
     dvBox.style.visibility = 'visible'; dvBox.style.transition = 'opacity .6s ease'; dvBox.style.opacity = 1; }
   function introDeskStop() {
-    if (!dvOn) return; dvOn = false; introActive = false;
+    if (!dvOn) return; dvOn = false; introActive = false; document.body.classList.remove('intro-desk-on');
+    if (dvSndBox && dvSndHome) { dvSndHome.insertBefore(dvSndBox.firstChild, dvSndHome.firstChild); dvSndBox.remove(); dvSndBox = null; }
     dvBox.style.transition = 'none'; dvBox.style.opacity = 0; dvBox.style.visibility = 'hidden'; try { dvVid.pause(); } catch (e) {} }
   function introDeskHome() {   /* the last beat: the real three circles and strip clusters take over exactly where the video left them */
     if (!dvOn || phase === 'menu') return;
@@ -3090,7 +3111,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
   skipIntro.addEventListener('click', introSkipHome, true);
   /* Oct 31: phone Skip intro during the intro goes straight to the three circles (never the old Begin wall) */
   function introPhoneSkip(e) { if (!introPhoneOn) return; e.stopImmediatePropagation(); e.preventDefault(); window.__pvPaused = false;
-    frameEl.classList.remove('show'); finishMusic(); endT = 200; endVis = 1; openMenu(); startField(); introPhoneStop(false); }
+    frameEl.classList.remove('show'); finishMusic(); endT = 200; endVis = 1; openMenu(); startField(); introPhoneStop(false); pvArmRelease(); }
   skipIntro.addEventListener('click', introPhoneSkip, true);
   skipIntro.addEventListener('click', introDeskSkip, true); skipBtn.addEventListener('click', introDeskSkip, true);
   skipIntro.addEventListener('click', () => introPhoneStop(false), true);
@@ -3130,7 +3151,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
   }
   skipIntro.addEventListener('click', () => { if (introActive) introStop(); });
   skipBtn.addEventListener('click', () => { if (introActive) introStop(); });
-  (function skipShow() { requestAnimationFrame(skipShow); const want = innerWidth > 760 && !document.body.classList.contains('artist-on') && (phase === 'idle' || phase === 'burst' || phase === 'dance' || phase === 'end');
+  (function skipShow() { requestAnimationFrame(skipShow); const want = INTRO_ON && !document.body.classList.contains('artist-on') && (phase === 'idle' || phase === 'burst' || phase === 'dance' || phase === 'end');
     if (skipIntro.hidden === want) skipIntro.hidden = !want; })();
 
   // ======== Menu: three force-field rings — The Studio · The Artist · The Mirror ========
