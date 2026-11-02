@@ -3522,7 +3522,10 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
         if (p.x < -hw) { p.x = -hw; v.x = Math.abs(v.x); } if (p.x > hw) { p.x = hw; v.x = -Math.abs(v.x); }
         if (p.y < yBot) { p.y = yBot; v.y = Math.abs(v.y); } if (p.y > yTop) { p.y = yTop; v.y = -Math.abs(v.y); }
       }
-      const L = fieldL;   // links match the wall's triangle size
+      /* Nov 2: desktop — same points, fewer lines: once the intro has landed the link reach eases from 100% to 75% in under a second
+         (about 574 lines down to about 370); the longest, faintest lines go first, nothing jumps. Phone unchanged */
+      const lk = innerWidth > 760 ? 1 - 0.25 * (t => t * t * (3 - 2 * t))(Math.max(0, Math.min(1, (endT - 15) / 40))) : 1;
+      const L = fieldL * lk;   // links match the wall's triangle size
       for (let i = 0; i < PFN && nLines < MAXL; i++) for (let j = i + 1; j < PFN && nLines < MAXL; j++) {
         if (eHand[i] || eHand[j]) continue;
         const a = ePts[i], b = ePts[j], d = Math.hypot(a.x - b.x, a.y - b.y);
