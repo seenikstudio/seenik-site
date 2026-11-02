@@ -3629,7 +3629,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
       const ar = (lo.naturalHeight / lo.naturalWidth) || .5606, dh = Math.min(r.height, r.width * ar), dw = dh / ar, iy = r.top + (r.height - dh) / 2, ix = r.left + (r.width - dw) / 2;   // where the picture actually sits inside its box
       const ox = ix + dw * .949, oy = iy + dh * .466, wx = ix + dw * .569, lx = ix + dw * .066, c0 = Math.max(0, (document.documentElement.clientWidth - PAGE_MAX) / 2), c = (c0 + goal) / 2;   // centred in the page column, not the whole window
       const M = Math.max(24, document.documentElement.clientWidth - fm.form.getBoundingClientRect().right), S = Math.min(2.4, 1.4 * (goal - M) / (ox - lx)), t = goal - ox;   // Oct 24: 40% bigger; the right tip stays put, it grows to the left and up and down   // balanced: the whole logo shows, its left tip the same distance from the edge as the form's right side
-      lo.style.transformOrigin = (ox - r.left).toFixed(1) + 'px ' + (oy - r.top).toFixed(1) + 'px'; lo.style.scale = S.toFixed(3); lo.style.translate = Math.round(t) + 'px ' + Math.round(em.bottom - .5 - oy) + 'px'; };
+      lo.style.transformOrigin = (ox - r.left).toFixed(1) + 'px ' + (oy - r.top).toFixed(1) + 'px'; lo.style.scale = S.toFixed(3); lo.style.translate = Math.round(t + (window.__stSlide || 0)) + 'px ' + Math.round(em.bottom - .5 - oy) + 'px'; };   /* Nov 1: + the entrance slide */
     requestAnimationFrame(fit); })();
   (function reelLabels() {   // Digital Media: every video title the same size, small enough that the longest one fits inside its thumbnail
     let key = '';
@@ -4254,7 +4254,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     const dots = () => SV.querySelectorAll('.reel-txt').forEach(r => { if (r.querySelector('.gdot')) return; const h = r.querySelector('h3'); if (!h) return;
       const d = document.createElement('button'); d.type = 'button'; d.className = 'gdot'; d.innerHTML = '<i></i><i></i><i></i>'; d.setAttribute('aria-label', 'Show the words'); d.setAttribute('aria-expanded', 'false'); h.after(d); });
     SV.addEventListener('click', e => { const t = e.target.closest('.gdot:not(.fold), .reel-txt h3'); if (!t || innerWidth > 760) return; const r = t.closest('.reel-txt'); if (!r) return; const on = r.classList.toggle('open'); const d = r.querySelector('.gdot'); if (d) d.setAttribute('aria-expanded', on); });
-    const EL_V = n => `<video src="space-img/el-${n}.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`;   // Oct 25: the four elementals are videos
+    const EL_V = n => `<video src="space-img/el-${n}.mp4?v=orig" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`;   // Oct 25: the four elementals are videos
     const quads = () => SV.querySelectorAll('.fr.mir-wide:not(.mir-lined)').forEach(f => { if (f.querySelector('.el4')) return; const src = f.querySelector('img').src;   // the four elementals: one picture, shown as two rows of two
       const X = [25, 1179, 409, 792];   // top: murmurations, kaleidoscope; bottom: cymatics, fractals — the pictures tell it, no names   // each picture's square inside the 1540 x 462 image (333 px), without the label strip
       const VN = ['murmuration', 'kaleidoscope', 'cymatics', 'fractal'];
@@ -5589,7 +5589,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     h.appendChild(cv); ok = false; checked = 0;
     h.querySelector('img').style.opacity = '';   // the picture stays visible until the live eye is proven to draw
   }
-  let t0 = performance.now(), last = t0;
+  let t0 = performance.now(), last = t0; window.__eyeT0 = t0;   /* Nov 1: the eye's clock, for its sound */
   (function tick(now) {
     requestAnimationFrame(tick);
     const h = document.querySelector('#section-view.on .mir-hero .mir-par');
@@ -5631,7 +5631,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
       const im = b.querySelector('img'); if (im && /seenik-03c/.test(im.src)) im.src = 'space-img/elementals-clean.jpg';
       names = document.createElement('div'); names.className = 'el-names'; names.setAttribute('aria-hidden', 'true');
       names.innerHTML = N.map(([t, x]) => `<span style="left:${x}%">${t}</span>`).join(''); b.parentElement.appendChild(names);
-      if (!b.querySelector('.el-vids')) b.insertAdjacentHTML('beforeend', `<span class="el-vids">${[['murmuration', 25], ['cymatics', 409], ['fractal', 792], ['kaleidoscope', 1179]].map(([n, x]) => `<video style="left:${(x / 1540 * 100).toFixed(3)}%" src="space-img/el-${n}.mp4" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`).join('')}</span>`); }
+      if (!b.querySelector('.el-vids')) b.insertAdjacentHTML('beforeend', `<span class="el-vids">${[['murmuration', 25], ['cymatics', 409], ['fractal', 792], ['kaleidoscope', 1179]].map(([n, x]) => `<video style="left:${(x / 1540 * 100).toFixed(3)}%" src="space-img/el-${n}.mp4?v=orig" autoplay muted loop playsinline preload="auto" aria-hidden="true"></video>`).join('')}</span>`); }
     if (!btn || !names) return;
     const op = names.offsetParent || document.body, r = btn.getBoundingClientRect(), pr = op.getBoundingClientRect();
     names.style.left = (r.left - pr.left + op.scrollLeft - op.clientLeft) + 'px'; names.style.top = (r.top - pr.top + op.scrollTop - op.clientTop + r.height * (37 / 462)) + 'px'; names.style.width = r.width + 'px';
@@ -5646,7 +5646,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     if (cur !== el) { el = cur; t0 = 0; if (el) { el.querySelector('.t3').style.scale = '1'; el.querySelector('.sub').classList.add('pre'); } }
     if (!el) return;
     const t3 = el.querySelector('.t3'), sub = el.querySelector('.sub'), pic = el.parentElement.querySelector('.mir-par img, .mir-par canvas, .mir-par');
-    if (!t0) { const r = t3.getBoundingClientRect(); if (r.top < innerHeight * .8 && r.bottom > 0) t0 = now; else return; }
+    if (!t0) { const r = t3.getBoundingClientRect(); if (r.top < innerHeight * .8 && r.bottom > 0) { t0 = now; dispatchEvent(new Event('sn-title3d')); } else return; }   /* Nov 1: tells the title sound it has started */
     const w = t3.offsetWidth, ring = pic.getBoundingClientRect().width * (1544 / 2400) * .96, S = w ? Math.max(1, ring / w) : 1, u = ease(((now - t0) / 1000 - .4) / 2.4);
     t3.style.transformOrigin = '50% 100%'; t3.style.scale = (1 + (S - 1) * u).toFixed(4);
     if ((now - t0) / 1000 > 1.0 && sub.classList.contains('pre')) { sub.classList.remove('pre'); sub.classList.add('enter'); }
@@ -5856,6 +5856,239 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     cam.position.x = m.x * .35; cam.position.y = -m.y * .22 + c * .3; cam.lookAt(0, c * .12, -.4);
     gal.rotation.set(.18 + m.y * .1 + c * .08, m.x * .14, 0);
     U.time.value = t; R.render(sc, cam);
+  })();
+})();
+</script>
+<style>
+/* Nov 1 SOUND: the Studio logo's slide is driven in the script below */
+@media (min-width: 761px) {
+}
+</style>
+<script>
+/* Nov 1 SOUND (desktop only): the Studio logo's swoosh follows its slide frame by frame and settles with it;
+   The Artist titles: a crisp relay click on hover, a heavy latch on click. Follows the site speaker + volume. */
+(function () {
+  if (innerWidth <= 760) return;
+  let ctx = null, out = null, nb = null;
+  const level = () => { const v = document.getElementById('vol'), b = document.getElementById('snd'); const muted = b && b.getAttribute('aria-label') === 'Unmute'; return muted ? 0 : (v ? +v.value / 100 : .5); };
+  function audio() {
+    if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+      out = ctx.createGain(); out.connect(ctx.destination);
+      const n = ctx.sampleRate * 2; nb = ctx.createBuffer(1, n, ctx.sampleRate); const d = nb.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; }
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    out.gain.setTargetAtTime(level(), ctx.currentTime, .05);
+    return ctx;
+  }
+  addEventListener('pointerdown', () => audio(), { capture: true, passive: true });
+  window.__snSfx = { ctx: () => ctx, out: () => out };
+  document.addEventListener('input', e => { if (e.target && e.target.id === 'vol' && ctx) out.gain.setTargetAtTime(level(), ctx.currentTime, .05); }, true);
+  document.addEventListener('click', e => { if (e.target && e.target.closest && e.target.closest('#snd') && ctx) setTimeout(() => out.gain.setTargetAtTime(level(), ctx.currentTime, .05), 0); }, true);
+  const G = (v, dest) => { const g = ctx.createGain(); g.gain.value = v; g.connect(dest); return g; };
+  const F = (type, f, q, dest) => { const b = ctx.createBiquadFilter(); b.type = type; b.frequency.value = f; b.Q.value = q; b.connect(dest); return b; };
+  const N = (dest, t0, t1) => { const s = ctx.createBufferSource(); s.buffer = nb; s.loop = true; s.connect(dest); s.start(t0, Math.random()); if (t1) s.stop(t1); return s; };
+  const O = (type, f, dest, t0, t1) => { const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t0); o.connect(dest); o.start(t0); o.stop(t1); return o; };
+  const E = (g, t, a, peak, rel) => { const p = g.gain; p.setValueAtTime(.0001, t); p.linearRampToValueAtTime(peak, t + a); p.exponentialRampToValueAtTime(.0001, t + a + rel); };
+  function clunk(t, amp, f) {   /* a mechanical latch: low body thump + short metal resonances that don't ring on */
+    const g = G(0, out); E(g, t, .002, amp, .14); O('sine', f * 1.6, g, t, t + .25).frequency.exponentialRampToValueAtTime(f * .7, t + .09);
+    [[950, 18, .5], [2300, 22, .3], [4100, 25, .18]].forEach(([fr, q, a]) => { const k = G(0, out); E(k, t, .001, amp * a, .07); N(F('bandpass', fr, q, k), t, t + .12); });
+    const c = G(0, F('highpass', 2500, .7, out)); E(c, t, .0005, amp * .5, .012); N(c, t, t + .03);
+  }
+  function thoom(t, amp) { const g = G(0, out); E(g, t, .02, amp, .8); O('sine', 64, g, t, t + 1).frequency.exponentialRampToValueAtTime(40, t + .5); }
+  function tick(t, amp, f) { const k = G(0, out); E(k, t, .0005, amp, .02); N(F('bandpass', f, 9, k), t, t + .035); const b = G(0, out); E(b, t, .001, amp * .4, .03); O('sine', f / 9, b, t, t + .05); }
+
+  /* The Artist: Film Work, Digital Media, Art & Photography */
+  document.addEventListener('pointerover', e => { const f = e.target.closest && e.target.closest('#artist-view .frame'); if (!f || f.contains(e.relatedTarget) || !audio()) return; const t = ctx.currentTime + .005; tick(t, .35, 2200); tick(t + .032, .22, 1800); }, true);
+  document.addEventListener('click', e => { const f = e.target.closest && e.target.closest('#artist-view .frame'); if (!f || !audio()) return; const t = ctx.currentTime + .005; clunk(t, .8, 52); thoom(t, .3); }, true);
+
+  /* The Studio logo: start the slide when the page opens; the air follows the logo's real position every frame */
+  let seen = new WeakSet(), slideT0 = null, air = null, lastX = null, sp = 0, moving = 0, last = performance.now();
+  (function f(now) { requestAnimationFrame(f);
+    const dt = Math.min(.1, (now - last) / 1000) || .016; last = now;
+    const lo = document.querySelector('#section-view.on .st-lead .st-logo'); if (!lo) { lastX = null; window.__stSlide = 0; slideT0 = null; return; }
+    if (!seen.has(lo)) { seen.add(lo); lastX = null; if (!matchMedia('(prefers-reduced-motion: reduce)').matches) { slideT0 = now; lo.style.opacity = '0'; } }
+    if (slideT0 != null) {   /* a soft spring: comes in from the right, runs a little past its place, then eases back */
+      const t = (now - slideT0) / 1000, A = innerWidth * .55, z = .72, w = 4.9, wd = w * Math.sqrt(1 - z * z);
+      window.__stSlide = A * Math.exp(-z * w * t) * (Math.cos(wd * t) + (z * w / wd) * Math.sin(wd * t)); lo.style.opacity = Math.min(1, t / .5).toFixed(3);
+      if (t > 2.4) { window.__stSlide = 0; lo.style.opacity = ''; slideT0 = null; } }
+    if (!ctx || ctx.state !== 'running') return;
+    if (!air) { air = { g: G(0, out), p: ctx.createStereoPanner() }; air.p.connect(air.g); air.bp = F('bandpass', 500, 1.1, air.p); N(air.bp, ctx.currentTime); }
+    const x = window.__stSlide || 0;
+    if (lastX == null) lastX = x; const v = Math.abs(x - lastX) / dt; lastX = x;
+    sp += (Math.min(1, v / 1800) - sp) * .5; const ct = ctx.currentTime;
+    air.g.gain.setTargetAtTime(sp * .4, ct, .025); air.bp.frequency.setTargetAtTime(380 + 1500 * sp, ct, .025); air.p.pan.setTargetAtTime(Math.max(-1, Math.min(1, x / 700)), ct, .025);
+    if (sp > .25) moving = 1;
+    if (moving && sp < .03) { moving = 0; const g = G(0, F('lowpass', 700, .7, out)); E(g, ct, .05, .07, .5); N(g, ct, ct + .7); }   /* it settles */
+  })(performance.now());
+})();
+</script>
+<script src="space-img/laser-data.js"></script>
+<script>
+/* Nov 1 SOUND (desktop only): the laser on the two top titles (The Studio, The Mirror) plays Sandy's laser scan.
+   It follows the light itself: the first part (slowed) while the bar travels down, the last part from the moment it turns and rises, faded out as the light goes. */
+(function () {
+  if (innerWidth <= 760 || !window.SN_LASER) return;
+  let bufs = null, cur = null, lastY = 0, lastO = 0, dir = 0;
+  const load = ctx => { if (bufs) return; bufs = {}; ['down', 'up'].forEach(k => { const raw = atob(SN_LASER[k]), u = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) u[i] = raw.charCodeAt(i); ctx.decodeAudioData(u.buffer, d => { bufs[k] = d; }, () => {}); }); };
+  const play = (ctx, out, k, t) => { if (!bufs || !bufs[k]) return null; const s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = bufs[k]; s.connect(g); g.connect(out); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.9, t + .03); s.start(t); (window.__snLog = window.__snLog || []).push(k + '@' + Math.round(performance.now())); return { s, g }; };
+  const stop = (v, t, d) => { if (!v) return; const p = v.g.gain; p.cancelScheduledValues(t); p.setValueAtTime(p.value, t); p.linearRampToValueAtTime(0, t + d); try { v.s.stop(t + d + .05); } catch (e) {} };
+  (function f() { requestAnimationFrame(f);
+    const A = window.__snSfx, ctx = A && A.ctx(), b = document.getElementById('lz-bar'), on = b && b.parentElement && b.parentElement.classList.contains('mir-top');
+    const o = on ? (parseFloat(b.style.opacity) || 0) : 0, y = on ? (parseFloat(b.style.top) || 0) : 0;
+    if (!ctx || ctx.state !== 'running') { lastO = o; lastY = y; return; }
+    load(ctx); const t = ctx.currentTime, out = A.out();
+    if (lastO < .02 && o > .02) { stop(cur, t, .03); cur = play(ctx, out, 'down', t); dir = 1; }   /* the light appears and starts down */
+    else if (o > .02 && dir === 1 && y < lastY - .5) { stop(cur, t, .06); cur = play(ctx, out, 'up', t); dir = -1; }   /* it turns and rises */
+    if (lastO > .2 && o < .02) { stop(cur, t, .12); cur = null; dir = 0; }   /* the light is gone */
+    lastO = o; lastY = y;
+  })();
+})();
+</script>
+<script>
+/* Nov 1 SOUND (desktop only): The Studio's water drop — real water-drop sounds into a pool: big, smaller, tiny, one each time a drop lands
+   (0.72 s, 3.10 s, 4.88 s into the loop), and only while you can see it. */
+(function () {
+  if (innerWidth <= 760) return;
+  const HITS = [[.72, 1], [3.10, .5], [4.88, .2]], fired = [0, 0, 0];
+  let bus = null, nb = null;
+  (function f() { requestAnimationFrame(f);
+    const A = window.__snSfx, ctx = A && A.ctx(); if (!ctx || ctx.state !== 'running') return;
+    const v = document.querySelector('#section-view.on .st-drop-vid'); if (!v || v.paused || document.hidden) return;
+    const r = v.getBoundingClientRect(), seen = (Math.min(innerHeight, r.bottom) - Math.max(0, r.top)) / Math.max(1, r.height), cy = r.top + r.height * .5;
+    if (seen < .75 || cy < innerHeight * .15 || cy > innerHeight * .85 || !document.hasFocus()) return;   /* only when you can see it */
+    if (!bus) {   /* mostly dry, with a little room */
+      bus = ctx.createGain(); bus.gain.value = 1; bus.connect(A.out());
+      const n = Math.floor(ctx.sampleRate * 3.2), ir = ctx.createBuffer(2, n, ctx.sampleRate);
+      for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); let lp = 0; for (let i = 0; i < n; i++) { lp += (Math.random() * 2 - 1 - lp) * .5; d[i] = lp * Math.pow(1 - i / n, 3); } }
+      const cv = ctx.createConvolver(); cv.buffer = ir; const w = ctx.createGain(); w.gain.value = .22; bus.connect(w); w.connect(cv); cv.connect(A.out());
+      const m = ctx.sampleRate * 2; nb = ctx.createBuffer(1, m, ctx.sampleRate); const nd = nb.getChannelData(0); for (let i = 0; i < m; i++) nd[i] = Math.random() * 2 - 1;
+    }
+    const G = (t, peak, rel) => { const g = ctx.createGain(); g.connect(bus); g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(peak, t + .002); g.gain.exponentialRampToValueAtTime(.0001, t + .002 + rel); return g; };
+    function plop(t, size) {   /* the bubble's rising "plop", the splash, and a soft knock under the big ones */
+      const f0 = size === 1 ? 520 : size === .5 ? 950 : 1500, dur = .06 + .12 * size;
+      const o = ctx.createOscillator(); o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * (2.1 + size), t + dur); o.connect(G(t, .5 * (.15 + .85 * size), dur + .05)); o.start(t); o.stop(t + dur + .2);
+      const s = ctx.createBufferSource(); s.buffer = nb; const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 3800; bp.Q.value = .9; s.connect(bp); bp.connect(G(t, .18 * size + .03, .12 + .25 * size)); s.start(t, Math.random()); s.stop(t + .6);
+      if (size > .4) { const k = ctx.createOscillator(); k.frequency.setValueAtTime(140, t); k.frequency.exponentialRampToValueAtTime(70, t + .08); k.connect(G(t, .35 * size, .09)); k.start(t); k.stop(t + .2); }
+    }
+    const tau = v.currentTime, ct = ctx.currentTime, pn = performance.now();
+    HITS.forEach(([h, size], i) => { const d = h - tau; if (d > -.25 && d < .5 && pn - fired[i] > 2000) { fired[i] = pn; plop(ct + Math.max(0, d) - .015, size); } });
+  })();
+})();
+</script>
+<script>
+/* Nov 1 SOUND (desktop only): The Mirror's mountain, forest and water wave — a quiet tide that rolls in as the wave rises,
+   peaks with it and draws out as it flattens, with a deep swell under the peak. Locked to the video's own clock; only while you can see it. */
+(function () {
+  if (innerWidth <= 760) return;
+  let W = null;
+  function build(ctx, out) {
+    W = { g: ctx.createGain() }; W.g.gain.value = 0; W.g.connect(out);
+    const m = ctx.sampleRate * 8, buf = ctx.createBuffer(2, m, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) { const e = buf.getChannelData(c); let l = 0; for (let i = 0; i < m; i++) { l = (l + .02 * (Math.random() * 2 - 1)) / 1.02; e[i] = l * 3.5; } }
+    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+    W.sea = ctx.createGain(); W.sea.gain.value = 0; W.sea.connect(W.g);
+    W.lp = ctx.createBiquadFilter(); W.lp.type = 'lowpass'; W.lp.frequency.value = 500; W.lp.Q.value = .5; W.lp.connect(W.sea); src.connect(W.lp); src.start();
+    W.sub = ctx.createGain(); W.sub.gain.value = 0; W.sub.connect(W.g);
+    const o = ctx.createOscillator(); o.frequency.value = 46; o.connect(W.sub); o.start();
+    const lp2 = ctx.createBiquadFilter(); lp2.type = 'lowpass'; lp2.frequency.value = 140; const s2 = ctx.createGain(); s2.gain.value = .3; lp2.connect(s2); s2.connect(W.sub);
+    const o2 = ctx.createOscillator(); o2.type = 'sawtooth'; o2.frequency.value = 46; o2.connect(lp2); o2.start();
+  }
+  (function f() { requestAnimationFrame(f);
+    const A = window.__snSfx, ctx = A && A.ctx(); if (!ctx || ctx.state !== 'running') return;
+    const v = document.querySelector('#section-view.on video.wave-live');
+    if (!v) { if (W) W.g.gain.setTargetAtTime(0, ctx.currentTime, .3); return; }
+    if (!W) build(ctx, A.out());
+    const r = v.getBoundingClientRect(), seen = (Math.min(innerHeight, r.bottom) - Math.max(0, r.top)) / Math.max(1, r.height), cy = r.top + r.height * .5;
+    const see = seen > .6 && cy > innerHeight * .1 && cy < innerHeight * .9 && !v.paused && !document.hidden && document.hasFocus();   /* only when you can see it */
+    const ct = ctx.currentTime, D = v.duration || 9.97, tau = v.currentTime || 0;
+    W.g.gain.setTargetAtTime(see ? 1 : 0, ct, .3);
+    const u = tau >= 8 ? Math.pow((tau - 8) / (D - 8), 1.6) : tau < 2.2 ? Math.pow(1 - tau / 2.2, 1.4) : 0;   /* the wave's size: rising 8 s to the loop point, biggest there, flat by 2.2 s */
+    W.sea.gain.setTargetAtTime(.015 + .18 * u, ct, .25); W.lp.frequency.setTargetAtTime(380 + 1500 * u, ct, .25);
+    W.sub.gain.setTargetAtTime(.25 * u * u, ct, .2);
+  })();
+})();
+</script>
+<script>
+/* Nov 1 SOUND (desktop only): The Mirror's eye — a low turbine bed, and each light circling the eye is a blade of air travelling round with it
+   (measured from the eye picture's traced rings: their speed, direction and where each ring is drawn). Kept quiet; only while you can see the eye. */
+(function () {
+  if (innerWidth <= 760) return;
+  const RINGS = [
+    { rk: 41, spd: .21, dir: 1, f: 1700, cov: [.99,.15,.27,.93,.94,.93,.95,.66,.41,.94,1,.91,.83,.88,.99,.76,0,.45,.93,.98,.74,.41,.38,.01,.25,0,.35,0,.06,.25,0,.14,.29,.66,.88,.94] },
+    { rk: 40, spd: .16, dir: -1, f: 1050, cov: [0,0,0,0,0,0,0,0,0,0,.01,.03,.05,.02,0,0,0,0,0,.21,.69,.82,.38,.43,.34,.09,.06,.09,.11,.33,.61,.84,1,.82,.29,0] },
+    { rk: 55, spd: .16, dir: 1, f: 650, cov: [.91,1,1,.97,1,.97,.94,.85,.88,.62,.01,0,0,0,0,0,.02,.7,.8,.87,.84,.83,.76,.64,.74,.73,.79,.81,.73,.7,.67,.79,.84,.87,.85,.81] } ];
+  const lit = (cov, turn) => { const x = (((turn % 1) + 1) % 1) * 36, i0 = Math.floor(x) % 36, i1 = (i0 + 1) % 36, u = x - Math.floor(x); return cov[i0] * (1 - u) + cov[i1] * u; };
+  const LEVEL = .55;   /* not too loud */
+  let E = null;
+  function build(ctx, out) {
+    E = { g: ctx.createGain(), heads: [] }; E.g.gain.value = 0; E.g.connect(out);
+    const n = ctx.sampleRate * 2, nb = ctx.createBuffer(1, n, ctx.sampleRate), d = nb.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    const ws = ctx.createWaveShaper(), c = new Float32Array(1024); for (let i = 0; i < 1024; i++) { const x = i / 1023 * 2 - 1; c[i] = Math.tanh(2 * x) / Math.tanh(2); } ws.curve = c;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 260; lp.Q.value = 1.2; lp.connect(E.g);   /* the turbine bed */
+    const g1 = ctx.createGain(); g1.gain.value = .12; g1.connect(ws); ws.connect(lp); const g2 = ctx.createGain(); g2.gain.value = .12; g2.connect(lp);
+    [[44, g1], [44.3, g2]].forEach(([fq, dst]) => { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = fq; o.connect(dst); o.start(); });
+    RINGS.forEach(rg => [0, .5].forEach(hf => {   /* two lights per ring, opposite each other (the second dimmer) */
+      const p = ctx.createStereoPanner(); p.connect(E.g); const g = ctx.createGain(); g.gain.value = 0; g.connect(p);
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = rg.f; bp.Q.value = 4; bp.connect(g);
+      const s = ctx.createBufferSource(); s.buffer = nb; s.loop = true; s.connect(bp); s.start(0, Math.random() * 1.5);
+      E.heads.push({ rg, hf, p, g, bp }); }));
+  }
+  (function f() { requestAnimationFrame(f);
+    const A = window.__snSfx, ctx = A && A.ctx(); if (!ctx || ctx.state !== 'running' || window.__eyeT0 == null) return;
+    const h = document.querySelector('#section-view.on .mir-hero .mir-par');
+    if (!h) { if (E) E.g.gain.setTargetAtTime(0, ctx.currentTime, .3); return; }
+    if (!E) build(ctx, A.out());
+    const r = h.getBoundingClientRect(), v = Math.max(0, Math.min(innerHeight, r.bottom) - Math.max(0, r.top)) / Math.max(1, Math.min(innerHeight, r.height));
+    const vis = document.hidden || !document.hasFocus() ? 0 : Math.max(0, Math.min(1, (v - .35) / .4));   /* only while you can see the eye */
+    const T = (performance.now() - window.__eyeT0) / 1000, ct = ctx.currentTime;
+    E.g.gain.setTargetAtTime(vis * LEVEL, ct, .3);
+    E.heads.forEach(k => { const turn = k.rg.dir * (T * k.rg.spd - k.rg.rk * .37) + k.hf, a = 2 * Math.PI * turn, L = lit(k.rg.cov, turn) * (k.hf ? .7 : 1), top = .5 - .5 * Math.sin(a);   /* exactly where the eye draws this light */
+      k.p.pan.setTargetAtTime(Math.cos(a) * .9, ct, .03); k.g.gain.setTargetAtTime(L * .16, ct, .05); k.bp.frequency.setTargetAtTime(k.rg.f * (.7 + .5 * top), ct, .05); });
+  })();
+})();
+</script>
+<script src="space-img/mirror-title-enig.js"></script>
+<script>
+/* Nov 1 SOUND (desktop only): THE MIRROR title — the Enigmatic Intro Transition starts the moment the title starts coming toward you,
+   swells as it grows and settles after it lands; a soft glow and star sparkle swell with it, burst outward on landing, then settle away. */
+(function () {
+  if (innerWidth <= 760) return;
+  let buf = null, src = null, t3 = null, landT = null, moving = 0, cv = null, X = null, P = [], burst = 0, last = performance.now() / 1000;
+  addEventListener('sn-title3d', () => {   /* the title has just started */
+    const A = window.__snSfx, ctx = A && A.ctx(); landT = null; moving = 1; burst = 0;   /* it is on its way */
+    if (!ctx || ctx.state !== 'running' || !window.SN_MENIG) return;
+    const go = b => { if (src) { try { src.stop(); } catch (e) {} } src = ctx.createBufferSource(); const g = ctx.createGain(); g.gain.value = .8; src.buffer = b; src.connect(g); g.connect(A.out()); src.start(ctx.currentTime + .01); };
+    if (buf) go(buf); else { const raw = atob(SN_MENIG), u = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) u[i] = raw.charCodeAt(i); ctx.decodeAudioData(u.buffer, b => { buf = b; go(b); }, () => {}); }
+  });
+  (function f() { requestAnimationFrame(f);
+    const tn = performance.now() / 1000, dt = Math.min(.1, tn - last); last = tn;
+    const SV = document.querySelector('#section-view.on'), el = SV && SV.querySelector('.mir-title3d .t3');
+    if (!el) { if (X && P.length) { P = []; X.clearRect(0, 0, cv.width, cv.height); } t3 = null; return; }
+    if (el !== t3) { t3 = el; landT = null; burst = 0; }
+    const pic = el.closest('.mir-title3d').parentElement.querySelector('.mir-par img, .mir-par canvas, .mir-par'), w = el.offsetWidth;
+    const S = w && pic ? Math.max(1.001, pic.getBoundingClientRect().width * (1544 / 2400) * .96 / w) : 2, sc = parseFloat(el.style.scale) || 1;
+    const prog = Math.max(0, Math.min(1, (sc - 1) / (S - 1)));   /* how far the title has grown */
+    if (prog > .02 && prog < .9) moving = 1;
+    if (prog > .995 && moving && landT == null) landT = tn;
+    let g = Math.pow(Math.sin(Math.PI / 2 * prog), 2) * (.88 + .12 * Math.sin(tn * 2 * Math.PI * .8));   /* the glow blooms as it grows, breathing slowly (no flashing) */
+    if (landT != null) g = Math.max(0, 1 - (tn - landT) / 1.8) ** 2; if (!moving && landT == null) g = 0;   /* then settles back to the normal title */
+    /* star sparkle */
+    if (!cv) { cv = document.createElement('canvas'); cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:40'; document.body.appendChild(cv); X = cv.getContext('2d'); }
+    const dpr = Math.min(2, devicePixelRatio || 1); if (cv.width !== Math.round(innerWidth * dpr)) { cv.width = Math.round(innerWidth * dpr); cv.height = Math.round(innerHeight * dpr); }
+    const r = el.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, since = landT != null ? tn - landT : 0;
+    if (landT != null && !burst) { burst = 1; for (let i = 0; i < 90; i++) { const a = Math.random() * Math.PI * 2, sp = 40 + Math.random() * 160; P.push({ x: cx + (Math.random() - .5) * r.width * .9, y: cy + (Math.random() - .5) * r.height * .7, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * .5, age: 0, life: 1.2 + Math.random() * 1.6, s: 1 + Math.random() * 2.6, h: Math.random() }); } }
+    const rate = landT != null ? 70 * Math.max(0, 1 - since / 1.6) : moving ? 140 * Math.pow(prog, 1.3) : 0;
+    for (let n = rate * dt; n > 0; n--) if (Math.random() < n) P.push({ x: r.left - r.width * .08 + Math.random() * r.width * 1.16, y: r.top - r.height * .25 + Math.random() * r.height * 1.5, vx: (Math.random() - .5) * 14, vy: -6 - Math.random() * 14, age: 0, life: .9 + Math.random() * 1.6, s: .8 + Math.random() * 2.2, h: Math.random() });
+    if (!P.length && g <= .002 && !cv._dirty) return;
+    X.setTransform(dpr, 0, 0, dpr, 0, 0); X.clearRect(0, 0, innerWidth, innerHeight); X.globalCompositeOperation = 'lighter'; cv._dirty = g > .002 || P.length > 0;
+    if (g > .002) {   /* the glow is drawn on its own layer behind the stars, so the letters themselves are never redrawn and can't shimmer */
+      X.save(); X.translate(cx, cy); X.scale(1, (r.height * 1.4) / (r.width * .62)); const gl = X.createRadialGradient(0, 0, 0, 0, 0, r.width * .62);
+      gl.addColorStop(0, `rgba(170,200,255,${(.26 * g).toFixed(3)})`); gl.addColorStop(.55, `rgba(150,185,255,${(.12 * g).toFixed(3)})`); gl.addColorStop(1, 'rgba(150,185,255,0)');
+      X.fillStyle = gl; X.beginPath(); X.arc(0, 0, r.width * .62, 0, 7); X.fill(); X.restore(); }
+    P = P.filter(q => (q.age += dt) < q.life);
+    P.forEach(q => { q.x += q.vx * dt; q.y += q.vy * dt; q.vx *= .985; q.vy *= .985;
+      const a = Math.sin(Math.PI * q.age / q.life) * (.55 + .45 * Math.sin(q.age * 5 + q.h * 9)), col = q.h < .7 ? '210,228,255' : '255,232,190', L = q.s * 4.5;   /* each star twinkles on its own */
+      const gr = X.createRadialGradient(q.x, q.y, 0, q.x, q.y, q.s * 2.2); gr.addColorStop(0, `rgba(${col},${a})`); gr.addColorStop(1, `rgba(${col},0)`); X.fillStyle = gr; X.beginPath(); X.arc(q.x, q.y, q.s * 2.2, 0, 7); X.fill();
+      X.strokeStyle = `rgba(${col},${a * .55})`; X.lineWidth = .7; X.beginPath(); X.moveTo(q.x - L, q.y); X.lineTo(q.x + L, q.y); X.moveTo(q.x, q.y - L); X.lineTo(q.x, q.y + L); X.stroke(); });
   })();
 })();
 </script>

@@ -1,0 +1,27 @@
+<script>
+/* Nov 1 SOUND (desktop only): The Studio's water drop — three musical water notes, one each time a drop lands
+   (the big drop 0.72 s, the rebound 3.10 s, the last droplet 4.88 s into the loop), and only while the drop is on screen. */
+(function () {
+  if (innerWidth <= 760) return;
+  const HITS = [[.72, 1, 440], [3.10, .5, 659.3], [4.88, .2, 880]], fired = [0, 0, 0];
+  let bus = null;
+  (function f() { requestAnimationFrame(f);
+    const A = window.__snSfx, ctx = A && A.ctx(); if (!ctx || ctx.state !== 'running') return;
+    const v = document.querySelector('#section-view.on .st-drop-vid'); if (!v || v.paused || document.hidden) return;
+    const r = v.getBoundingClientRect(), seen = (Math.min(innerHeight, r.bottom) - Math.max(0, r.top)) / Math.max(1, r.height), cy = r.top + r.height * .5;
+    if (seen < .75 || cy < innerHeight * .15 || cy > innerHeight * .85 || !document.hasFocus()) return;   /* only when you can see it: most of the video on screen, the spot where the drop lands well inside the window, and the browser in front */
+    if (!bus) {   /* a dry path plus a soft room */
+      bus = ctx.createGain(); bus.gain.value = .9; bus.connect(A.out());
+      const n = Math.floor(ctx.sampleRate * 3.2), ir = ctx.createBuffer(2, n, ctx.sampleRate);
+      for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); let lp = 0; for (let i = 0; i < n; i++) { lp += (Math.random() * 2 - 1 - lp) * .5; d[i] = lp * Math.pow(1 - i / n, 3); } }
+      const cv = ctx.createConvolver(); cv.buffer = ir; const w = ctx.createGain(); w.gain.value = .7; bus.connect(w); w.connect(cv); cv.connect(A.out());
+    }
+    const tau = v.currentTime, ct = ctx.currentTime, pn = performance.now();
+    const G = (val, dest) => { const g = ctx.createGain(); g.gain.value = val; g.connect(dest); return g; };
+    const tone = (fr, t, amp, dec) => { const g = G(0, bus); g.gain.setValueAtTime(.0001, t); g.gain.linearRampToValueAtTime(amp, t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + .004 + dec); const o = ctx.createOscillator(); o.frequency.value = fr; o.connect(g); o.start(t); o.stop(t + dec + .2); return o; };
+    HITS.forEach(([h, size, fq], i) => { const d = h - tau; if (d > -.05 && d < .35 && pn - fired[i] > 2000) { fired[i] = pn; const t = ct + Math.max(0, d) - .015, amp = .2 * (.5 + size * .5), dec = 1.2 + 1.6 * size;
+      [[1, 1], [2, .25], [3.01, .08]].forEach(([rt, a], k) => tone(fq * rt, t, amp * a, dec / (1 + k * .8)));
+      const o = tone(fq * 1.6, t, .08, .08); o.frequency.setValueAtTime(fq * 1.6, t); o.frequency.exponentialRampToValueAtTime(fq * 3, t + .07); } });   /* the little water "bloop" at the start of each note */
+  })();
+})();
+</script>

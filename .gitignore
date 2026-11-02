@@ -3,3 +3,12 @@ img-topaz/
 preview/space-img/gx-data.js
 galaxy/
 .DS_Store
+
+# Sound Lab (local listening tests only)
+preview/SOUND-LAB.html
+preview/sound-lab/
+preview/SOUND LAB/
+preview/space-img/site-music.mp3
+preview/SOUND LAB 2/
+preview/MIRROR-SOUND.html
+preview/MIRROR SOUND/

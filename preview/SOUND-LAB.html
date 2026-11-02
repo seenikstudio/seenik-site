@@ -4,7 +4,46 @@
 <meta name="robots" content="noindex">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Seenik Sound Lab</title><link rel="stylesheet" href="sound-lab/lab.css"><script src="sound-lab/lab.js" defer></script>
+<title>Seenik Sound Lab</title><style>
+/* SOUND LAB only */
+#lab-snd { position: fixed; top: 40px; right: 136px; z-index: 60; display: flex; align-items: center; gap: 10px; }
+#lab-snd button { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,.35); background: rgba(0,0,0,.35); color: #f2f4f7; display: grid; place-items: center; cursor: pointer; padding: 0; }
+#lab-snd button:hover { border-color: #f2f4f7; }
+#lab-snd svg { width: 17px; height: 17px; }
+#lab-snd .vol { width: 0; opacity: 0; overflow: hidden; transition: width .3s, opacity .3s; display: flex; align-items: center; }
+#lab-snd.open .vol { width: 92px; opacity: 1; }
+@media (hover: hover) { #lab-snd:hover .vol { width: 92px; opacity: 1; } }
+#lab-snd .vol input { width: 86px; accent-color: #f2f4f7; }
+body:not(.artist-on) #lab-snd { top: 18px; right: 158px; }
+@media (max-width: 760px) { #lab-snd { top: calc(14px + env(safe-area-inset-top, 0px)); right: 14px; } }
+
+#lab-panel { position: fixed; left: 16px; bottom: 16px; z-index: 61; width: min(400px, calc(100vw - 32px)); max-height: 62vh; overflow: auto; box-sizing: border-box; padding: 14px 14px 12px;
+  background: rgba(6,8,14,.86); border: 1px solid rgba(255,255,255,.2); border-radius: 12px; color: #e9ecf2; font: 13px/1.35 'Roboto', system-ui, sans-serif; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+#lab-panel .lab-k { font-size: 10px; letter-spacing: .22em; opacity: .6; }
+#lab-panel .lab-n { font-size: 14px; font-weight: 700; margin: 4px 0 10px; }
+#lab-panel .lab-o { display: grid; gap: 6px; }
+#lab-panel .lab-o button { display: flex; gap: 10px; align-items: flex-start; text-align: left; background: transparent; color: inherit; border: 1px solid rgba(255,255,255,.16); border-radius: 8px; padding: 5px 9px; cursor: pointer; font: inherit; }
+#lab-panel .lab-o button b { min-width: 14px; }
+#lab-panel .lab-o button:hover { border-color: rgba(255,255,255,.5); }
+#lab-panel .lab-o button.on { border-color: #cfe0ff; background: rgba(160,190,255,.14); }
+#lab-panel .lab-r { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+#lab-panel .lab-r button { background: #e9ecf2; color: #05070c; border: 0; border-radius: 16px; padding: 6px 13px; font: 700 12px/1 'Roboto', system-ui, sans-serif; cursor: pointer; }
+#lab-panel .lab-r .lab-pg { background: transparent; color: #e9ecf2; border: 1px solid rgba(255,255,255,.35); }
+#lab-panel .lab-m { margin-left: auto; font-size: 12px; opacity: .8; display: flex; gap: 5px; align-items: center; cursor: pointer; }
+#lab-panel .lab-s { display: flex; gap: 6px; margin-top: 10px; }
+#lab-panel .lab-s a { width: 24px; height: 24px; display: grid; place-items: center; border-radius: 50%; border: 1px solid rgba(255,255,255,.25); color: #e9ecf2; text-decoration: none; font-size: 11px; }
+#lab-panel .lab-s a.on { background: #e9ecf2; color: #05070c; }
+@media (max-width: 760px) { #lab-panel { left: 8px; right: 8px; width: auto; bottom: 8px; max-height: 40vh; font-size: 12px; } }
+
+/* the new desktop logo entrances (lab only) */
+@keyframes labLogoL { from { translate: -55vw 0; opacity: 0; } 70% { opacity: 1; } to { translate: 0 0; opacity: 1; } }
+@keyframes labLogoR { from { translate: 55vw 0; opacity: 0; } 70% { opacity: 1; } to { translate: 0 0; opacity: 1; } }
+@keyframes labLogoG { from { scale: 1.35; filter: blur(22px); opacity: 0; } 60% { opacity: 1; } to { scale: 1; filter: blur(0); opacity: 1; } }
+
+#pv-bar { display: none !important; }   /* the intro timeline is not needed here; it covered the panel */
+#lab-panel .lab-r .lab-stop { background: transparent; color: #e9ecf2; border: 1px solid rgba(255,255,255,.35); }
+
+</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Italiana&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@400&family=Nunito:wght@900&family=Ubuntu:wght@300;400;500&family=Roboto:wght@700&display=swap">
@@ -2715,6 +2754,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     Promise.race([fl, new Promise(r => setTimeout(r, 2500))]).then(buildBudShapes);
   };
   wordImg.src = 'data:image/png;base64,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';
+  window.__scatterWord = () => scatterWord();
   function scatterWord() {
     for (let i = 0; i < WN; i++) {
       WP[i].set((Math.random() - 0.5) * 4, (Math.random() - 0.5) * 3, (Math.random() - 0.5) * 3);
@@ -5295,6 +5335,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     if (phase === 'idle') { points.material.opacity = shapeFade; lines.material.opacity = shapeFade; }
     facesMesh.material.opacity = 0.55 * shapeFade * (dvOn && phase !== 'idle' ? (phase === 'burst' ? Math.max(0, 1 - phaseT / 50) : 0) : 1);   /* Nov 1: the exploded dome's dark faces never stay stretched across the screen under the intro video */
 
+    if (phase === 'idle' && shapeFade > 0.5) { let sp = 0, ws = 0; for (let i = 0; i < N; i++) sp += P[i].distanceTo(home[i]); for (let i = 0; i < WN; i++) { const a = WP[i], b = WH[i]; ws += Math.hypot(a.x - b.x, a.y - b.y, a.z - b.z); } window.__domeStats = { hits: disturbed, spread: sp / N, word: WN ? ws / WN : 0, x: ndc.x, y: ndc.y, speed: mouse.speed }; } else window.__domeStats = null;   /* SOUND LAB */
     burstPending = 0;
 
     if (disturbed > 2 && now - lastNote > 90) {
@@ -5643,7 +5684,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
     if (cur !== el) { el = cur; t0 = 0; if (el) { el.querySelector('.t3').style.scale = '1'; el.querySelector('.sub').classList.add('pre'); } }
     if (!el) return;
     const t3 = el.querySelector('.t3'), sub = el.querySelector('.sub'), pic = el.parentElement.querySelector('.mir-par img, .mir-par canvas, .mir-par');
-    if (!t0) { const r = t3.getBoundingClientRect(); if (r.top < innerHeight * .8 && r.bottom > 0) t0 = now; else return; }
+    if (!t0) { const r = t3.getBoundingClientRect(); if (r.top < innerHeight * .8 && r.bottom > 0) { t0 = now; window.__sfx && window.__sfx('title3d', el); } else return; }
     const w = t3.offsetWidth, ring = pic.getBoundingClientRect().width * (1544 / 2400) * .96, S = w ? Math.max(1, ring / w) : 1, u = ease(((now - t0) / 1000 - .4) / 2.4);
     t3.style.transformOrigin = '50% 100%'; t3.style.scale = (1 + (S - 1) * u).toFixed(4);
     if ((now - t0) / 1000 > 1.0 && sub.classList.contains('pre')) { sub.classList.remove('pre'); sub.classList.add('enter'); }
@@ -5857,3 +5898,499 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
 })();
 </script>
 </html>
+<script>
+/* Seenik SOUND LAB: hear every sound option on the real pages. Lab only; the live site is untouched.
+   All sounds are made live in the browser (Web Audio), no files except the site music. */
+(function () {
+  'use strict';
+  const Q = new URLSearchParams(location.search);
+  const SETS = {
+    laser:   { name: 'Laser titles: the bar comes down, rises, disappears', page: 'studio', both: true, opts: {
+      A: 'Servo: a motor that runs only while the bar moves, speeds with it, a small click at each turn, a soft lock as it disappears',
+      B: 'Power line: an electrical hum that brightens as the bar travels, a soft air release as it disappears',
+      C: 'Sub + scrape: a low sub under a light metal scrape that follows the bar\'s speed, a soft low hit as it disappears' } },
+    fortyeight: { name: 'THE MIRROR title coming toward us (with the 48-min line)', page: 'mirror', opts: {
+      A: 'Deep bass: moves with the title frame by frame, rises in pitch as it grows, settles as it lands',
+      B: 'Deep bass + air: the same, with a low rush of air that follows its speed',
+      C: 'Low drone: opens up exactly as far as the title has grown, fades after it lands' } },
+    rings:   { name: 'Rings around the eye and nebula (locked to their cycles)', page: 'mirror', opts: {
+      A: 'Turbine: a low machine hum that pulses with each ring\'s rotation',
+      B: 'Clockwork: gear-tooth ticks driven by each ring\'s speed, travelling round with it',
+      C: 'Radar: a motor drone with a sweep that passes once per outer-ring cycle (20 s) and a lock at each new cycle' } },
+    wave:    { name: 'Mountain, forest and water wave pulse', page: 'mirror', opts: {
+      A: 'Tide: the water rolls in as the wave rises, peaks with it, draws out as it flattens',
+      B: 'Tide + deep swell under the peak',
+      C: 'Tide + a slow warp at the peak' } },
+    logo:    { name: 'Studio logo entrance (new on desktop)', page: 'studio', opts: {
+      A: 'Slides in from the right on a swoosh and settles (your pick)' } },
+    drop:    { name: 'Raindrop: three hits (big, smaller, tiny)', page: 'studio', opts: {
+      A: 'Musical drops, only while the drop is on screen (your pick)' } },
+    artist:  { name: 'The Artist: hover and click the titles', page: 'artist', opts: {
+      A: 'Your B, cleaned up: low hum swell on hover, lock-on pulse + mechanical latch on click',
+      B: 'Servo: a short motor turn on hover, motor + lock + air release on click',
+      C: 'Relay: a crisp relay click on hover, a heavy latch on click' } },
+    touch:   { name: 'Opening dome: running the cursor through the lines', page: 'home', opts: {
+      A: 'Bamboo: short hollow wood knocks, percussion only (your pick)' } },
+    breakup: { name: 'Opening dome: lines breaking apart and coming back together', page: 'home', opts: {
+      A: 'Tension: a low rumble that builds as the lines pull apart and eases as they return',
+      B: 'Air: a pull of wind as they stretch, a soft exhale as they come together',
+      C: 'Sand: the same sand as the logo, quieter and lower, drifting while they move',
+      D: 'No sound for this (the bamboo knocks only)' } },
+    logo3d:  { name: 'Opening dome: the 3D logo (arrival + when you push it)', page: 'home', opts: {
+      A: 'Sand: grains that pour as the letters scatter and settle as they form (your pick)' } },
+  };
+  const setKey = SETS[Q.get('set')] ? Q.get('set') : 'laser';
+  const SET = SETS[setKey];
+  const store = { get(k, d) { try { const v = localStorage.getItem('sndlab-' + k); return v == null ? d : v; } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem('sndlab-' + k, v); } catch (e) {} } };
+  let opt = store.get('opt-' + setKey, 'A'); if (!SET.opts[opt]) opt = 'A';
+
+  /* ---------------- audio engine ---------------- */
+  let ctx = null, out, sfx, verb, cave, noiseBuf, brownBuf;
+  let stopped = false;
+  let vol = +store.get('vol', '50'), muted = store.get('muted', '0') === '1', musicOn = false;
+  const level = () => muted ? 0 : vol / 100;
+  function makeIR(sec, decay, bright) {
+    const n = Math.floor(ctx.sampleRate * sec), b = ctx.createBuffer(2, n, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); let lp = 0; for (let i = 0; i < n; i++) { const w = Math.random() * 2 - 1; lp += (w - lp) * bright; d[i] = lp * Math.pow(1 - i / n, decay); } }
+    return b;
+  }
+  function audio() {
+    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return ctx; }
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    out = ctx.createGain(); out.gain.value = level(); out.connect(ctx.destination);
+    sfx = ctx.createGain(); sfx.gain.value = 0.9; sfx.connect(out); window.__labSfx = sfx; window.__labMeter = () => { const an = ctx.createAnalyser(); an.fftSize = 2048; out.connect(an); const d = new Float32Array(2048); let pk = 0; const iv = setInterval(() => { an.getFloatTimeDomainData(d); for (const x of d) pk = Math.max(pk, Math.abs(x)); }, 20); return () => { clearInterval(iv); return pk; }; };
+    verb = ctx.createConvolver(); verb.buffer = makeIR(3.2, 3, 0.5); verb.connect(sfx);
+    cave = ctx.createConvolver(); cave.buffer = makeIR(5.5, 2.2, 0.35); cave.connect(sfx);
+    const n = ctx.sampleRate * 4; noiseBuf = ctx.createBuffer(1, n, ctx.sampleRate); const d = noiseBuf.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    const m = ctx.sampleRate * 8; brownBuf = ctx.createBuffer(2, m, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) { const e = brownBuf.getChannelData(c); let l = 0; for (let i = 0; i < m; i++) { l = (l + 0.02 * (Math.random() * 2 - 1)) / 1.02; e[i] = l * 3.5; } }
+    return ctx;
+  }
+  const now = () => ctx.currentTime;
+  // little building blocks
+  let trim = 1;
+  const TRIM = { laser: { A: 1, B: 1, C: 1 }, forty: { A: .6, B: .55, C: 1.2 }, logo: { A: 3 }, hov: { A: .9, B: 1, C: 1 }, clk: { A: .9, B: 1, C: 1 } };
+  const trimmed = (k, fn) => { trim = (TRIM[k] && TRIM[k][opt]) || 1; try { fn(); } finally { trim = 1; } };
+  function bus(dry = 1, wet = 0, room = verb, pan = 0) {   // a channel strip: gain -> pan -> dry + reverb send
+    const g = ctx.createGain(), p = ctx.createStereoPanner(); p.pan.value = pan; g.connect(p);
+    const d = ctx.createGain(); d.gain.value = dry * trim; p.connect(d); d.connect(sfx);
+    if (wet) { const w = ctx.createGain(); w.gain.value = wet * trim; p.connect(w); w.connect(room); }
+    g.panner = p; return g;
+  }
+  function osc(type, f, dest, t0, t1) { const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t0); o.connect(dest); o.start(t0); o.stop(t1); return o; }
+  function noise(dest, t0, t1, loop = true) { const s = ctx.createBufferSource(); s.buffer = noiseBuf; s.loop = loop; s.connect(dest); s.start(t0, Math.random() * 3); s.stop(t1); return s; }
+  function filt(type, f, q, dest) { const b = ctx.createBiquadFilter(); b.type = type; b.frequency.value = f; b.Q.value = q || 0.7; b.connect(dest); return b; }
+  function gain(v, dest) { const g = ctx.createGain(); g.gain.value = v; g.connect(dest); return g; }
+  function env(g, t, a, peak, hold, rel) { const p = g.gain; p.cancelScheduledValues(t); p.setValueAtTime(0.0001, t); p.linearRampToValueAtTime(peak, t + a); p.setValueAtTime(peak, t + a + hold); p.exponentialRampToValueAtTime(0.0001, t + a + hold + rel); }
+  function bell(f, t, amp, dec, dest, ratios = [1, 2.76, 5.4], amps = [1, .45, .2]) {
+    ratios.forEach((r, i) => { const g = gain(0, dest); env(g, t, 0.004, amp * amps[i], 0, dec / (1 + i * .8)); osc('sine', f * r, g, t, t + dec + .2); });
+  }
+  function bowl(f, t, amp, dec, dest) {   // a felt-struck singing bowl: soft attack, two close partials that beat slowly
+    [[1, 1], [1.004, .6], [2.71, .35], [2.716, .2], [5.2, .08]].forEach(([r, a]) => { const g = gain(0, dest); const p = g.gain; p.setValueAtTime(0.0001, t); p.linearRampToValueAtTime(amp * a, t + 0.06); p.exponentialRampToValueAtTime(0.0001, t + dec * (r > 2 ? .55 : 1)); osc('sine', f * r, g, t, t + dec + .1); });
+  }
+  function whoosh(t, dur, f0, f1, amp, dest, q = 1.2, shape = 'mid') {
+    const g = gain(0, dest), b = filt('bandpass', f0, q, g); noise(b, t, t + dur + .05);
+    b.frequency.setValueAtTime(f0, t); b.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    const p = g.gain; p.setValueAtTime(0.0001, t);
+    if (shape === 'rise') { p.exponentialRampToValueAtTime(amp, t + dur * .95); p.linearRampToValueAtTime(0.0001, t + dur); }
+    else { p.linearRampToValueAtTime(amp, t + dur * .45); p.exponentialRampToValueAtTime(0.0001, t + dur); }
+    return { g, b };
+  }
+  function thoom(t, amp, dest, f0 = 70, f1 = 42, dec = 1.6) {
+    const g = gain(0, dest); env(g, t, .02, amp, .05, dec); const o = osc('sine', f0, g, t, t + dec + .2); o.frequency.exponentialRampToValueAtTime(f1, t + dec * .6);
+    const g2 = gain(0, dest), lp = filt('lowpass', 260, .7, g2); env(g2, t, .01, amp * .5, 0, .35); noise(lp, t, t + .5);
+  }
+  function crunch(k, dest) { const ws = ctx.createWaveShaper(), n = 1024, c = new Float32Array(n); for (let i = 0; i < n; i++) { const x = i / (n - 1) * 2 - 1; c[i] = Math.tanh(k * x) / Math.tanh(k); } ws.curve = c; ws.oversample = '2x'; ws.connect(dest); return ws; }
+  function clunk(t, amp, dest, f = 70) {   // a mechanical lock: low body thump + short metal resonances that don't ring on
+    const g = gain(0, dest); env(g, t, .002, amp, 0, .14); const o = osc('sine', f * 1.6, g, t, t + .25); o.frequency.exponentialRampToValueAtTime(f * .7, t + .09);
+    [[950, 18, .5], [2300, 22, .3], [4100, 25, .18]].forEach(([fr, q, a]) => { const k = gain(0, dest); env(k, t, .001, amp * a, 0, .07); noise(filt('bandpass', fr, q, k), t, t + .12); });
+    const c = gain(0, filt('highpass', 2500, .7, dest)); env(c, t, .0005, amp * .5, 0, .012); noise(c, t, t + .03);
+  }
+  function servo(t, dur, f0, f1, amp, dest) {   // an electric motor turning: buzzy, gliding, a little grit
+    const g = gain(0, dest), p = g.gain; p.setValueAtTime(.0001, t); p.linearRampToValueAtTime(amp, t + .04); p.setValueAtTime(amp, t + Math.max(.05, dur - .06)); p.linearRampToValueAtTime(.0001, t + dur);
+    const bp = filt('bandpass', f0 * 4, 3, g), o = osc('sawtooth', f0, crunch(3, bp), t, t + dur + .05); o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    bp.frequency.setValueAtTime(f0 * 4, t); bp.frequency.exponentialRampToValueAtTime(f1 * 4, t + dur);
+    osc('sawtooth', f0 * 1.5, gain(.25, bp), t, t + dur + .05).frequency.exponentialRampToValueAtTime(f1 * 1.5, t + dur);
+    noise(gain(amp * .25, filt('bandpass', 3500, 1.5, g)), t, t + dur);
+  }
+  function hydraulic(t, dur, amp, dest) {   // pressurised air letting go
+    const g = gain(0, dest), bp = filt('bandpass', 4200, .9, g); noise(bp, t, t + dur + .1); bp.frequency.setValueAtTime(4200, t); bp.frequency.exponentialRampToValueAtTime(900, t + dur);
+    const p = g.gain; p.setValueAtTime(.0001, t); p.linearRampToValueAtTime(amp, t + .03); p.exponentialRampToValueAtTime(.0001, t + dur);
+  }
+  function powerHum(t, dur, f0, f1, amp, dest) {   // an electrical power-up
+    const g = gain(0, dest), lp = filt('lowpass', 200, 1.5, g), o = osc('sawtooth', f0, crunch(2.5, lp), t, t + dur + .1), o2 = osc('square', f0 * 2.01, gain(.3, lp), t, t + dur + .1);
+    o.frequency.exponentialRampToValueAtTime(f1, t + dur); o2.frequency.exponentialRampToValueAtTime(f1 * 2.01, t + dur);
+    lp.frequency.setValueAtTime(200, t); lp.frequency.exponentialRampToValueAtTime(1600, t + dur);
+    const p = g.gain; p.setValueAtTime(.0001, t); p.linearRampToValueAtTime(amp, t + dur * .85); p.linearRampToValueAtTime(.0001, t + dur + .08);
+  }
+  function tick(t, amp, f, dest) { const k = gain(0, dest); env(k, t, .0005, amp, 0, .02); noise(filt('bandpass', f, 9, k), t, t + .035); const b = gain(0, dest); env(b, t, .001, amp * .4, 0, .03); osc('sine', f / 9, b, t, t + .05); }
+  function sparkle(t, dur, dens, f0, f1, amp, dest, rise = true) {   // a cloud of tiny glass grains
+    const scale = [1, 1.125, 1.25, 1.5, 1.667, 2, 2.25, 2.5, 3];
+    for (let x = 0; x < dur; x += 1 / dens) {
+      const u = x / dur, tt = t + x + Math.random() * .02, f = (f0 + (f1 - f0) * (rise ? u : 1 - u)) * scale[Math.floor(Math.random() * scale.length)] / 2;
+      const p = ctx.createStereoPanner(); p.pan.value = Math.random() * 1.6 - .8; p.connect(dest);
+      const g = ctx.createGain(); g.connect(p); env(g, tt, .003, amp * (.4 + .6 * Math.random()) * (rise ? .4 + .6 * u : 1), 0, .18 + Math.random() * .2); osc('sine', f, g, tt, tt + .5);
+    }
+  }
+
+  /* ---------------- 1. site music ---------------- */
+  const MUSIC_SRC = 'space-img/site-music.mp3', LOOP_AT = 128.0, XF = 3.5;   /* 48 bars at 90 BPM; the last 10 s is the fade-out, so it crossfades back to the top on the bar */
+  const decks = [new Audio(MUSIC_SRC), new Audio(MUSIC_SRC)]; decks.forEach(a => { a.preload = 'auto'; a.volume = 0; });
+  let deck = 0, mLvl = 0, mWant = 0, mStarted = false, xfading = false;
+  const MUSIC_LEVEL = 0.75;
+  function musicTick(dt) {
+    const onPage = document.body.classList.contains('artist-on'), introSong = document.getElementById('music'), introOn = introSong && !introSong.paused && !onPage;
+    mWant = musicOn && onPage && !introOn && ctx && !stopped ? 1 : 0;
+    if (mWant && !mStarted) { mStarted = true; decks[deck].currentTime = 0; decks[deck].play().catch(() => {}); }
+    if (mWant && decks[deck].paused && !xfading) decks[deck].play().catch(() => {});
+    mLvl += (mWant - mLvl) * Math.min(1, dt / (mWant ? 1.2 : .6));
+    const a = decks[deck], b = decks[1 - deck];
+    if (!xfading && a.currentTime >= LOOP_AT) { xfading = true; b.currentTime = 0; b.play().catch(() => {}); b._t = performance.now(); }
+    let ka = 1, kb = 0;
+    if (xfading) { const u = Math.min(1, (performance.now() - b._t) / 1000 / XF); ka = Math.cos(u * Math.PI / 2); kb = Math.sin(u * Math.PI / 2); if (u >= 1) { a.pause(); deck = 1 - deck; xfading = false; ka = 1; kb = 0; } }
+    const L = level() * MUSIC_LEVEL * mLvl;
+    (xfading ? a : decks[deck]).volume = Math.max(0, Math.min(1, L * ka)); if (xfading) b.volume = Math.max(0, Math.min(1, L * kb));
+    if (mLvl < 0.002 && !mWant) decks.forEach(d => { if (!d.paused) d.pause(); });
+  }
+
+  /* ---------------- 2. laser titles (both pages; 3.0 s: down .93, on .64, up 1.07, fade .36) ---------------- */
+  const LZ = { T1: .93, T2: 1.57, T3: 2.64, E: 3.0 };
+  const LASER = {
+    A(t) { const d = bus(1, .25); powerHum(t, LZ.T1, 45, 92, .32, d); servo(t + LZ.T1, LZ.T2 - LZ.T1, 110, 150, .1, d);
+      const h = bus(1, .3); hydraulic(t + LZ.T2, LZ.T3 - LZ.T2, .16, h); powerHum(t + LZ.T2, LZ.T3 - LZ.T2, 92, 60, .16, h);
+      clunk(t + LZ.T3, .55, bus(1, .35), 65); thoom(t + LZ.T3, .25, bus(1, .3), 60, 38, 1.2); },
+    B(t) { const d = bus(1, .2); servo(t, LZ.T1, 95, 70, .16, d); clunk(t + LZ.T1, .28, d, 90); servo(t + LZ.T1 + .02, LZ.T2 - LZ.T1 - .02, 70, 120, .12, d); clunk(t + LZ.T2, .28, d, 90);
+      servo(t + LZ.T2 + .02, LZ.T3 - LZ.T2 - .02, 130, 75, .16, d); clunk(t + LZ.T3, .6, bus(1, .35), 60); hydraulic(t + LZ.T3 + .05, .4, .07, d); },
+    C(t) { const d = bus(1, .3), g = gain(0, d), lp = filt('lowpass', 140, 1, g); osc('sine', 38, g, t, t + LZ.E + 2); osc('sawtooth', 38, crunch(2, gain(.35, lp)), t, t + LZ.E + 2);
+      const p = g.gain; p.setValueAtTime(.0001, t); p.linearRampToValueAtTime(.4, t + .3); p.setValueAtTime(.4, t + LZ.T3); p.setTargetAtTime(.0001, t + LZ.T3 + .1, .6);
+      const s = gain(0, crunch(1.5, d)), bp = filt('bandpass', 600, 12, s); noise(bp, t, t + LZ.T3);
+      bp.frequency.setValueAtTime(600, t); bp.frequency.exponentialRampToValueAtTime(1100, t + LZ.T2); bp.frequency.exponentialRampToValueAtTime(1900, t + LZ.T3);
+      const q = s.gain; q.setValueAtTime(.0001, t); q.linearRampToValueAtTime(.5, t + .15); q.setValueAtTime(.5, t + LZ.T3 - .1); q.linearRampToValueAtTime(.0001, t + LZ.T3);
+      hydraulic(t + LZ.T3, .6, .15, bus(1, .3)); thoom(t + LZ.T3, .55, bus(1, .45), 70, 36, 1.8); }
+  };
+
+  /* ---------------- 3. "48-min experience" (letters fly in over 2 s) ---------------- */
+  const FORTY = {   /* t = the moment the title starts; it grows from .4 s and lands at 2.8 s */
+    A(t) { const g = bus(1, .3), p = g.gain, s0 = t + .4, L = t + 2.8;
+      p.setValueAtTime(.0001, t); p.linearRampToValueAtTime(.3, s0 + .25); p.linearRampToValueAtTime(.75, L); p.setTargetAtTime(.0001, L + .15, 1.1);
+      const lp = filt('lowpass', 160, 1.2, g); lp.frequency.setValueAtTime(160, s0); lp.frequency.linearRampToValueAtTime(420, L); lp.frequency.setTargetAtTime(150, L, .8);
+      [[1, 'sine', .9], [2, 'sine', .35], [1, 'sawtooth', .18]].forEach(([m, ty, a]) => { const o = osc(ty, 41 * m, gain(a, ty === 'sine' && m === 1 ? g : lp), t, L + 6); o.frequency.setValueAtTime(41 * m, s0); o.frequency.linearRampToValueAtTime(55 * m, L); }); },
+    B(t) { FORTY.A(t); const L = t + 2.8, g = bus(1, .4), lp = filt('lowpass', 300, .7, g); noise(lp, t + .4, L + 3); lp.frequency.setValueAtTime(300, t + .4); lp.frequency.exponentialRampToValueAtTime(1400, L); lp.frequency.setTargetAtTime(250, L, .5);
+      const p = g.gain; p.setValueAtTime(.0001, t + .4); p.linearRampToValueAtTime(.22, L); p.setTargetAtTime(.0001, L + .05, .5); thoom(L, .55, bus(1, .5), 60, 34, 2.4); },
+    C(t) { const g = bus(1, .45), lp = filt('lowpass', 120, 1, g), s0 = t + .4, L = t + 2.8; [36.7, 55, 73.4, 110].forEach((f, i) => { osc('sawtooth', f, gain(.12, lp), t, L + 6); osc('sawtooth', f * 1.004, gain(.08, lp), t, L + 6); });
+      lp.frequency.setValueAtTime(120, s0); lp.frequency.exponentialRampToValueAtTime(900, L); lp.frequency.setTargetAtTime(220, L + .3, 1.2);
+      const p = g.gain; p.setValueAtTime(.0001, t); p.linearRampToValueAtTime(.35, s0 + .3); p.linearRampToValueAtTime(.6, L); p.setTargetAtTime(.0001, L + .4, 1.4); }
+  };
+
+
+  /* ---------------- 4. eye rings (live, locked to the eye's own clock) ---------------- */
+  const SPD = [.11, .16, .21], DIRS = [-1, 1, -1];   /* the shader: ring k turns at .11 + .05 * (k % 3) turns per second, alternate rings the other way */
+  let rings = null;
+  function ringsBuild() {
+    const R = { g: bus(1, .45), next: {}, cyc: -1 }; R.g.gain.value = 0;
+    if (opt === 'A') { R.p = ctx.createStereoPanner(); R.p.connect(R.g); const lp = filt('lowpass', 420, 1.5, R.p); R.am = [0, 1, 2].map(() => gain(.33, lp));
+      R.am.forEach((a, k) => { osc('sawtooth', 55 * [1, 1.5, 2][k], crunch(2, a), now(), now() + 1e5); osc('sine', SPD[k] * 2, gain(.22, a.gain), now(), now() + 1e5); }); }   /* each ring's two lights: the hum pulses twice per turn */
+    if (opt === 'B') { const lp = filt('lowpass', 160, 1, R.g); osc('sawtooth', 48, gain(.12, lp), now(), now() + 1e5); }
+    if (opt === 'C') { R.p = ctx.createStereoPanner(); R.p.connect(R.g); const lp = filt('lowpass', 300, 2, R.g); osc('sawtooth', 41, crunch(2, gain(.18, lp)), now(), now() + 1e5);
+      R.sw = gain(0, R.p); R.bp = filt('bandpass', 1200, 1.2, R.sw); noise(R.bp, now(), now() + 1e5); }
+    return R;
+  }
+  function eyeVisible() { const h = document.querySelector('#section-view.on .mir-hero .mir-par'); if (!h) return 0; const r = h.getBoundingClientRect(); const v = Math.max(0, Math.min(innerHeight, r.bottom) - Math.max(0, r.top)) / Math.max(1, Math.min(innerHeight, r.height)); return Math.max(0, Math.min(1, v)); }
+  function ringsTick() {
+    if (setKey !== 'rings' || !ctx || window.__eyeT0 == null) return;
+    if (!rings) rings = ringsBuild();
+    const T = (performance.now() - window.__eyeT0) / 1000, ct = now(), vis = eyeVisible();
+    rings.g.gain.setTargetAtTime(stopped ? 0 : vis, ct, .4);
+    const th = 2 * Math.PI * (T * .05 % 1);   /* the light that sweeps the outer ring's degree marks: once round every 20 s */
+    if (opt === 'A') rings.p.pan.setTargetAtTime(Math.cos(th) * .6, ct, .1);
+    if (opt === 'B') SPD.forEach((s, k) => {   /* 12 teeth per turn: a tick each time a tooth passes, panned to where that ring's light is */
+      const rate = s * 12, n = Math.floor(T * rate) + 1, tN = n / rate;
+      if (rings.next[k] !== n && tN - T < .3) { rings.next[k] = n; const a = 2 * Math.PI * DIRS[k] * (T * s - k * .37), b = bus(1, .3, verb, Math.cos(a) * .8); tick(ct + Math.max(0, tN - T), .18 * Math.max(.1, vis), [1700, 2500, 3500][k], b); }
+    });
+    if (opt === 'C') { const front = .5 + .5 * Math.cos(th); rings.p.pan.setTargetAtTime(Math.sin(th) * .8, ct, .1); rings.sw.gain.setTargetAtTime(.02 + .22 * Math.pow(front, 6), ct, .15); rings.bp.frequency.setTargetAtTime(700 + 1400 * front, ct, .15);
+      const c = Math.floor(T * .05); if (c !== rings.cyc) { if (rings.cyc >= 0) clunk(ct, .4 * vis, bus(1, .4), 60); rings.cyc = c; } }
+  }
+
+  /* ---------------- 5. the wave (video loop: big at the loop point, flat 2-8 s, rising 8-10 s) ---------------- */
+  let wv = null;
+  function waveBuild() {
+    const W = { g: bus(1, .3) }; W.g.gain.value = 0;
+    W.sea = gain(0, W.g); const src = ctx.createBufferSource(); src.buffer = brownBuf; src.loop = true; W.src = src;
+    W.lp = filt('lowpass', 500, .5, W.sea); src.connect(W.lp); src.start();
+    if (opt === 'B') { W.sub = gain(0, W.g); const lp = filt('lowpass', 140, 1, W.sub); osc('sine', 46, W.sub, now(), now() + 1e5); osc('sawtooth', 46, gain(.3, lp), now(), now() + 1e5); }
+    return W;
+  }
+  function waveVid() { return document.querySelector('#section-view.on video.wave-live'); }
+  function waveTick() {
+    if (setKey !== 'wave' || !ctx) return;
+    const v = waveVid(); if (!v) { if (wv) wv.g.gain.setTargetAtTime(0, now(), .3); return; }
+    if (!wv) wv = waveBuild();
+    const r = v.getBoundingClientRect(), vis = Math.max(0, Math.min(1, (Math.min(innerHeight, r.bottom) - Math.max(0, r.top)) / Math.max(1, r.height)));
+    const ct = now(), D = v.duration || 9.97, tau = v.currentTime || 0;
+    wv.g.gain.setTargetAtTime(vis * (v.paused || document.hidden ? 0 : 1), ct, .3);
+    /* how big the wave is right now: rising 8 s -> loop point, biggest at the loop point, flat by 2.2 s */
+    const u = tau >= 8 ? Math.pow((tau - 8) / (D - 8), 1.6) : tau < 2.2 ? Math.pow(1 - tau / 2.2, 1.4) : 0;
+    wv.sea.gain.setTargetAtTime(.02 + .3 * u, ct, .25);   /* quiet while flat; the tide rolls in with the wave and draws out as it flattens */
+    wv.lp.frequency.setTargetAtTime(380 + 1500 * u, ct, .25);
+    if (opt === 'B') wv.sub.gain.setTargetAtTime(.35 * u * u, ct, .2);
+    if (opt === 'C') wv.src.playbackRate.setTargetAtTime(1 - .3 * u * u * (1 + .15 * Math.sin(performance.now() / 260)), ct, .08);
+  }
+
+  /* ---------------- 6. Studio logo entrance ---------------- */
+  const LOGO = {
+    A(t) { const g = bus(1, .3); g.panner.pan.setValueAtTime(.8, t); g.panner.pan.linearRampToValueAtTime(0, t + 1.25); whoosh(t, 1.3, 500, 2000, .32, g, 1.1); const s2 = bus(.8, .4), sg = gain(0, s2), lp = filt('lowpass', 900, .7, sg); env(sg, t + 1.1, .2, .12, 0, .9); noise(lp, t + 1.1, t + 2.4); }
+  };
+  const LOGO_CSS = { A: 'labLogoR' };
+
+  /* ---------------- 7. raindrop (video clock: the drop lands at 0.72 s, the rebound at 3.10 s, the last droplet at 4.88 s) ---------------- */
+  const HITS = [[.72, 1], [3.10, .5], [4.88, .2]];
+  function plop(t, size, dest) {
+    const f0 = [1500, 950, 520][size === 1 ? 2 : size === .5 ? 1 : 0], dur = .06 + .12 * size;
+    const g = gain(0, dest); env(g, t, .002, .5 * (.15 + .85 * size), 0, dur + .05); const o = osc('sine', f0, g, t, t + dur + .2); o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * (2.1 + size), t + dur);
+    const s = gain(0, dest), bp = filt('bandpass', 3800, .9, s); env(s, t, .002, .18 * size + .03, 0, .12 + .25 * size); noise(bp, t, t + .6);
+    if (size > .4) { const k = gain(0, dest); env(k, t, .001, .35 * size, 0, .09); osc('sine', 140, k, t, t + .2).frequency.exponentialRampToValueAtTime(70, t + .08); }
+  }
+  let dropBus = null;
+  function dropTick() {
+    if (setKey !== 'drop' || !ctx) return;
+    const v = document.querySelector('#section-view.on .st-drop-vid'); if (!v || v.paused) return;
+    const r = v.getBoundingClientRect(), seen = (Math.min(innerHeight, r.bottom) - Math.max(0, r.top)) / Math.max(1, r.height); if (seen < .6 || document.hidden || stopped) return;   /* only while at least 60% of the drop is on screen */
+    if (!dropBus || dropBus.opt !== opt) {
+      if (false) { dropBus = bus(.7, 1.1, cave); const dl = ctx.createDelay(1), fb = gain(.38, dl), lp = filt('lowpass', 2400, .7, fb); dl.delayTime.value = .31; dropBus.connect(dl); dl.connect(lp); dl.connect(gain(.5, sfx)); }
+      else dropBus = bus(1, .7);
+      dropBus.opt = opt;
+    }
+    const tau = v.currentTime, ct = now();
+    HITS.forEach(([h, size], i) => { const d = h - tau; if (d > -0.05 && d < 0.35 && !(performance.now() - (dropBus['h' + i] || 0) < 2000)) { dropBus['h' + i] = performance.now(); const t = ct + Math.max(0, d) - .015;
+      if (opt === 'A') { const f = [440, 659.3, 880][i]; bell(f, t, .2 * (.5 + size * .5), 1.2 + 1.6 * size, dropBus, [1, 2.0, 3.01], [1, .25, .08]); const g = gain(0, dropBus); env(g, t, .002, .08, 0, .08); osc('sine', f * 1.6, g, t, t + .15).frequency.exponentialRampToValueAtTime(f * 3, t + .07); }
+      (window.__labLog = window.__labLog || []).push('drop' + i); } });
+  }
+
+  /* ---------------- 8. The Artist titles ---------------- */
+  function artHover(i) { audio(); const t = now() + .005;
+    if (opt === 'A') { const d = bus(1, .3), g = gain(0, d), lp = filt('lowpass', 300, 5, g); env(g, t, .25, .16, .1, .5); osc('sawtooth', 110, lp, t, t + 1.1); osc('sawtooth', 110.6, lp, t, t + 1.1); lp.frequency.setValueAtTime(260, t); lp.frequency.exponentialRampToValueAtTime(1100, t + .35); lp.frequency.exponentialRampToValueAtTime(300, t + .9); }
+    if (opt === 'B') servo(t, .14, 170, 260, .12, bus(1, .2));
+    if (opt === 'C') { const d = bus(1, .2); tick(t, .35, 2200, d); tick(t + .032, .22, 1800, d); } }
+  function artClick(i) { audio(); const t = now() + .005;
+    if (opt === 'A') { const d = bus(1, .4); [0, .12].forEach(x => { const g = gain(0, d); env(g, t + x, .005, .3, .04, .18); osc('sine', 220, g, t + x, t + x + .35); osc('square', 12, gain(.15, g.gain), t + x, t + x + .3); }); clunk(t + .26, .45, d, 70); }
+    if (opt === 'B') { const d = bus(1, .3); servo(t, .2, 150, 90, .14, d); clunk(t + .19, .5, d, 65); hydraulic(t + .22, .35, .08, d); }
+    if (opt === 'C') { const d = bus(1, .35); clunk(t, .8, d, 52); thoom(t, .3, d, 64, 40, .8); } }
+  document.addEventListener('pointerover', e => { if (setKey !== 'artist') return; const f = e.target.closest && e.target.closest('#artist-view .frame'); if (!f || f.contains(e.relatedTarget)) return; trimmed('hov', () => artHover([...document.querySelectorAll('#artist-view .frame')].indexOf(f))); }, true);
+  document.addEventListener('click', e => { if (setKey !== 'artist') return; const f = e.target.closest && e.target.closest('#artist-view .frame'); if (f) trimmed('clk', () => artClick([...document.querySelectorAll('#artist-view .frame')].indexOf(f))); }, true);
+
+  /* ---------------- 9-11. the opening dome (reads the page's own numbers every frame) ---------------- */
+  const PENTA = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21, 24];
+  let dm = null;
+  function bamboo(t, f, amp, dest) {   // a dry hollow wood knock: very short body, no ringing note
+    [[1, .35, .03], [2.32, .12, .018]].forEach(([r, a, d]) => { const g = gain(0, dest); env(g, t, .001, amp * a, 0, d); osc('sine', f * r, g, t, t + d + .05); });
+    const k = gain(0, filt('bandpass', f * 1.6, 1.4, dest)); env(k, t, .001, amp * .9, 0, .025); noise(k, t, t + .05);
+    const h = gain(0, filt('bandpass', f, 9, dest)); env(h, t, .001, amp * 1.4, 0, .05); noise(h, t, t + .08);
+  }
+  function grains(t, n, fLo, fHi, amp, pan, dest) {   // sand: many tiny random clicks of noise, like grains landing
+    for (let i = 0; i < n; i++) { const tt = t + Math.random() * .017, p = ctx.createStereoPanner(); p.pan.value = Math.max(-1, Math.min(1, pan + (Math.random() - .5) * .9)); p.connect(dest);
+      const g = ctx.createGain(); g.connect(p); const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = fLo + Math.random() * (fHi - fLo); bp.Q.value = 1.5; bp.connect(g);
+      const d = .002 + Math.random() * .008; g.gain.setValueAtTime(amp * (.3 + Math.random() * .7), tt); g.gain.exponentialRampToValueAtTime(.0001, tt + d);
+      const s = ctx.createBufferSource(); s.buffer = noiseBuf; s.connect(bp); s.start(tt, Math.random() * 3, d + .01); }
+  }
+  function kalimba(t, f, amp, dest) { const g = gain(0, dest); env(g, t, .003, amp, 0, 1.4); const o = osc('sine', f, g, t, t + 1.6); osc('sine', f * 3, gain(f * .9, o.frequency), t, t + .06); bell(f * 5.4, t, amp * .08, .2, dest, [1], [1]); }
+  function domeBuild() {
+    const D = { opt, g: bus(1, .5), peak: 0, wpeak: 0, lastHit: 0 };
+    if (setKey === 'breakup') {
+      D.lay = gain(0, D.g);
+      if (opt === 'A') { D.lp = filt('lowpass', 140, .8, D.lay); const s = ctx.createBufferSource(); s.buffer = brownBuf; s.loop = true; s.connect(D.lp); s.start(); osc('sine', 48, gain(.25, D.lay), now(), now() + 1e5); }
+      if (opt === 'B') { D.bp = filt('bandpass', 700, .7, D.lay); noise(D.bp, now(), now() + 1e5); }
+    }
+    if (setKey === 'logo3d') {
+      D.lay = gain(0, D.g);
+      if (opt === 'A') { D.bp = filt('bandpass', 2600, .5, D.lay); noise(D.bp, now(), now() + 1e5); }   /* a soft bed of hiss under the grains */
+      if (opt === 'C') { D.bp = filt('bandpass', 900, 1.2, D.lay); noise(D.bp, now(), now() + 1e5); }
+      if (opt === 'D') { const am = gain(.5, D.lay); osc('square', 31, gain(.5, am.gain), now(), now() + 1e5); D.lp = filt('lowpass', 600, 4, am); D.o = [osc('sawtooth', 98, D.lp, now(), now() + 1e5), osc('sawtooth', 98.7, D.lp, now(), now() + 1e5)]; }
+    }
+    return D;
+  }
+  function domeTick() {
+    if (!/^(touch|breakup|logo3d)$/.test(setKey) || !ctx) return;
+    const S = window.__domeStats;
+    if (!dm || dm.opt !== opt) { if (dm) { const old = dm.g; old.gain.setTargetAtTime(0, now(), .1); setTimeout(() => old.disconnect(), 600); } dm = domeBuild(); }
+    const ct = now(), tn = performance.now();
+    if (!S) { if (dm.lay) dm.lay.gain.setTargetAtTime(0, ct, .2); return; }
+    const pan = Math.max(-1, Math.min(1, S.x * .9));
+    if (setKey === 'touch' && S.speed > .06 && S.hits >= 1) {
+      const gap = Math.max(55, 240 - S.speed * 260);
+      if (tn - dm.lastHit > gap) { dm.lastHit = tn;
+        const vel = Math.min(1, .3 + S.hits / 20) * Math.min(1, .35 + S.speed), idx = Math.max(0, Math.min(PENTA.length - 1, Math.round((S.x + 1) / 2 * (PENTA.length - 1)) + (Math.random() < .3 ? (Math.random() < .5 ? -1 : 1) : 0)));
+        const b = bus(1, opt === 'C' ? .8 : .45, verb, pan), t = ct + .005;
+        if (opt === 'A') bamboo(t, 330 + Math.random() * 170, .8 * vel, b);
+      }
+    }
+    if (setKey === 'breakup') {
+      const sp = S.spread, u = Math.max(0, Math.min(1, (sp - .008) / .04));
+      dm.peak = Math.max(dm.peak * .999, sp);
+      if (opt === 'A') { dm.lay.gain.setTargetAtTime(u * .5, ct, .25); dm.lp.frequency.setTargetAtTime(120 + 260 * u, ct, .2); }
+      if (opt === 'B') { dm.lay.gain.setTargetAtTime(u * .22, ct, .2); dm.bp.frequency.setTargetAtTime(500 + 1100 * u, ct, .2); }
+      if (opt === 'C' && u > .03) grains(ct, Math.round(u * 5), 1200, 3200, .05 * u + .01, pan, dm.g);
+      if (dm.peak > .025 && sp < dm.peak * .45) {   // they have come back together
+        dm.peak = sp; const t = ct + .01;
+        if (opt === 'B') { const g = gain(0, bus(1, .4, verb, pan)), lp = filt('lowpass', 1400, .7, g); env(g, t, .08, .12, .1, .9); noise(lp, t, t + 1.3); lp.frequency.setValueAtTime(1400, t); lp.frequency.exponentialRampToValueAtTime(250, t + 1); }
+      }
+    }
+    if (setKey === 'logo3d') {
+      const w = S.word, u = Math.max(0, Math.min(1, (w - .004) / .03));
+      dm.wpeak = Math.max(dm.wpeak * .999, w);
+      if (opt === 'A') { dm.lay.gain.setTargetAtTime(u * .05, ct, .1); if (u > .02) grains(ct, Math.round(2 + u * 9), 2200, 7500, .06 + .1 * u, pan, dm.g); }
+      if (opt === 'C') { dm.lay.gain.setTargetAtTime(Math.min(1, u * (.4 + S.speed)) * .5, ct, .1); dm.bp.frequency.setTargetAtTime(500 + 2500 * Math.min(1, S.speed), ct, .1); }
+      if (opt === 'D') { dm.lay.gain.setTargetAtTime(u * .25, ct, .1); dm.o[0].frequency.setTargetAtTime(98 * (1 + u), ct, .1); dm.o[1].frequency.setTargetAtTime(98.7 * (1 + u), ct, .1); dm.lp.frequency.setTargetAtTime(300 + 2000 * u, ct, .1); }
+      if (dm.wpeak > .012 && w < dm.wpeak * .35) {   // the letters have re-formed
+        dm.wpeak = w; const b = bus(.9, .7, verb, pan), t = ct + .01;
+        if (opt === 'C') { const g = gain(0, b); env(g, t, .3, .1, .2, 1.5); osc('sine', 261.6, g, t, t + 2.2); osc('sine', 392, gain(.5, g), t, t + 2.2); }
+        if (opt === 'D') { const g = gain(0, b); env(g, t, .02, .2, .1, .6); const o = osc('sawtooth', 196, filt('lowpass', 800, 2, g), t, t + 1); o.frequency.exponentialRampToValueAtTime(98, t + .5); }
+      }
+    }
+  }
+
+  /* ---------------- motion-driven sound: every frame the sound reads where the thing actually is on screen ---------------- */
+  function voice(kind) {
+    const out = bus(1, .25); out.gain.value = 0; const v = { out, kind }, T0 = now(), T1 = T0 + 1e5;
+    if (kind === 'servo') { v.bp = filt('bandpass', 400, 3, out); v.o = osc('sawtooth', 90, crunch(3, v.bp), T0, T1); v.o2 = osc('sawtooth', 135, gain(.25, v.bp), T0, T1); noise(gain(.05, filt('bandpass', 3500, 1.5, out)), T0, T1); }
+    if (kind === 'hum') { v.lp = filt('lowpass', 300, 1.5, out); v.o = osc('sawtooth', 55, crunch(2.5, v.lp), T0, T1); v.o2 = osc('square', 110.5, gain(.3, v.lp), T0, T1); }
+    if (kind === 'sub') { v.lp = filt('lowpass', 140, 1, out); v.o = osc('sine', 40, out, T0, T1); v.o2 = osc('sawtooth', 40, crunch(2, gain(.35, v.lp)), T0, T1); v.sc = gain(0, crunch(1.5, out)); v.bp = filt('bandpass', 800, 12, v.sc); noise(v.bp, T0, T1); }
+    if (kind === 'air') { v.bp = filt('bandpass', 500, 1.1, out); noise(v.bp, T0, T1); }
+    if (kind === 'drone') { v.lp = filt('lowpass', 120, 1, out); [36.7, 55, 73.4].forEach(f => { osc('sawtooth', f, gain(.14, v.lp), T0, T1); osc('sawtooth', f * 1.004, gain(.09, v.lp), T0, T1); }); }
+    return v;
+  }
+  const kill = v => { if (!v) return; v.out.gain.setTargetAtTime(0, now(), .03); setTimeout(() => { try { v.out.disconnect(); } catch (e) {} }, 300); };
+  const TAU = .025;   /* how tightly the sound follows the picture (seconds) */
+  let mo = null;
+  function motionTick(dt) {
+    if (!ctx || !/^(laser|fortyeight|logo)$/.test(setKey)) return;
+    if (!mo || mo.opt !== opt) { if (mo) (mo.v || []).forEach(kill); mo = { opt, v: [], y: 0, w: 0, o: 0, dir: 0, dist: 0, p: 0, moving: 0, x: null, sp: 0 };
+      if (setKey === 'laser') mo.v = [voice(opt === 'A' ? 'servo' : opt === 'B' ? 'hum' : 'sub')];
+      if (setKey === 'fortyeight') mo.v = opt === 'C' ? [voice('drone')] : opt === 'B' ? [voice('sub'), voice('air')] : [voice('sub')];
+      if (setKey === 'logo') mo.v = [voice('air')]; }
+    const ct = now(), L = stopped ? 0 : 1, v = mo.v[0];
+    if (setKey === 'laser') {
+      const b = document.getElementById('lz-bar'), o = b ? (parseFloat(b.style.opacity) || 0) : 0, y = b ? (parseFloat(b.style.top) || 0) : 0, w = b ? (parseFloat(b.style.width) || 0) : 0;
+      if (mo.o < .02 && o > .02) { mo.y = y; mo.w = w; mo.dist = 0; mo.dir = 0; }   /* a new pass starts: no jump */
+      const vy = (y - mo.y) / Math.max(dt, .001), vw = (w - mo.w) / Math.max(dt, .001); mo.y = y; mo.w = w;
+      const sp = Math.min(1, (Math.abs(vy) + Math.abs(vw) * .4) / 260); mo.sp += (sp - mo.sp) * .5; mo.dist += Math.abs(vy) * dt;
+      const prog = Math.min(1, mo.dist / 260);
+      if (opt === 'A') { v.out.gain.setTargetAtTime(L * o * mo.sp * .3, ct, TAU); v.o.frequency.setTargetAtTime(60 + 110 * mo.sp, ct, TAU); v.o2.frequency.setTargetAtTime(90 + 165 * mo.sp, ct, TAU); v.bp.frequency.setTargetAtTime(240 + 700 * mo.sp, ct, TAU); }
+      if (opt === 'B') { v.out.gain.setTargetAtTime(L * o * (.06 + .2 * mo.sp), ct, TAU); v.o.frequency.setTargetAtTime(50 + 30 * prog, ct, TAU); v.o2.frequency.setTargetAtTime(100.5 + 60 * prog, ct, TAU); v.lp.frequency.setTargetAtTime(220 + 1300 * mo.sp, ct, TAU); }
+      if (opt === 'C') { v.out.gain.setTargetAtTime(L * o * (.12 + .25 * mo.sp), ct, TAU); v.sc.gain.setTargetAtTime(mo.sp * .35, ct, TAU); v.bp.frequency.setTargetAtTime(600 + 1300 * prog, ct, TAU); }
+      const dir = Math.abs(vy) > 25 ? Math.sign(vy) : mo.dir;
+      if (o > .5 && mo.dir && dir && dir !== mo.dir && opt === 'A') tick(ct, .12 * L, 2400, bus(1, .2));   /* the bar turns round */
+      mo.dir = dir;
+      if (mo.o > .25 && o < .05) {   /* the bar has just disappeared */
+        if (opt === 'A') clunk(ct, .22 * L, bus(1, .3), 70);
+        if (opt === 'B') hydraulic(ct, .35, .05 * L, bus(1, .3));
+        if (opt === 'C') thoom(ct, .22 * L, bus(1, .4), 66, 38, 1.2);
+      }
+      mo.o = o;
+    }
+    if (setKey === 'fortyeight') {
+      const SV = document.querySelector('#section-view.on'), t3 = SV && SV.querySelector('.mir-title3d .t3');
+      if (!t3) { mo.v.forEach(x => x.out.gain.setTargetAtTime(0, ct, .1)); return; }
+      const pic = t3.closest('.mir-title3d').parentElement.querySelector('.mir-par img, .mir-par canvas, .mir-par'), w = t3.offsetWidth;
+      const S = w && pic ? Math.max(1.001, pic.getBoundingClientRect().width * (1544 / 2400) * .96 / w) : 2, sc = parseFloat(t3.style.scale) || 1;
+      const prog = Math.max(0, Math.min(1, (sc - 1) / (S - 1))), vel = Math.max(0, (prog - mo.p) / Math.max(dt, .001)); mo.p = prog;   /* how far the title has grown, and how fast it is growing right now */
+      const vn = Math.min(1, vel / .7); mo.sp += (vn - mo.sp) * .4;
+      if (opt !== 'C') { v.out.gain.setTargetAtTime(L * (.05 + .45 * mo.sp) * (prog > 0 && prog < .999 ? 1 : 0), ct, prog >= .999 ? .5 : TAU); v.o.frequency.setTargetAtTime(36 + 20 * prog, ct, TAU); v.o2.frequency.setTargetAtTime(36 + 20 * prog, ct, TAU); v.lp.frequency.setTargetAtTime(120 + 300 * mo.sp, ct, TAU); }
+      if (opt === 'B') { const a = mo.v[1]; a.out.gain.setTargetAtTime(L * mo.sp * .14, ct, TAU); a.bp.frequency.setTargetAtTime(300 + 900 * mo.sp, ct, TAU); }
+      if (opt === 'C') { v.out.gain.setTargetAtTime(L * (prog > 0 && prog < .999 ? .3 : 0), ct, prog >= .999 ? 1.2 : .15); v.lp.frequency.setTargetAtTime(110 + 800 * prog, ct, TAU); }
+      if (prog > .995 && mo.moving) { mo.moving = 0; if (opt !== 'C') thoom(ct, .22 * L, bus(1, .4), 58, 36, 1.6); }   /* it has landed */
+      if (prog > .02 && prog < .9) mo.moving = 1;
+    }
+    if (setKey === 'logo') {
+      const lo = document.querySelector('#section-view.on .st-lead .st-logo, #section-view.on .st-logo'); if (!lo) return;
+      const tr = getComputedStyle(lo).translate, x = tr && tr !== 'none' ? parseFloat(tr) || 0 : 0;
+      if (mo.x == null) mo.x = x; const vx = Math.abs(x - mo.x) / Math.max(dt, .001); mo.x = x;
+      const sp = Math.min(1, vx / 1800); mo.sp += (sp - mo.sp) * .5;
+      v.out.gain.setTargetAtTime(L * mo.sp * .4, ct, TAU); v.bp.frequency.setTargetAtTime(380 + 1500 * mo.sp, ct, TAU); v.out.panner.pan.setTargetAtTime(Math.max(-1, Math.min(1, x / 700)), ct, TAU);
+      if (mo.sp > .25) mo.moving = 1;
+      if (mo.moving && mo.sp < .03) { mo.moving = 0; const g = gain(0, filt('lowpass', 700, .7, bus(1, .3))); env(g, ct, .05, .07 * L, 0, .5); noise(g, ct, ct + .7); }   /* it settles */
+    }
+  }
+
+  /* ---------------- hooks from the page ---------------- */
+  window.__sfx = (kind, el) => {
+    if (kind === 'title3d') { (window.__labLog = window.__labLog || []).push('48' + opt); return; }
+    if (!ctx || kind !== 'laser' || setKey !== 'laser' || stopped) return;
+    if (el.classList.contains('mir-top') && el.querySelector('.mir-small')) (window.__labLog = window.__labLog || []).push('laser' + opt);
+  };
+  document.addEventListener('animationstart', e => {
+    if (!ctx) return;
+    if (setKey === 'logo' && e.animationName === 'stLogoDrift') trimmed('logo', () => LOGO[opt](now() + .01));   /* phone: its own entrance, with the sound */
+    if (setKey === 'logo' && /^labLogo/.test(e.animationName)) (window.__labLog = window.__labLog || []).push('logo' + opt);
+  }, true);
+  // desktop logo entrance (lab only): play it when the logo comes into view
+  let logoSeen = new WeakSet();
+  function logoTick() {
+    if (setKey !== 'logo' || innerWidth <= 760) return;
+    const lo = document.querySelector('#section-view.on .st-lead .st-logo, #section-view.on .st-logo'); if (!lo || logoSeen.has(lo)) return;
+    const r = lo.getBoundingClientRect(); if (r.top > innerHeight * .85 || r.bottom < 0 || !ctx) return;
+    logoSeen.add(lo); lo.style.animation = 'none'; void lo.offsetWidth; lo.style.animation = LOGO_CSS[opt] + ' 1.35s cubic-bezier(.2,.75,.25,1) both';
+  }
+
+  /* ---------------- speaker + volume, top right ---------------- */
+  const ICON_ON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
+  const ICON_OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>';
+  const box = document.createElement('div'); box.id = 'lab-snd';
+  box.innerHTML = `<span class="vol"><input type="range" min="0" max="100" value="${vol}" aria-label="Volume"></span><button type="button" aria-label="Sound"></button>`;
+  document.body.appendChild(box);
+  const sBtn = box.querySelector('button'), sVol = box.querySelector('input');
+  const applyLvl = () => { sBtn.innerHTML = level() ? ICON_ON : ICON_OFF; if (out) out.gain.setTargetAtTime(level(), now(), .05); const iv = document.getElementById('vol'); if (iv) { iv.value = vol; iv.dispatchEvent(new Event('input', { bubbles: true })); } };
+  let closeT = 0;
+  sBtn.addEventListener('click', e => { e.stopPropagation(); audio(); if (!box.classList.contains('open')) { box.classList.add('open'); } else { muted = !muted; if (!muted && vol === 0) vol = 50, sVol.value = 50; store.set('muted', muted ? '1' : '0'); applyLvl(); } clearTimeout(closeT); closeT = setTimeout(() => box.classList.remove('open'), 2500); });
+  sVol.addEventListener('input', e => { vol = +sVol.value; muted = vol === 0; store.set('vol', vol); store.set('muted', muted ? '1' : '0'); applyLvl(); clearTimeout(closeT); closeT = setTimeout(() => box.classList.remove('open'), 2500); });
+  ['pointerdown', 'click'].forEach(k => sVol.addEventListener(k, e => e.stopPropagation()));
+  applyLvl();
+
+  /* ---------------- the lab panel ---------------- */
+  const panel = document.createElement('div'); panel.id = 'lab-panel';
+  const others = Object.keys(SETS).map((k, i) => `<a href="SOUND-LAB.html?set=${k}"${k === setKey ? ' class="on"' : ''}>${i + 1}</a>`).join('');
+  panel.innerHTML = `<div class="lab-k">SOUND LAB · ${Object.keys(SETS).indexOf(setKey) + 1} of ${Object.keys(SETS).length}</div><div class="lab-n">${SET.name}</div>
+    <div class="lab-o">${Object.entries(SET.opts).map(([k, d]) => `<button type="button" data-o="${k}"><b>${k}</b><span>${d}</span></button>`).join('')}</div>
+    <div class="lab-r"><button type="button" class="lab-go">${SET.page === 'home' ? '▶ Start sound' : '▶ Start'}</button><button type="button" class="lab-stop">■ Stop</button>${SET.both ? '<button type="button" class="lab-pg" data-p="studio">The Studio</button><button type="button" class="lab-pg" data-p="mirror">The Mirror</button>' : ''}</div>
+    <div class="lab-s">${others}</div>`;
+  document.body.appendChild(panel);
+  ['pointerdown', 'click', 'wheel'].forEach(k => panel.addEventListener(k, e => e.stopPropagation()));
+  const mark = () => panel.querySelectorAll('[data-o]').forEach(b => b.classList.toggle('on', b.dataset.o === opt));
+  mark();
+  let curPage = store.get('page-' + setKey, SET.page);
+  function go(page) {
+    audio(); curPage = page || curPage; store.set('page-' + setKey, curPage);
+    [rings, wv].forEach(o => { if (o && o.g) { const g = o.g; g.gain.setTargetAtTime(0, now(), .05); setTimeout(() => { try { g.disconnect(); } catch (e) {} }, 400); } });
+    if (mo) { (mo.v || []).forEach(kill); mo = null; }
+    rings = null; wv = null; dropBus = null;   /* rebuilt with the chosen option; the old sound is switched off */
+    if (curPage === 'home') { if (setKey === 'logo3d' && window.__scatterWord) { window.__scatterWord(); panel.querySelector('.lab-go').textContent = '▶ Replay the arrival'; } else panel.querySelector('.lab-go').textContent = '♪ Sound is on: move through the dome'; return; }
+    if (window.__jumpTo) {
+      window.__jumpTo(curPage === 'artist' ? 'contact' : 'artist');   /* step away and back, so the page is built fresh and its animations play again */
+      setTimeout(() => { window.__jumpTo(curPage); setTimeout(scrollToTarget, 450); }, 120);
+    }
+    panel.querySelector('.lab-go').textContent = '▶ Play again';
+  }
+  function scrollToTarget() {
+    const SV = document.getElementById('section-view'); if (!SV) return;
+    const sel = { fortyeight: '.mir-title3d', rings: '.mir-hero', wave: 'video.wave-live', drop: '.st-drop-vid', logo: '.st-logo' }[setKey];
+    const el = sel && SV.querySelector(sel); if (!el) return;
+    if (setKey === 'logo' && innerWidth > 760) { const lo = SV.querySelector('.st-logo'); if (lo) lo.style.opacity = '0'; }
+    const tryScroll = (n) => { const e2 = SV.querySelector(sel); if (!e2) return; const r = e2.getBoundingClientRect(); SV.scrollBy({ top: r.top + r.height / 2 - innerHeight / 2, behavior: 'smooth' }); if (n) setTimeout(() => tryScroll(n - 1), 700); };
+    setTimeout(() => tryScroll(1), setKey === 'logo' ? 0 : 900);
+    if (setKey === 'logo') setTimeout(() => { const lo = SV.querySelector('.st-logo'); if (lo) lo.style.opacity = ''; }, 900);
+  }
+  panel.querySelector('.lab-go').addEventListener('click', () => { stopped = false; if (ctx) ctx.resume(); go(); });
+  panel.querySelector('.lab-stop').addEventListener('click', () => { stopped = true; if (ctx) ctx.suspend(); decks.forEach(d => d.pause()); panel.querySelector('.lab-go').textContent = '▶ Play'; });
+  panel.querySelectorAll('.lab-pg').forEach(b => b.addEventListener('click', () => go(b.dataset.p)));
+  panel.querySelectorAll('[data-o]').forEach(b => b.addEventListener('click', () => { stopped = false; if (ctx) ctx.resume(); opt = b.dataset.o; store.set('opt-' + setKey, opt); mark(); go(); }));
+
+  window.__labTest = { LASER, FORTY, LOGO, artHover, artClick, audio, plop, bell, setOpt: o => { opt = o; }, now: () => now() };
+  /* ---------------- one clock for everything ---------------- */
+  let lastT = performance.now();
+  (function tick() {
+    requestAnimationFrame(tick); const t = performance.now(), dt = Math.min(.1, (t - lastT) / 1000); lastT = t;
+    musicTick(dt); if (!ctx) return;
+    ringsTick(); waveTick(); dropTick(); logoTick(); domeTick(); motionTick(dt);
+  })();
+})();
+
+</script>

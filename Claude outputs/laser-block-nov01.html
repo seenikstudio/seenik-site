@@ -1,0 +1,22 @@
+<script src="space-img/laser-data.js"></script>
+<script>
+/* Nov 1 SOUND (desktop only): the laser on the two top titles (The Studio, The Mirror) plays Sandy's laser scan.
+   It follows the light itself: the first part (slowed) while the bar travels down, the last part from the moment it turns and rises, faded out as the light goes. */
+(function () {
+  if (innerWidth <= 760 || !window.SN_LASER) return;
+  let bufs = null, cur = null, lastY = 0, lastO = 0, dir = 0;
+  const load = ctx => { if (bufs) return; bufs = {}; ['down', 'up'].forEach(k => { const raw = atob(SN_LASER[k]), u = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) u[i] = raw.charCodeAt(i); ctx.decodeAudioData(u.buffer, d => { bufs[k] = d; }, () => {}); }); };
+  const play = (ctx, out, k, t) => { if (!bufs || !bufs[k]) return null; const s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = bufs[k]; s.connect(g); g.connect(out); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.9, t + .03); s.start(t); (window.__snLog = window.__snLog || []).push(k + '@' + Math.round(performance.now())); return { s, g }; };
+  const stop = (v, t, d) => { if (!v) return; const p = v.g.gain; p.cancelScheduledValues(t); p.setValueAtTime(p.value, t); p.linearRampToValueAtTime(0, t + d); try { v.s.stop(t + d + .05); } catch (e) {} };
+  (function f() { requestAnimationFrame(f);
+    const A = window.__snSfx, ctx = A && A.ctx(), b = document.getElementById('lz-bar'), on = b && b.parentElement && b.parentElement.classList.contains('mir-top');
+    const o = on ? (parseFloat(b.style.opacity) || 0) : 0, y = on ? (parseFloat(b.style.top) || 0) : 0;
+    if (!ctx || ctx.state !== 'running') { lastO = o; lastY = y; return; }
+    load(ctx); const t = ctx.currentTime, out = A.out();
+    if (lastO < .02 && o > .02) { stop(cur, t, .03); cur = play(ctx, out, 'down', t); dir = 1; }   /* the light appears and starts down */
+    else if (o > .02 && dir === 1 && y < lastY - .5) { stop(cur, t, .06); cur = play(ctx, out, 'up', t); dir = -1; }   /* it turns and rises */
+    if (lastO > .2 && o < .02) { stop(cur, t, .12); cur = null; dir = 0; }   /* the light is gone */
+    lastO = o; lastY = y;
+  })();
+})();
+</script>

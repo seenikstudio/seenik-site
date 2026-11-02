@@ -1,0 +1,33 @@
+<script>
+/* Nov 1 SOUND (desktop only): The Mirror's mountain, forest and water wave — a quiet tide that rolls in as the wave rises,
+   peaks with it and draws out as it flattens, with a deep swell under the peak. Locked to the video's own clock; only while you can see it. */
+(function () {
+  if (innerWidth <= 760) return;
+  let W = null;
+  function build(ctx, out) {
+    W = { g: ctx.createGain() }; W.g.gain.value = 0; W.g.connect(out);
+    const m = ctx.sampleRate * 8, buf = ctx.createBuffer(2, m, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) { const e = buf.getChannelData(c); let l = 0; for (let i = 0; i < m; i++) { l = (l + .02 * (Math.random() * 2 - 1)) / 1.02; e[i] = l * 3.5; } }
+    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+    W.sea = ctx.createGain(); W.sea.gain.value = 0; W.sea.connect(W.g);
+    W.lp = ctx.createBiquadFilter(); W.lp.type = 'lowpass'; W.lp.frequency.value = 500; W.lp.Q.value = .5; W.lp.connect(W.sea); src.connect(W.lp); src.start();
+    W.sub = ctx.createGain(); W.sub.gain.value = 0; W.sub.connect(W.g);
+    const o = ctx.createOscillator(); o.frequency.value = 46; o.connect(W.sub); o.start();
+    const lp2 = ctx.createBiquadFilter(); lp2.type = 'lowpass'; lp2.frequency.value = 140; const s2 = ctx.createGain(); s2.gain.value = .3; lp2.connect(s2); s2.connect(W.sub);
+    const o2 = ctx.createOscillator(); o2.type = 'sawtooth'; o2.frequency.value = 46; o2.connect(lp2); o2.start();
+  }
+  (function f() { requestAnimationFrame(f);
+    const A = window.__snSfx, ctx = A && A.ctx(); if (!ctx || ctx.state !== 'running') return;
+    const v = document.querySelector('#section-view.on video.wave-live');
+    if (!v) { if (W) W.g.gain.setTargetAtTime(0, ctx.currentTime, .3); return; }
+    if (!W) build(ctx, A.out());
+    const r = v.getBoundingClientRect(), seen = (Math.min(innerHeight, r.bottom) - Math.max(0, r.top)) / Math.max(1, r.height), cy = r.top + r.height * .5;
+    const see = seen > .6 && cy > innerHeight * .1 && cy < innerHeight * .9 && !v.paused && !document.hidden && document.hasFocus();   /* only when you can see it */
+    const ct = ctx.currentTime, D = v.duration || 9.97, tau = v.currentTime || 0;
+    W.g.gain.setTargetAtTime(see ? 1 : 0, ct, .3);
+    const u = tau >= 8 ? Math.pow((tau - 8) / (D - 8), 1.6) : tau < 2.2 ? Math.pow(1 - tau / 2.2, 1.4) : 0;   /* the wave's size: rising 8 s to the loop point, biggest there, flat by 2.2 s */
+    W.sea.gain.setTargetAtTime(.015 + .18 * u, ct, .25); W.lp.frequency.setTargetAtTime(380 + 1500 * u, ct, .25);
+    W.sub.gain.setTargetAtTime(.25 * u * u, ct, .2);
+  })();
+})();
+</script>

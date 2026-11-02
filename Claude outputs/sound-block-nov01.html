@@ -1,0 +1,59 @@
+<style>
+/* Nov 1 SOUND: desktop only — The Studio's logo slides in from the right as the page opens */
+@media (min-width: 761px) {
+  @keyframes snLogoIn { from { translate: 55vw 0; opacity: 0; } 70% { opacity: 1; } to { translate: 0 0; opacity: 1; } }
+  #section-view.on .st-lead .st-logo.sn-in { animation: snLogoIn 1.35s cubic-bezier(.2,.75,.25,1) both; }
+}
+</style>
+<script>
+/* Nov 1 SOUND (desktop only): the Studio logo's swoosh follows its slide frame by frame and settles with it;
+   The Artist titles: a crisp relay click on hover, a heavy latch on click. Follows the site speaker + volume. */
+(function () {
+  if (innerWidth <= 760) return;
+  let ctx = null, out = null, nb = null;
+  const level = () => { const v = document.getElementById('vol'), b = document.getElementById('snd'); const muted = b && b.getAttribute('aria-label') === 'Unmute'; return muted ? 0 : (v ? +v.value / 100 : .5); };
+  function audio() {
+    if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+      out = ctx.createGain(); out.connect(ctx.destination);
+      const n = ctx.sampleRate * 2; nb = ctx.createBuffer(1, n, ctx.sampleRate); const d = nb.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; }
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    out.gain.setTargetAtTime(level(), ctx.currentTime, .05);
+    return ctx;
+  }
+  addEventListener('pointerdown', () => audio(), { capture: true, passive: true });
+  document.addEventListener('input', e => { if (e.target && e.target.id === 'vol' && ctx) out.gain.setTargetAtTime(level(), ctx.currentTime, .05); }, true);
+  document.addEventListener('click', e => { if (e.target && e.target.closest && e.target.closest('#snd') && ctx) setTimeout(() => out.gain.setTargetAtTime(level(), ctx.currentTime, .05), 0); }, true);
+  const G = (v, dest) => { const g = ctx.createGain(); g.gain.value = v; g.connect(dest); return g; };
+  const F = (type, f, q, dest) => { const b = ctx.createBiquadFilter(); b.type = type; b.frequency.value = f; b.Q.value = q; b.connect(dest); return b; };
+  const N = (dest, t0, t1) => { const s = ctx.createBufferSource(); s.buffer = nb; s.loop = true; s.connect(dest); s.start(t0, Math.random()); if (t1) s.stop(t1); return s; };
+  const O = (type, f, dest, t0, t1) => { const o = ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t0); o.connect(dest); o.start(t0); o.stop(t1); return o; };
+  const E = (g, t, a, peak, rel) => { const p = g.gain; p.setValueAtTime(.0001, t); p.linearRampToValueAtTime(peak, t + a); p.exponentialRampToValueAtTime(.0001, t + a + rel); };
+  function clunk(t, amp, f) {   /* a mechanical latch: low body thump + short metal resonances that don't ring on */
+    const g = G(0, out); E(g, t, .002, amp, .14); O('sine', f * 1.6, g, t, t + .25).frequency.exponentialRampToValueAtTime(f * .7, t + .09);
+    [[950, 18, .5], [2300, 22, .3], [4100, 25, .18]].forEach(([fr, q, a]) => { const k = G(0, out); E(k, t, .001, amp * a, .07); N(F('bandpass', fr, q, k), t, t + .12); });
+    const c = G(0, F('highpass', 2500, .7, out)); E(c, t, .0005, amp * .5, .012); N(c, t, t + .03);
+  }
+  function thoom(t, amp) { const g = G(0, out); E(g, t, .02, amp, .8); O('sine', 64, g, t, t + 1).frequency.exponentialRampToValueAtTime(40, t + .5); }
+  function tick(t, amp, f) { const k = G(0, out); E(k, t, .0005, amp, .02); N(F('bandpass', f, 9, k), t, t + .035); const b = G(0, out); E(b, t, .001, amp * .4, .03); O('sine', f / 9, b, t, t + .05); }
+
+  /* The Artist: Film Work, Digital Media, Art & Photography */
+  document.addEventListener('pointerover', e => { const f = e.target.closest && e.target.closest('#artist-view .frame'); if (!f || f.contains(e.relatedTarget) || !audio()) return; const t = ctx.currentTime + .005; tick(t, .35, 2200); tick(t + .032, .22, 1800); }, true);
+  document.addEventListener('click', e => { const f = e.target.closest && e.target.closest('#artist-view .frame'); if (!f || !audio()) return; const t = ctx.currentTime + .005; clunk(t, .8, 52); thoom(t, .3); }, true);
+
+  /* The Studio logo: start the slide when the page opens; the air follows the logo's real position every frame */
+  let seen = new WeakSet(), air = null, lastX = null, sp = 0, moving = 0, last = performance.now();
+  (function f(now) { requestAnimationFrame(f);
+    const dt = Math.min(.1, (now - last) / 1000) || .016; last = now;
+    const lo = document.querySelector('#section-view.on .st-lead .st-logo'); if (!lo) { lastX = null; return; }
+    if (!seen.has(lo)) { seen.add(lo); lastX = null; if (!matchMedia('(prefers-reduced-motion: reduce)').matches) { lo.classList.add('sn-in'); lo.addEventListener('animationend', e => { if (e.animationName === 'snLogoIn') lo.classList.remove('sn-in'); }); } }   /* the class comes off after, so Send's pulse still works */
+    if (!ctx || ctx.state !== 'running') return;
+    if (!air) { air = { g: G(0, out), p: ctx.createStereoPanner() }; air.p.connect(air.g); air.bp = F('bandpass', 500, 1.1, air.p); N(air.bp, ctx.currentTime); }
+    const tr = getComputedStyle(lo).translate, x = tr && tr !== 'none' ? parseFloat(tr) || 0 : 0;
+    if (lastX == null) lastX = x; const v = Math.abs(x - lastX) / dt; lastX = x;
+    sp += (Math.min(1, v / 1800) - sp) * .5; const ct = ctx.currentTime;
+    air.g.gain.setTargetAtTime(sp * .4, ct, .025); air.bp.frequency.setTargetAtTime(380 + 1500 * sp, ct, .025); air.p.pan.setTargetAtTime(Math.max(-1, Math.min(1, x / 700)), ct, .025);
+    if (sp > .25) moving = 1;
+    if (moving && sp < .03) { moving = 0; const g = G(0, F('lowpass', 700, .7, out)); E(g, ct, .05, .07, .5); N(g, ct, ct + .7); }   /* it settles */
+  })(performance.now());
+})();
+</script>

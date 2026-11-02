@@ -1,0 +1,39 @@
+<script>
+/* Nov 1 SOUND (desktop only): The Mirror's eye — a low turbine bed, and each light circling the eye is a blade of air travelling round with it
+   (measured from the eye picture's traced rings: their speed, direction and where each ring is drawn). Kept quiet; only while you can see the eye. */
+(function () {
+  if (innerWidth <= 760) return;
+  const RINGS = [
+    { rk: 41, spd: .21, dir: 1, f: 1700, cov: [.99,.15,.27,.93,.94,.93,.95,.66,.41,.94,1,.91,.83,.88,.99,.76,0,.45,.93,.98,.74,.41,.38,.01,.25,0,.35,0,.06,.25,0,.14,.29,.66,.88,.94] },
+    { rk: 40, spd: .16, dir: -1, f: 1050, cov: [0,0,0,0,0,0,0,0,0,0,.01,.03,.05,.02,0,0,0,0,0,.21,.69,.82,.38,.43,.34,.09,.06,.09,.11,.33,.61,.84,1,.82,.29,0] },
+    { rk: 55, spd: .16, dir: 1, f: 650, cov: [.91,1,1,.97,1,.97,.94,.85,.88,.62,.01,0,0,0,0,0,.02,.7,.8,.87,.84,.83,.76,.64,.74,.73,.79,.81,.73,.7,.67,.79,.84,.87,.85,.81] } ];
+  const lit = (cov, turn) => { const x = (((turn % 1) + 1) % 1) * 36, i0 = Math.floor(x) % 36, i1 = (i0 + 1) % 36, u = x - Math.floor(x); return cov[i0] * (1 - u) + cov[i1] * u; };
+  const LEVEL = .55;   /* not too loud */
+  let E = null;
+  function build(ctx, out) {
+    E = { g: ctx.createGain(), heads: [] }; E.g.gain.value = 0; E.g.connect(out);
+    const n = ctx.sampleRate * 2, nb = ctx.createBuffer(1, n, ctx.sampleRate), d = nb.getChannelData(0); for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    const ws = ctx.createWaveShaper(), c = new Float32Array(1024); for (let i = 0; i < 1024; i++) { const x = i / 1023 * 2 - 1; c[i] = Math.tanh(2 * x) / Math.tanh(2); } ws.curve = c;
+    const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 260; lp.Q.value = 1.2; lp.connect(E.g);   /* the turbine bed */
+    const g1 = ctx.createGain(); g1.gain.value = .12; g1.connect(ws); ws.connect(lp); const g2 = ctx.createGain(); g2.gain.value = .12; g2.connect(lp);
+    [[44, g1], [44.3, g2]].forEach(([fq, dst]) => { const o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = fq; o.connect(dst); o.start(); });
+    RINGS.forEach(rg => [0, .5].forEach(hf => {   /* two lights per ring, opposite each other (the second dimmer) */
+      const p = ctx.createStereoPanner(); p.connect(E.g); const g = ctx.createGain(); g.gain.value = 0; g.connect(p);
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = rg.f; bp.Q.value = 4; bp.connect(g);
+      const s = ctx.createBufferSource(); s.buffer = nb; s.loop = true; s.connect(bp); s.start(0, Math.random() * 1.5);
+      E.heads.push({ rg, hf, p, g, bp }); }));
+  }
+  (function f() { requestAnimationFrame(f);
+    const A = window.__snSfx, ctx = A && A.ctx(); if (!ctx || ctx.state !== 'running' || window.__eyeT0 == null) return;
+    const h = document.querySelector('#section-view.on .mir-hero .mir-par');
+    if (!h) { if (E) E.g.gain.setTargetAtTime(0, ctx.currentTime, .3); return; }
+    if (!E) build(ctx, A.out());
+    const r = h.getBoundingClientRect(), v = Math.max(0, Math.min(innerHeight, r.bottom) - Math.max(0, r.top)) / Math.max(1, Math.min(innerHeight, r.height));
+    const vis = document.hidden || !document.hasFocus() ? 0 : Math.max(0, Math.min(1, (v - .35) / .4));   /* only while you can see the eye */
+    const T = (performance.now() - window.__eyeT0) / 1000, ct = ctx.currentTime;
+    E.g.gain.setTargetAtTime(vis * LEVEL, ct, .3);
+    E.heads.forEach(k => { const turn = k.rg.dir * (T * k.rg.spd - k.rg.rk * .37) + k.hf, a = 2 * Math.PI * turn, L = lit(k.rg.cov, turn) * (k.hf ? .7 : 1), top = .5 - .5 * Math.sin(a);   /* exactly where the eye draws this light */
+      k.p.pan.setTargetAtTime(Math.cos(a) * .9, ct, .03); k.g.gain.setTargetAtTime(L * .16, ct, .05); k.bp.frequency.setTargetAtTime(k.rg.f * (.7 + .5 * top), ct, .05); });
+  })();
+})();
+</script>
