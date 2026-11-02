@@ -5654,7 +5654,7 @@ function elSetVol(v, x) { if (EL_IOS && location.protocol !== 'file:') { try {
   v.volume = Math.max(0, Math.min(1, x)); }
 function elStop() { document.querySelectorAll('.el-vids video').forEach(v => { v.pause(); v.__go = false; }); elVs = null; elVis = false; }
 (function elTick() { requestAnimationFrame(elTick); const vs = elVs; if (!vs || vs[0].paused) return;
-  const lvl = window.__sndLevel == null ? 0.5 : window.__sndLevel, target = elVis ? Math.min(1, lvl) : 0;   /* the speaker's level: 50 on the slider = half volume */ const nowT = performance.now(), dtS = Math.min(0.25, (nowT - (elTick.t || nowT)) / 1000); elTick.t = nowT; elVol += (target - elVol) * (1 - Math.exp(-dtS * 3));   /* about a 1 s fade, whatever the frame rate */ if (Math.abs(target - elVol) < 0.003) elVol = target; elSetVol(vs[0], Math.max(0, Math.min(1, elVol)));
+  const lvl = window.__sndLevel == null ? 0.5 : window.__sndLevel, target = elVis ? Math.min(1, lvl) * 0.6 : 0;   /* Nov 2: beat at 30% (60% of the speaker's 50) */   /* the speaker's level: 50 on the slider = half volume */ const nowT = performance.now(), dtS = Math.min(0.25, (nowT - (elTick.t || nowT)) / 1000); elTick.t = nowT; elVol += (target - elVol) * (1 - Math.exp(-dtS * 3));   /* about a 1 s fade, whatever the frame rate */ if (Math.abs(target - elVol) < 0.003) elVol = target; elSetVol(vs[0], Math.max(0, Math.min(1, elVol)));
   const D = vs[0].duration || 22.5225, t0 = vs[0].currentTime;
   for (let k = 1; k < vs.length; k++) { const v = vs[k]; if (v.paused || !v.duration) continue; let d = t0 - v.currentTime; if (d > D / 2) d -= D; if (d < -D / 2) d += D;
     v.playbackRate = Math.abs(d) < 0.01 ? 1 : 1 + Math.max(-0.05, Math.min(0.05, d * 0.5)); } })();
@@ -5911,8 +5911,7 @@ function elStop() { document.querySelectorAll('.el-vids video').forEach(v => { v
 <script>
 /* Nov 1 SOUND (desktop only): the Studio logo's swoosh follows its slide frame by frame and settles with it;
    The Artist titles: a crisp relay click on hover, a heavy latch on click. Follows the site speaker + volume. */
-(function () {
-  if (innerWidth <= 760) return;
+(function () {   /* Nov 2: phone gets these sounds too */
   let ctx = null, out = null, nb = null;
   const level = () => { const v = document.getElementById('vol'), b = document.getElementById('snd'); const muted = b && b.getAttribute('aria-label') === 'Unmute'; return muted ? 0 : (v ? +v.value / 100 : .5); };
   function audio() {
@@ -5970,7 +5969,7 @@ function elStop() { document.querySelectorAll('.el-vids video').forEach(v => { v
 /* Nov 1 SOUND (desktop only): the laser on the two top titles (The Studio, The Mirror) plays Sandy's laser scan.
    It follows the light itself: the first part (slowed) while the bar travels down, the last part from the moment it turns and rises, faded out as the light goes. */
 (function () {
-  if (innerWidth <= 760 || !window.SN_LASER) return;
+  if (!window.SN_LASER) return;
   let bufs = null, cur = null, lastY = 0, lastO = 0, dir = 0;
   const load = ctx => { if (bufs) return; bufs = {}; ['down', 'up'].forEach(k => { const raw = atob(SN_LASER[k]), u = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) u[i] = raw.charCodeAt(i); ctx.decodeAudioData(u.buffer, d => { bufs[k] = d; }, () => {}); }); };
   const play = (ctx, out, k, t) => { if (!bufs || !bufs[k]) return null; const s = ctx.createBufferSource(), g = ctx.createGain(); s.buffer = bufs[k]; s.connect(g); g.connect(out); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.9, t + .03); s.start(t); (window.__snLog = window.__snLog || []).push(k + '@' + Math.round(performance.now())); return { s, g }; };
@@ -5990,8 +5989,7 @@ function elStop() { document.querySelectorAll('.el-vids video').forEach(v => { v
 <script>
 /* Nov 1 SOUND (desktop only): The Studio's water drop — real water-drop sounds into a pool: big, smaller, tiny, one each time a drop lands
    (0.72 s, 3.10 s, 4.88 s into the loop), and only while you can see it. */
-(function () {
-  if (innerWidth <= 760) return;
+(function () {   /* Nov 2: phone gets these sounds too */
   const HITS = [[.72, 1], [3.10, .5], [4.88, .2]], fired = [0, 0, 0];
   let bus = null, nb = null;
   (function f() { requestAnimationFrame(f);
@@ -6021,8 +6019,7 @@ function elStop() { document.querySelectorAll('.el-vids video').forEach(v => { v
 <script>
 /* Nov 1 SOUND (desktop only): The Mirror's mountain, forest and water wave — a quiet tide that rolls in as the wave rises,
    peaks with it and draws out as it flattens, with a deep swell under the peak. Locked to the video's own clock; only while you can see it. */
-(function () {
-  if (innerWidth <= 760) return;
+(function () {   /* Nov 2: phone gets these sounds too */
   let W = null;
   function build(ctx, out) {
     W = { g: ctx.createGain() }; W.g.gain.value = 0; W.g.connect(out);
@@ -6054,8 +6051,7 @@ function elStop() { document.querySelectorAll('.el-vids video').forEach(v => { v
 <script>
 /* Nov 1 SOUND (desktop only): The Mirror's eye — a low turbine bed, and each light circling the eye is a blade of air travelling round with it
    (measured from the eye picture's traced rings: their speed, direction and where each ring is drawn). Kept quiet; only while you can see the eye. */
-(function () {
-  if (innerWidth <= 760) return;
+(function () {   /* Nov 2: phone gets these sounds too */
   const RINGS = [
     { rk: 41, spd: .21, dir: 1, f: 1700, cov: [.99,.15,.27,.93,.94,.93,.95,.66,.41,.94,1,.91,.83,.88,.99,.76,0,.45,.93,.98,.74,.41,.38,.01,.25,0,.35,0,.06,.25,0,.14,.29,.66,.88,.94] },
     { rk: 40, spd: .16, dir: -1, f: 1050, cov: [0,0,0,0,0,0,0,0,0,0,.01,.03,.05,.02,0,0,0,0,0,.21,.69,.82,.38,.43,.34,.09,.06,.09,.11,.33,.61,.84,1,.82,.29,0] },
@@ -6094,8 +6090,7 @@ function elStop() { document.querySelectorAll('.el-vids video').forEach(v => { v
 <script>
 /* Nov 1 SOUND (desktop only): THE MIRROR title — the Enigmatic Intro Transition starts the moment the title starts coming toward you,
    swells as it grows and settles after it lands; a soft glow and star sparkle swell with it, burst outward on landing, then settle away. */
-(function () {
-  if (innerWidth <= 760) return;
+(function () {   /* Nov 2: phone gets these sounds too */
   let buf = null, src = null, t3 = null, landT = null, moving = 0, cv = null, X = null, P = [], burst = 0, last = performance.now() / 1000;
   addEventListener('sn-title3d', () => {   /* the title has just started */
     const A = window.__snSfx, ctx = A && A.ctx(); landT = null; moving = 1; burst = 0;   /* it is on its way */
