@@ -75,6 +75,10 @@
   .top-actions .vol { position: absolute; right: calc(100% + 10px); top: 50%; transform: translateY(-50%); width: 0; opacity: 0; overflow: hidden; transition: width .3s, opacity .3s; display: flex; align-items: center; }
   .top-actions .vol input { width: 80px; accent-color: #f2f4f7; }
   @media (hover: hover) { .top-actions .sndwrap:hover .vol { width: 84px; opacity: 1; } }
+  @media (max-width: 760px) {   /* Nov 4: phone — the speaker is pinned top-right on every page so it can always be tapped */
+    .top-actions .sndwrap { position: fixed; top: calc(14px + env(safe-area-inset-top, 0px)); right: 14px; z-index: 60; }
+    .top-actions #snd { background: rgba(0,0,0,.55); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  }
   #skip-intro { cursor: pointer; font: 400 11px/1 var(--mono); letter-spacing: .22em; text-transform: uppercase; color: var(--fg); background: transparent;
     border: 1px solid rgba(255,255,255,.4) !important; border-radius: 999px; padding: 10px 16px; transition: border-color .3s; }
   #skip-intro:hover { border-color: var(--fg) !important; }
@@ -2797,7 +2801,7 @@ html body #section-view .mir-credit.gx-credit { display: none !important; }   /*
   function applySound() {
     const v = soundLevel();
     if (outGain) outGain.gain.value = v; else { try { music.volume = v; } catch (e) {} }
-    window.__sndLevel = v;   // Nov 2: the elementals' beat follows this speaker too
+    window.__sndLevel = v; try { music.muted = v === 0; } catch (e) {}   /* Nov 4: mute = truly silent, phones too */   // Nov 2: the elementals' beat follows this speaker too
     sndBtn.innerHTML = v === 0 ? SND_OFF : SND_ON; sndBtn.setAttribute('aria-label', v === 0 ? 'Unmute' : 'Mute');
   }
   const replayBtn = document.getElementById('replay');
@@ -5653,10 +5657,21 @@ function elSetVol(v, x) { if (EL_IOS && location.protocol !== 'file:') { try {
       elGain.gain.value = x; v.volume = 1; return; } catch (e) {} }
   v.volume = Math.max(0, Math.min(1, x)); }
 function elStop() { document.querySelectorAll('.el-vids video').forEach(v => { v.pause(); v.__go = false; }); elVs = null; elVis = false; }
-(function elTick() { requestAnimationFrame(elTick); const vs = elVs; if (!vs || vs[0].paused) return;
-  const lvl = window.__sndLevel == null ? 0.5 : window.__sndLevel, target = elVis ? Math.min(1, lvl) * 0.6 : 0;   /* Nov 2: beat at 30% (60% of the speaker's 50) */   /* the speaker's level: 50 on the slider = half volume */ const nowT = performance.now(), dtS = Math.min(0.25, (nowT - (elTick.t || nowT)) / 1000); elTick.t = nowT; elVol += (target - elVol) * (1 - Math.exp(-dtS * 3));   /* about a 1 s fade, whatever the frame rate */ if (Math.abs(target - elVol) < 0.003) elVol = target; elSetVol(vs[0], Math.max(0, Math.min(1, elVol)));
-  const D = vs[0].duration || 22.5225, t0 = vs[0].currentTime;
-  for (let k = 1; k < vs.length; k++) { const v = vs[k]; if (v.paused || !v.duration) continue; let d = t0 - v.currentTime; if (d > D / 2) d -= D; if (d < -D / 2) d += D;
+(function elTick() { requestAnimationFrame(elTick); const vs = elVs; if (!vs) return;
+  /* Nov 4: the beat really STOPS (pauses) when the four are off screen, when you leave The Mirror, when the page is hidden and when the speaker is muted —
+     phones ignore volume, so pausing is the only sure stop. It fades in (1 s) when they come back. A silent video is the clock that keeps all four together */
+  const snd = vs[0], clk = vs.length > 1 ? vs[1] : vs[0];
+  const lvl = window.__sndLevel == null ? 0.5 : window.__sndLevel, want = elVis && !document.hidden && lvl > 0, target = want ? Math.min(1, lvl) * 0.6 : 0;
+  const nowT = performance.now(), dtS = Math.min(0.25, (nowT - (elTick.t || nowT)) / 1000); elTick.t = nowT;
+  if (want && snd.paused && !clk.paused && !snd.seeking) { elVol = 0; try { snd.currentTime = clk.currentTime; } catch (e) {} snd.muted = false; const q = snd.play(); if (q) q.catch(() => {}); }
+  elVol += (target - elVol) * (1 - Math.exp(-dtS * 3)); if (Math.abs(target - elVol) < 0.003) elVol = target;
+  if (!snd.paused) elSetVol(snd, Math.max(0, Math.min(1, elVol)));
+  if (!want && !snd.paused && (elVol < 0.02 || lvl === 0 || document.hidden || EL_IOS)) { if (EL_IOS && elVol > 0.02 && lvl > 0 && !document.hidden) { /* iPhone: let the 1 s fade try first */ if (!snd.__offT) snd.__offT = nowT; if (nowT - snd.__offT > 1000) { snd.pause(); snd.__offT = 0; } } else { snd.pause(); snd.__offT = 0; } }
+  if (want) snd.__offT = 0;
+  if (clk.paused || !clk.duration) return;
+  const D = clk.duration || 22.5225, t0 = clk.currentTime;
+  for (let k = 0; k < vs.length; k++) { const v = vs[k]; if (v === clk || v.paused || !v.duration || v.seeking) continue; let d = t0 - v.currentTime; if (d > D / 2) d -= D; if (d < -D / 2) d += D;
+    if (Math.abs(d) > 0.5) { if (!v.__snapT || nowT - v.__snapT > 1500) { v.__snapT = nowT; try { v.currentTime = t0 + 0.05; } catch (e) {} } continue; }
     v.playbackRate = Math.abs(d) < 0.01 ? 1 : 1 + Math.max(-0.05, Math.min(0.05, d * 0.5)); } })();
 (function elPhone() { requestAnimationFrame(elPhone); if (innerWidth > 760) return;   /* Nov 2: phone — the 2x2 elementals start together with the beat on The Mirror, stop when it closes */
   const SV = document.querySelector('#section-view.on'), f = SV ? [...SV.querySelectorAll('.fr.mir-wide')].find(x => x.querySelector('.el4 video')) : null;
